@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/myFavicon.png">
+  <link rel="mask-icon" href="/images/myFavicon.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。 什么是 SSMSSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：表现层 SpringMVC：接受用户参数，显示页面。业务层 Spring：处理业务逻辑。持久层 MyBatis：操作数据库。  从上图我们可以看到三层模型之间的依赖关系，并且 Sp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSM 整合">
+<meta property="og:url" content="http://yoursite.com/2020/02/19/blog2/index.html">
+<meta property="og:site_name" content="Jieb&#39;s website">
+<meta property="og:description" content="我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。 什么是 SSMSSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：表现层 SpringMVC：接受用户参数，显示页面。业务层 Spring：处理业务逻辑。持久层 MyBatis：操作数据库。  从上图我们可以看到三层模型之间的依赖关系，并且 Sp">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/blog2/SSM.png">
+<meta property="og:image" content="http://yoursite.com/images/blog2/structure.png">
+<meta property="article:published_time" content="2020-02-19T02:06:28.000Z">
+<meta property="article:modified_time" content="2020-02-20T04:26:00.744Z">
+<meta property="article:author" content="Jieb">
+<meta property="article:tag" content="spring">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/blog2/SSM.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/19/blog2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>SSM 整合 | Jieb's website</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Jieb's website" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jieb's website</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-toolbox">
+
+    <a href="/toolbox/" rel="section"><i class="fa fa-fw fa-wrench"></i>工具箱</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-code"></i>项目</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/19/blog2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/myAvatar.jpg">
+      <meta itemprop="name" content="Jieb">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jieb's website">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSM 整合
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-19 10:06:28" itemprop="dateCreated datePublished" datetime="2020-02-19T10:06:28+08:00">2020-02-19</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
+<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
+<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
+<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
+
+<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
+<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
+<p>编写 AccountDao 接口，实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
+
+<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
+<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #555;font-size:14px;">-------------The End-------------</div>
+    
+</div>
+      
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"># spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/14/blog1/" rel="prev" title="欢迎来到我的网站">
+      <i class="fa fa-chevron-left"></i> 欢迎来到我的网站
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/20/blog3/" rel="next" title="Selenium IDE 的简单使用">
+      Selenium IDE 的简单使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是-SSM"><span class="nav-number">1.</span> <span class="nav-text">什么是 SSM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境搭建"><span class="nav-number">2.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-MySQL-创建-account-表"><span class="nav-number">2.1.</span> <span class="nav-text">使用 MySQL 创建 account 表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目结构"><span class="nav-number">2.2.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Maven-导入项目所需依赖-JAR-包"><span class="nav-number">2.3.</span> <span class="nav-text">使用 Maven 导入项目所需依赖 JAR 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编码"><span class="nav-number">2.4.</span> <span class="nav-text">编码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#整合部分"><span class="nav-number">3.</span> <span class="nav-text">整合部分</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring"><span class="nav-number">3.1.</span> <span class="nav-text">Spring</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-整合-MyBatis"><span class="nav-number">3.2.</span> <span class="nav-text">Spring 整合 MyBatis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringMVC"><span class="nav-number">3.3.</span> <span class="nav-text">SpringMVC</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jieb"
+      src="/images/myAvatar.jpg">
+  <p class="site-author-name" itemprop="name">Jieb</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jiebupup" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jiebupup" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jieb</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
