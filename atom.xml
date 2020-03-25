@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-02T11:10:00.642Z</updated>
+  <updated>2020-03-25T16:06:57.141Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,17 +21,16 @@
     <link href="http://yoursite.com/2020/03/01/blog4/"/>
     <id>http://yoursite.com/2020/03/01/blog4/</id>
     <published>2020-03-01T03:06:28.000Z</published>
-    <updated>2020-03-02T11:10:00.642Z</updated>
+    <updated>2020-03-25T16:06:57.141Z</updated>
     
     <content type="html"><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p><h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p><p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p><img src="/images/blog4/java.svg" width="30%" /><h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p><p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p><p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p><p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p><p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p><p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p><p>1.lambda 表达式和函数式接口</p><p>2.Optional</p><p>3.Stream</p><p>4.新的日期和时间 API</p><p>5.接口的默认方法</p><p>6.多重注解</p><p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p><h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p><p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p><p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p><img src="/images/blog4/linux.png" width="30%" /><p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p><p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p><h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p><p>网络部分还有两个重点：UNP 和 HTTP。</p><p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p><p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p><h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p><p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p><h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p><img src="/images/blog4/mysql.png" width="30%" /><p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p><h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p><img src="/images/blog4/redis.png" width="30%" /><p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p><h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过，<a href="">SSM 整合</a>。</p><img src="/images/blog4/spring.png" width="30%" /><p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p><p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p><p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p><h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p><p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p><img src="/images/blog4/dubbo.png" width="10%" /><p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p><p>Elasticsearch 是基于 Lucene 的搜索引擎。</p><img src="/images/blog4/elasticsearch.png" width="30%" /><p>Hystrix 资源隔离、降级和熔断。</p><img src="/images/blog4/hystrix.png" width="30%" /><p>Nginx 反向代理和负载均衡服务器。</p><img src="/images/blog4/nginx.png" width="30%" /><p>ZooKeeper 配置和管理分布式组件。</p><img src="/images/blog4/zookeeper.jpeg" width="30%" /><p>RocketMQ 和 Kafka 分布式架构的消息队列。</p><p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p><h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p><img src="/images/blog4/docker.png" width="30%" /><p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p><img src="/images/blog4/git.png" width="30%" /><img src="/images/blog4/maven.png" width="30%" />]]></content>
     
     <summary type="html">
     
-      
-      
-        &lt;p&gt;根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。&lt;/p&gt;
-&lt;h1 id=&quot;Java&quot;&gt;&lt;a href=&quot;#Java&quot; class=&quot;headerlink&quot; title=&quot;Java&quot;&gt;&lt;/a&gt;Java&lt;/h1&gt;&lt;p&gt;Java 语言是这篇博客的核心，无论是写业务
-      
+      &lt;p&gt;根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。&lt;/p&gt;
+&lt;h1 id=&quot;Java&quot;&gt;&lt;a href=&quot;#Java&quot; class=&quot;headerlink&quot; title=&quot;Java&quot;&gt;&lt;/a&gt;Java&lt;/h1&gt;&lt;p&gt;Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。&lt;/p&gt;
+&lt;p&gt;Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：&lt;a href=&quot;https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;思维导图&lt;/a&gt;，密码为 Pm6j。&lt;/p&gt;
+&lt;img src=&quot;/images/blog4/java.svg&quot; width=&quot;30%&quot;&gt;
     
     </summary>
     
@@ -52,11 +51,12 @@
     
     <summary type="html">
     
-      
-      
-        &lt;p&gt;研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。&lt;/p&gt;
-&lt;p&gt;首先了解下 Selenium：&lt;
-      
+      &lt;p&gt;研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。&lt;/p&gt;
+&lt;p&gt;首先了解下 Selenium：&lt;/p&gt;
+&lt;img src=&quot;/images/blog3/屏幕快照 2019-12-25 22.59.02.png&quot;&gt;
+
+&lt;p&gt;这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。&lt;/p&gt;
+&lt;p&gt;我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。&lt;/p&gt;
     
     </summary>
     
@@ -77,11 +77,10 @@
     
     <summary type="html">
     
-      
-      
-        &lt;p&gt;我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。&lt;/p&gt;
-&lt;h1 id=&quot;什么是-SSM&quot;&gt;&lt;a href=&quot;#什么是-SSM&quot; class=&quot;headerlink&quot; title=&quot;什么是 SSM&quot;&gt;&lt;/a&gt;什么是 SSM&lt;/h1&gt;
-      
+      &lt;p&gt;我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。&lt;/p&gt;
+&lt;h1 id=&quot;什么是-SSM&quot;&gt;&lt;a href=&quot;#什么是-SSM&quot; class=&quot;headerlink&quot; title=&quot;什么是 SSM&quot;&gt;&lt;/a&gt;什么是 SSM&lt;/h1&gt;&lt;p&gt;SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：&lt;br&gt;表现层 SpringMVC：接受用户参数，显示页面。&lt;br&gt;业务层 Spring：处理业务逻辑。&lt;br&gt;持久层 MyBatis：操作数据库。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/blog2/SSM.png&quot; alt=&quot;avatar&quot;&gt;&lt;/p&gt;
+&lt;p&gt;从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。&lt;/p&gt;
     
     </summary>
     
@@ -102,12 +101,11 @@
     
     <summary type="html">
     
-      
-      
-        &lt;p&gt;&amp;emsp;&amp;emsp;Hello, developers!&lt;/p&gt;
+      &lt;p&gt;&amp;emsp;&amp;emsp;Hello, developers!&lt;/p&gt;
 &lt;p&gt;&amp;emsp;&amp;emsp;这是本网站的第一篇博客，希望从这以后我能督促自己，以学习和分享为目的，产出高质量的技术博客。&lt;/p&gt;
-&lt;p&gt;&amp;emsp;&amp;emsp;本网站用于记录我日常编程开发的心得体会，主
-      
+&lt;p&gt;&amp;emsp;&amp;emsp;本网站用于记录我日常编程开发的心得体会，主要但不限于 Java 后端开发方向，还会有工具箱用来记录自己平时遇到高频关键的快捷键和命令，以及挂几个小项目。&lt;/p&gt;
+&lt;p&gt;&amp;emsp;&amp;emsp;欢迎小伙伴们的到来，衷心希望能与各位成为朋友。&lt;/p&gt;
+&lt;p&gt;&amp;emsp;&amp;emsp;Enjoy coding &amp;amp; peace！&lt;/p&gt;
     
     </summary>
     
