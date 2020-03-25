@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/myFavicon.png">
+  <link rel="mask-icon" href="/images/myFavicon.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。 JavaJava 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。 Java 相关的要点有：Java 基础，Java 容器，Java I&#x2F;O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：思维导图，密码为 Pm6j。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 后端开发技术选型">
+<meta property="og:url" content="http://yoursite.com/2020/03/01/blog4/index.html">
+<meta property="og:site_name" content="Jieb&#39;s website">
+<meta property="og:description" content="根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。 JavaJava 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。 Java 相关的要点有：Java 基础，Java 容器，Java I&#x2F;O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：思维导图，密码为 Pm6j。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/blog4/java.svg">
+<meta property="og:image" content="http://yoursite.com/images/blog4/linux.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/mysql.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/redis.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/spring.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/mybatis.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/blog4/hibernate.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/dubbo.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/elasticsearch.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/hystrix.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/nginx.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/zookeeper.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/blog4/rocketmq.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/blog4/kafka.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/docker.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/git.png">
+<meta property="og:image" content="http://yoursite.com/images/blog4/maven.png">
+<meta property="article:published_time" content="2020-03-01T03:06:28.000Z">
+<meta property="article:modified_time" content="2020-03-02T11:10:00.642Z">
+<meta property="article:author" content="Jieb">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/blog4/java.svg">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/01/blog4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Java 后端开发技术选型 | Jieb's website</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Jieb's website" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jieb's website</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-toolbox">
+
+    <a href="/toolbox/" rel="section"><i class="fa fa-fw fa-wrench"></i>工具箱</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-code"></i>项目</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/01/blog4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/myAvatar.jpg">
+      <meta itemprop="name" content="Jieb">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jieb's website">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 后端开发技术选型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 11:06:28" itemprop="dateCreated datePublished" datetime="2020-03-01T11:06:28+08:00">2020-03-01</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
+<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
+<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
+<img src="/images/blog4/java.svg" width="30%" />
+
+<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
+<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
+<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
+<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
+<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
+<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
+<p>1.lambda 表达式和函数式接口</p>
+<p>2.Optional</p>
+<p>3.Stream</p>
+<p>4.新的日期和时间 API</p>
+<p>5.接口的默认方法</p>
+<p>6.多重注解</p>
+<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
+<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
+<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
+<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
+<img src="/images/blog4/linux.png" width="30%" />
+
+<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
+<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
+<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
+<p>网络部分还有两个重点：UNP 和 HTTP。</p>
+<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
+<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
+<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
+<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
+<img src="/images/blog4/mysql.png" width="30%" />
+
+<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
+<img src="/images/blog4/redis.png" width="30%" />
+
+<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
+<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过，<a href="">SSM 整合</a>。</p>
+<img src="/images/blog4/spring.png" width="30%" />
+
+<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
+<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
+<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
+<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
+<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
+<img src="/images/blog4/dubbo.png" width="10%" />
+
+<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
+<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
+<img src="/images/blog4/elasticsearch.png" width="30%" />
+
+<p>Hystrix 资源隔离、降级和熔断。</p>
+<img src="/images/blog4/hystrix.png" width="30%" />
+
+<p>Nginx 反向代理和负载均衡服务器。</p>
+<img src="/images/blog4/nginx.png" width="30%" />
+
+<p>ZooKeeper 配置和管理分布式组件。</p>
+<img src="/images/blog4/zookeeper.jpeg" width="30%" />
+
+<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
+<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
+<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
+<img src="/images/blog4/docker.png" width="30%" />
+
+<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
+<img src="/images/blog4/git.png" width="30%" />
+
+<img src="/images/blog4/maven.png" width="30%" />
+
+
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #555;font-size:14px;">-------------The End-------------</div>
+    
+</div>
+      
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/20/blog3/" rel="prev" title="Selenium IDE 的简单使用">
+      <i class="fa fa-chevron-left"></i> Selenium IDE 的简单使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java"><span class="nav-number">1.</span> <span class="nav-text">Java</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-语言的发展"><span class="nav-number">1.1.</span> <span class="nav-text">Java 语言的发展</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#操作系统"><span class="nav-number">2.</span> <span class="nav-text">操作系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#计算机网络"><span class="nav-number">3.</span> <span class="nav-text">计算机网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库"><span class="nav-number">4.</span> <span class="nav-text">数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL"><span class="nav-number">4.1.</span> <span class="nav-text">MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">4.2.</span> <span class="nav-text">Redis</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring"><span class="nav-number">5.</span> <span class="nav-text">Spring</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式"><span class="nav-number">6.</span> <span class="nav-text">分布式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开发工具"><span class="nav-number">7.</span> <span class="nav-text">开发工具</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jieb"
+      src="/images/myAvatar.jpg">
+  <p class="site-author-name" itemprop="name">Jieb</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jiebupup" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jiebupup" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jieb</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
