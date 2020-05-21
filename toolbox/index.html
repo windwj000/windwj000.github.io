@@ -28,7 +28,7 @@
 <meta property="og:description" content="简介记录我平时开发时使用较多的快捷键和命令。 IDEA-hotkey格式化代码：command + option + L 大小写切换：command + shift + U 批量注释：command + shift + &#x2F;  删除光标所在行：command + DEL 复制多行：command + D 移动当前代码行：option + shift + 上下键 set&#x2F;get：control + e">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-02-14T07:19:24.000Z">
-<meta property="article:modified_time" content="2020-03-25T16:08:14.219Z">
+<meta property="article:modified_time" content="2020-03-30T08:45:50.861Z">
 <meta property="article:author" content="Jieb">
 <meta name="twitter:card" content="summary">
 
@@ -224,11 +224,15 @@
 <h1 id="macOS-commandline"><a href="#macOS-commandline" class="headerlink" title="macOS-commandline"></a>macOS-commandline</h1><p>删除当前行：control + U</p>
 <p>清屏：control + L</p>
 <p>显示当前文件路径：pwd</p>
+<p>显示出隐藏的文件夹：command + shift + .</p>
 <h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>Start MySQL Server</p>
 <p>mysql -uroot -p</p>
 <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>redis-server</p>
 <p>redis-cli</p>
 <p>redis-cli -h 127.0.0.1 -p 6379 shutdown</p>
+<h2 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a>Kafka</h2><p>cd kafka_2.12-2.4.1/</p>
+<p>bin/zookeeper-server-start.sh config/zookeeper.properties    // 先开 ZooKeeper，指定配置文件</p>
+<p>bin/kafka-server-start.sh config/server.properties    // 再开 Kafka 的 server，同样指定配置文件</p>
 <h2 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h2><p>elasticsearch 启动服务端 localhost:9200</p>
 <p>cd ~/elasticsearch-head</p>
 <p>npm run start 启动客户端 localhost:9100</p>
@@ -295,7 +299,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IDEA-hotkey"><span class="nav-number">2.</span> <span class="nav-text">IDEA-hotkey</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#macOS-commandline"><span class="nav-number">3.</span> <span class="nav-text">macOS-commandline</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库"><span class="nav-number">4.</span> <span class="nav-text">数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL"><span class="nav-number">4.1.</span> <span class="nav-text">MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">4.2.</span> <span class="nav-text">Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch"><span class="nav-number">4.3.</span> <span class="nav-text">Elasticsearch</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IDEA-hotkey"><span class="nav-number">2.</span> <span class="nav-text">IDEA-hotkey</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#macOS-commandline"><span class="nav-number">3.</span> <span class="nav-text">macOS-commandline</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库"><span class="nav-number">4.</span> <span class="nav-text">数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL"><span class="nav-number">4.1.</span> <span class="nav-text">MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">4.2.</span> <span class="nav-text">Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka"><span class="nav-number">4.3.</span> <span class="nav-text">Kafka</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch"><span class="nav-number">4.4.</span> <span class="nav-text">Elasticsearch</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -311,14 +315,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
