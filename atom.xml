@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="http://www.jiebcoder.top/"/>
   <updated>2020-05-25T06:26:37.955Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>http://www.jiebcoder.top/</id>
   
   <author>
     <name>Jieb</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>MySQL &amp; Redis 技术分享-上</title>
-    <link href="http://yoursite.com/2020/05/22/blog8/"/>
-    <id>http://yoursite.com/2020/05/22/blog8/</id>
+    <link href="http://www.jiebcoder.top/2020/05/22/blog8/"/>
+    <id>http://www.jiebcoder.top/2020/05/22/blog8/</id>
     <published>2020-05-22T04:06:28.000Z</published>
     <updated>2020-05-25T06:26:37.955Z</updated>
     
@@ -27,22 +27,24 @@
     
     <summary type="html">
     
-      &lt;p&gt;这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。&lt;/p&gt;
-&lt;h2 id=&quot;引言部分&quot;&gt;&lt;a href=&quot;#引言部分&quot; class=&quot;headerlink&quot; title=&quot;引言部分&quot;&gt;&lt;/a&gt;引言部分&lt;/h2&gt;&lt;p&gt;首先是后端技术栈介绍，这部分在 &lt;a href=&quot;https://jiebupup.github.io/2020/03/01/blog4/#more&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://jiebupup.github.io/2020/03/01/blog4/#more&lt;/a&gt; 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQL &amp;amp; Redis。&lt;/p&gt;
-&lt;h2 id=&quot;MySQL-基础&quot;&gt;&lt;a href=&quot;#MySQL-基础&quot; class=&quot;headerlink&quot; title=&quot;MySQL 基础&quot;&gt;&lt;/a&gt;MySQL 基础&lt;/h2&gt;&lt;h3 id=&quot;连接&quot;&gt;&lt;a href=&quot;#连接&quot; class=&quot;headerlink&quot; title=&quot;连接&quot;&gt;&lt;/a&gt;连接&lt;/h3&gt;
+      
+      
+        &lt;p&gt;这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。&lt;/p&gt;
+&lt;h2 id=&quot;引言部分&quot;&gt;&lt;a href=&quot;#引言部分&quot; class=&quot;headerlink&quot; title=&quot;引言部分&quot;&gt;&lt;/a&gt;引
+      
     
     </summary>
     
     
     
-      <category term="backend" scheme="http://yoursite.com/tags/backend/"/>
+      <category term="backend" scheme="http://www.jiebcoder.top/tags/backend/"/>
     
   </entry>
   
   <entry>
     <title>SimpleDateFormat 类使用避坑</title>
-    <link href="http://yoursite.com/2020/05/19/blog7/"/>
-    <id>http://yoursite.com/2020/05/19/blog7/</id>
+    <link href="http://www.jiebcoder.top/2020/05/19/blog7/"/>
+    <id>http://www.jiebcoder.top/2020/05/19/blog7/</id>
     <published>2020-05-19T11:06:28.000Z</published>
     <updated>2020-05-19T12:18:24.322Z</updated>
     
@@ -50,24 +52,23 @@
     
     <summary type="html">
     
-      &lt;p&gt;我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。&lt;/p&gt;
-&lt;h2 id=&quot;SimpleDateFormat-的使用&quot;&gt;&lt;a href=&quot;#SimpleDateFormat-的使用&quot; class=&quot;headerlink&quot; title=&quot;SimpleDateFormat 的使用&quot;&gt;&lt;/a&gt;SimpleDateFormat 的使用&lt;/h2&gt;&lt;p&gt;SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;SimpleDateFormat simpleDateFormat &amp;#x3D; new SimpleDateFormat(&amp;quot;yyyy-MM-dd HH:mm:ss&amp;quot;);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;Date date &amp;#x3D; simpleDateFormat.parse(&amp;quot;2020-05-19 15:06:13&amp;quot;);    &amp;#x2F;&amp;#x2F; Tue May 19 15:06:13 CST 2020&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;String time &amp;#x3D; simpleDateFormat.format(date);    &amp;#x2F;&amp;#x2F; 2020-05-19 15:06:13&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。&lt;/p&gt;
+      
+      
+        &lt;p&gt;我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计
+      
     
     </summary>
     
     
     
-      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+      <category term="java" scheme="http://www.jiebcoder.top/tags/java/"/>
     
   </entry>
   
   <entry>
     <title>PuTTY 的安装与使用</title>
-    <link href="http://yoursite.com/2020/05/06/blog6/"/>
-    <id>http://yoursite.com/2020/05/06/blog6/</id>
+    <link href="http://www.jiebcoder.top/2020/05/06/blog6/"/>
+    <id>http://www.jiebcoder.top/2020/05/06/blog6/</id>
     <published>2020-05-06T02:06:28.000Z</published>
     <updated>2020-05-06T04:19:26.653Z</updated>
     
@@ -75,22 +76,24 @@
     
     <summary type="html">
     
-      &lt;p&gt;我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。&lt;/p&gt;
-&lt;h2 id=&quot;PuTTY-是什么？&quot;&gt;&lt;a href=&quot;#PuTTY-是什么？&quot; class=&quot;headerlink&quot; title=&quot;PuTTY 是什么？&quot;&gt;&lt;/a&gt;PuTTY 是什么？&lt;/h2&gt;&lt;p&gt;PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，&lt;/p&gt;
-&lt;h2 id=&quot;mac-下-PuTTY-的安装&quot;&gt;&lt;a href=&quot;#mac-下-PuTTY-的安装&quot; class=&quot;headerlink&quot; title=&quot;mac 下 PuTTY 的安装&quot;&gt;&lt;/a&gt;mac 下 PuTTY 的安装&lt;/h2&gt;&lt;h3 id=&quot;安装-MacPorts&quot;&gt;&lt;a href=&quot;#安装-MacPorts&quot; class=&quot;headerlink&quot; title=&quot;安装 MacPorts&quot;&gt;&lt;/a&gt;安装 MacPorts&lt;/h3&gt;
+      
+      
+        &lt;p&gt;我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。&lt;/p&gt;
+&lt;h2 id=&quot;PuTTY-是什么？&quot;&gt;&lt;a href=&quot;#PuTTY-是什么？&quot; class=&quot;headerlink&quot; title=&quot;PuT
+      
     
     </summary>
     
     
     
-      <category term="other" scheme="http://yoursite.com/tags/other/"/>
+      <category term="other" scheme="http://www.jiebcoder.top/tags/other/"/>
     
   </entry>
   
   <entry>
     <title>MyBatis 与 Hibernate 对比</title>
-    <link href="http://yoursite.com/2020/03/30/blog5/"/>
-    <id>http://yoursite.com/2020/03/30/blog5/</id>
+    <link href="http://www.jiebcoder.top/2020/03/30/blog5/"/>
+    <id>http://www.jiebcoder.top/2020/03/30/blog5/</id>
     <published>2020-03-30T13:06:28.000Z</published>
     <updated>2020-05-22T04:06:25.400Z</updated>
     
@@ -98,23 +101,25 @@
     
     <summary type="html">
     
-      &lt;p&gt;在我之前写过的 &lt;a href&gt;SSM 整合&lt;/a&gt; 中，作为三层架构中的持久层，MyBatis 负责操作数据库。&lt;/p&gt;
+      
+      
+        &lt;p&gt;在我之前写过的 &lt;a href=&quot;&quot;&gt;SSM 整合&lt;/a&gt; 中，作为三层架构中的持久层，MyBatis 负责操作数据库。&lt;/p&gt;
 &lt;p&gt;同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。&lt;/p&gt;
-&lt;h1 id=&quot;JPA&quot;&gt;&lt;a href=&quot;#JPA&quot; class=&quot;headerlink&quot; title=&quot;JPA&quot;&gt;&lt;/a&gt;JPA&lt;/h1&gt;&lt;p&gt;要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。&lt;/p&gt;
-&lt;p&gt;Spring Data JPA 是对 JPA 的封装。&lt;/p&gt;
+&lt;h1 id=&quot;JPA&quot;&gt;&lt;a hre
+      
     
     </summary>
     
     
     
-      <category term="backend" scheme="http://yoursite.com/tags/backend/"/>
+      <category term="backend" scheme="http://www.jiebcoder.top/tags/backend/"/>
     
   </entry>
   
   <entry>
     <title>Java 后端开发技术选型</title>
-    <link href="http://yoursite.com/2020/03/01/blog4/"/>
-    <id>http://yoursite.com/2020/03/01/blog4/</id>
+    <link href="http://www.jiebcoder.top/2020/03/01/blog4/"/>
+    <id>http://www.jiebcoder.top/2020/03/01/blog4/</id>
     <published>2020-03-01T03:06:28.000Z</published>
     <updated>2020-03-30T14:03:35.759Z</updated>
     
@@ -122,23 +127,24 @@
     
     <summary type="html">
     
-      &lt;p&gt;根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。&lt;/p&gt;
-&lt;h1 id=&quot;Java&quot;&gt;&lt;a href=&quot;#Java&quot; class=&quot;headerlink&quot; title=&quot;Java&quot;&gt;&lt;/a&gt;Java&lt;/h1&gt;&lt;p&gt;Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。&lt;/p&gt;
-&lt;p&gt;Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：&lt;a href=&quot;https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;思维导图&lt;/a&gt;，密码为 Pm6j。&lt;/p&gt;
-&lt;img src=&quot;/images/blog4/java.svg&quot; width=&quot;30%&quot;&gt;
+      
+      
+        &lt;p&gt;根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。&lt;/p&gt;
+&lt;h1 id=&quot;Java&quot;&gt;&lt;a href=&quot;#Java&quot; class=&quot;headerlink&quot; title=&quot;Java&quot;&gt;&lt;/a&gt;Java&lt;/h1&gt;&lt;p&gt;Java 语言是这篇博客的核心，无论是写业务
+      
     
     </summary>
     
     
     
-      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+      <category term="java" scheme="http://www.jiebcoder.top/tags/java/"/>
     
   </entry>
   
   <entry>
     <title>Selenium IDE 的简单使用</title>
-    <link href="http://yoursite.com/2020/02/20/blog3/"/>
-    <id>http://yoursite.com/2020/02/20/blog3/</id>
+    <link href="http://www.jiebcoder.top/2020/02/20/blog3/"/>
+    <id>http://www.jiebcoder.top/2020/02/20/blog3/</id>
     <published>2020-02-20T01:06:28.000Z</published>
     <updated>2020-02-20T01:35:32.952Z</updated>
     
@@ -146,25 +152,24 @@
     
     <summary type="html">
     
-      &lt;p&gt;研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。&lt;/p&gt;
-&lt;p&gt;首先了解下 Selenium：&lt;/p&gt;
-&lt;img src=&quot;/images/blog3/屏幕快照 2019-12-25 22.59.02.png&quot;&gt;
-
-&lt;p&gt;这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。&lt;/p&gt;
-&lt;p&gt;我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。&lt;/p&gt;
+      
+      
+        &lt;p&gt;研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。&lt;/p&gt;
+&lt;p&gt;首先了解下 Selenium：&lt;
+      
     
     </summary>
     
     
     
-      <category term="other" scheme="http://yoursite.com/tags/other/"/>
+      <category term="other" scheme="http://www.jiebcoder.top/tags/other/"/>
     
   </entry>
   
   <entry>
     <title>SSM 整合</title>
-    <link href="http://yoursite.com/2020/02/19/blog2/"/>
-    <id>http://yoursite.com/2020/02/19/blog2/</id>
+    <link href="http://www.jiebcoder.top/2020/02/19/blog2/"/>
+    <id>http://www.jiebcoder.top/2020/02/19/blog2/</id>
     <published>2020-02-19T02:06:28.000Z</published>
     <updated>2020-02-20T04:26:00.744Z</updated>
     
@@ -172,23 +177,24 @@
     
     <summary type="html">
     
-      &lt;p&gt;我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。&lt;/p&gt;
-&lt;h1 id=&quot;什么是-SSM&quot;&gt;&lt;a href=&quot;#什么是-SSM&quot; class=&quot;headerlink&quot; title=&quot;什么是 SSM&quot;&gt;&lt;/a&gt;什么是 SSM&lt;/h1&gt;&lt;p&gt;SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：&lt;br&gt;表现层 SpringMVC：接受用户参数，显示页面。&lt;br&gt;业务层 Spring：处理业务逻辑。&lt;br&gt;持久层 MyBatis：操作数据库。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/blog2/SSM.png&quot; alt=&quot;avatar&quot;&gt;&lt;/p&gt;
-&lt;p&gt;从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。&lt;/p&gt;
+      
+      
+        &lt;p&gt;我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。&lt;/p&gt;
+&lt;h1 id=&quot;什么是-SSM&quot;&gt;&lt;a href=&quot;#什么是-SSM&quot; class=&quot;headerlink&quot; title=&quot;什么是 SSM&quot;&gt;&lt;/a&gt;什么是 SSM&lt;/h1&gt;
+      
     
     </summary>
     
     
     
-      <category term="spring" scheme="http://yoursite.com/tags/spring/"/>
+      <category term="spring" scheme="http://www.jiebcoder.top/tags/spring/"/>
     
   </entry>
   
   <entry>
     <title>欢迎来到我的网站</title>
-    <link href="http://yoursite.com/2020/02/14/blog1/"/>
-    <id>http://yoursite.com/2020/02/14/blog1/</id>
+    <link href="http://www.jiebcoder.top/2020/02/14/blog1/"/>
+    <id>http://www.jiebcoder.top/2020/02/14/blog1/</id>
     <published>2020-02-14T13:06:28.000Z</published>
     <updated>2020-04-15T03:54:49.805Z</updated>
     
@@ -196,17 +202,18 @@
     
     <summary type="html">
     
-      &lt;p&gt;&amp;emsp;&amp;emsp;Hello, developers!&lt;/p&gt;
+      
+      
+        &lt;p&gt;&amp;emsp;&amp;emsp;Hello, developers!&lt;/p&gt;
 &lt;p&gt;&amp;emsp;&amp;emsp;这是本网站的第一篇博客，希望从这以后我能督促自己，以学习和分享为目的，产出高质量的技术博客。如果能带给大家帮助，我将感到万分荣幸！&lt;/p&gt;
-&lt;p&gt;&amp;emsp;&amp;emsp;本网站用于记录我日常编程开发的心得体会，主要但不限于 Java 后端开发方向，还会有工具箱用来记录自己平时遇到高频关键的快捷键和命令，以及挂几个小项目。&lt;/p&gt;
-&lt;p&gt;&amp;emsp;&amp;emsp;欢迎小伙伴们的到来，衷心希望能与各位成为朋友。&lt;/p&gt;
-&lt;p&gt;&amp;emsp;&amp;emsp;Enjoy coding &amp;amp; peace！&lt;/p&gt;
+&lt;p&gt;&amp;emsp;&amp;emsp;本网
+      
     
     </summary>
     
     
     
-      <category term="welcome" scheme="http://yoursite.com/tags/welcome/"/>
+      <category term="welcome" scheme="http://www.jiebcoder.top/tags/welcome/"/>
     
   </entry>
   
