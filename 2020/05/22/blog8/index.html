@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/myFavicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/myFavicon.png">
+  <link rel="mask-icon" href="/images/myFavicon.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。 引言部分首先是后端技术栈介绍，这部分在 https:&#x2F;&#x2F;jiebupup.github.io&#x2F;2020&#x2F;03&#x2F;01&#x2F;blog4&#x2F;#more 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL &amp; Redis 技术分享-上">
+<meta property="og:url" content="http://yoursite.com/2020/05/22/blog8/index.html">
+<meta property="og:site_name" content="Jieb&#39;s website">
+<meta property="og:description" content="这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。 引言部分首先是后端技术栈介绍，这部分在 https:&#x2F;&#x2F;jiebupup.github.io&#x2F;2020&#x2F;03&#x2F;01&#x2F;blog4&#x2F;#more 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQ">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/blog8/%E5%9B%BE%E7%89%871.png">
+<meta property="og:image" content="http://yoursite.com/images/blog8/%E6%88%AA%E5%B1%8F2020-05-22%E4%B8%8B%E5%8D%885.01.32.png">
+<meta property="article:published_time" content="2020-05-22T04:06:28.000Z">
+<meta property="article:modified_time" content="2020-05-25T06:26:37.955Z">
+<meta property="article:author" content="Jieb">
+<meta property="article:tag" content="backend">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/blog8/%E5%9B%BE%E7%89%871.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/22/blog8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>MySQL & Redis 技术分享-上 | Jieb's website</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Jieb's website" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jieb's website</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-toolbox">
+
+    <a href="/toolbox/" rel="section"><i class="fa fa-fw fa-wrench"></i>工具箱</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-fw fa-code"></i>项目</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/22/blog8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/myAvatar.jpg">
+      <meta itemprop="name" content="Jieb">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jieb's website">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL & Redis 技术分享-上
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-22 12:06:28" itemprop="dateCreated datePublished" datetime="2020-05-22T12:06:28+08:00">2020-05-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。</p>
+<h2 id="引言部分"><a href="#引言部分" class="headerlink" title="引言部分"></a>引言部分</h2><p>首先是后端技术栈介绍，这部分在 <a href="https://jiebupup.github.io/2020/03/01/blog4/#more" target="_blank" rel="noopener">https://jiebupup.github.io/2020/03/01/blog4/#more</a> 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQL &amp; Redis。</p>
+<h2 id="MySQL-基础"><a href="#MySQL-基础" class="headerlink" title="MySQL 基础"></a>MySQL 基础</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>先从 MySQL 开始，MySQL 是典型的 C/S 架构，客户端与服务器的连接简单而言就是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Start MySQL Server &amp; mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+<p>-u 用户名，-p 密码（不建议直接写出来），-h 连接服务器进程所在域名或者 IP 地址（本机则可以忽略），各个参数的摆放顺序没有硬性规定。exit 退出。</p>
+<p>然而客户端与服务器的连接到客户端收到服务器处理结果，并没有看起来的那么简单。下图是一次 SQL 查询在 MySQL 客户端与服务器的执行过程：</p>
+<img src="/images/blog8/图片1.png" />
+
+<p>可以看到，这个执行过程可以分为连接管理、解析与优化和存储引擎三块。</p>
+<h3 id="连接管理"><a href="#连接管理" class="headerlink" title="连接管理"></a>连接管理</h3><p>连接管理中客户端与服务器连接本质上是一个进程间通信的过程，进程的通信方式有：</p>
+<ul>
+<li>TCP/IP</li>
+<li>windows 下的命名管道或共享内存</li>
+<li>unix 域套接字</li>
+</ul>
+<p>在客户端程序发起连接的时候，需要携带主机信息、用户名、密码，服务器程序会对客户端程序提供的这些信息进行认证，如果认证失败，服务器程序会拒绝连接。</p>
+<p>每当有一个客户端进程连接到服务器进程时，服务器进程都会创建一个线程来专门处理与这个客户端的交互。当该客户端退出时会与服务器断开连接，服务器并不会立即把与该客户端交互的线程销毁掉，而是把它缓存起来，在另一个新的客户端再进行连接时，把这个缓存的线程分配给该新客户端。这就是数据库连接池，这样就起到了不频繁创建和销毁线程的效果，从而节省开销。介绍几款第三方数据库连接池：Apache commons-dbcp（不活跃）、c3p0（很久没有更新）和 Druid（阿里）。</p>
+<h3 id="解析与优化"><a href="#解析与优化" class="headerlink" title="解析与优化"></a>解析与优化</h3><p>完成连接的建立后，就进入服务器开始解析与优化。</p>
+<h4 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h4><p>首先查询缓存，服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。</p>
+<p>当判断缓存是否命中时，MySQL 不会进行解析查询语句，而是直接使用 SQL 语句和客户端发送过来的其他原始信息。所以，任何字符上的不同，例如空格、注释等都会导致缓存的不命中。</p>
+<p>如果查询请求中包含某些系统函数（同样的函数的两次调用会产生不一样的结果，比如函数 NOW）、用户自定义变量和函数、一些系统表，如 mysql、information_schema、performance_schema 数据库中的表，那这个请求就不会被缓存。当查询语句中有一些不确定的数据时，也则不会被缓存。</p>
+<p>查询缓存系统会跟踪查询中涉及的每个表，如果这些表发生了变化，那么和这个表相关的所有缓存数据都将失效。</p>
+<p>缓存同时也带来了额外的开销，从 MySQL5.7.20 开始，不推荐使用查询缓存，并在 MySQL8.0 中删除。</p>
+<h4 id="语法解析"><a href="#语法解析" class="headerlink" title="语法解析"></a>语法解析</h4><p>从指定的文本中提取出我们需要的信息，本质上算是一个编译过程。</p>
+<h4 id="查询优化"><a href="#查询优化" class="headerlink" title="查询优化"></a>查询优化</h4><p>优化的结果就是生成一个执行计划，这个执行计划表明了应该使用哪些索引进行查询，表之间的连接顺序是什么样的。我们可以使用 EXPLAIN 语句来查看某个语句的执行计划。</p>
+<h3 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h3><p>MySQL 服务器把数据的存储和提取操作都封装到了一个叫存储引擎的模块里。我们知道表是由一行一行的记录组成的，但这只是一个逻辑上的概念，物理上如何表示记录，怎么从表中读取数据，怎么把数据写入具体的物理存储器上，这都是存储引擎负责的事情。它的功能就是接收上层传下来的指令，然后对表中的数据进行提取或写入操作。</p>
+<p>在 MySQL server 完成了查询优化后，只需按照生成的执行计划调用底层存储引擎提供的 API，获取到数据后返回给客户端就好了。</p>
+<p>进入 MySQL 客户端后可以通过：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW ENGINES;</span><br></pre></td></tr></table></figure>
+
+<p>查看 MySQL 支持的存储引擎，如下图：</p>
+<img src="/images/blog8/截屏2020-05-22下午5.01.32.png" />
+
+<p>在这些存储引擎中，比较重要的是 InnoDB 和 MyISAM。</p>
+<h4 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h4><ul>
+<li>MySQL 默认的事务型存储引擎（5.5 版本后），只有在需要它不支持的特性时，才考虑使用其它存储引擎</li>
+<li>实现了四个标准的隔离级别，默认级别是可重复读 REPEATABLE READ。</li>
+<li>主索引是聚簇索引，在索引中保存了数据，从而避免直接读取磁盘，因此对查询性能有很大的提升</li>
+<li>内部优化：从磁盘读取数据时采用的可预测性读、能够加快读操作并且自动创建的自适应哈希索引、能够加速插入操作的插入缓冲区等</li>
+<li>支持真正的在线热备份，读写混合。其它存储引擎不支持在线热备份。</li>
+<li>默认使用行级锁，在无索引无主键情况更新才会锁表。并发度高。</li>
+<li>支持外键，MVCC，宕机恢复。</li>
+</ul>
+<h4 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h4><ul>
+<li>设计简单，数据以紧密格式存储。对于只读数据，或者表比较小、可以容忍修复操作，则依然可以使用它。</li>
+<li>支持压缩表（对于不会进行修改的表，极大减少磁盘空间占用）和空间数据索引。</li>
+<li>只支持表级锁，不支持行级锁。只能对整张表加锁，读取时会对需要读到的所有表加共享锁，写入时则对表加排它锁。但在表有读取操作的同时，也可以往表中插入新的记录，这被称为并发插入。</li>
+<li>崩溃后发生损坏的概率比 InnoDB 高很多，而且恢复的速度也更慢。</li>
+<li>如果指定了延迟更新索引 DELAY_KEY_WRITE 选项，在每次修改执行完成时，不会立即将修改的索引数据写入磁盘，而是会写到内存中的键缓冲区，只有在清理键缓冲区或者关闭表的时候才会将对应的索引块写入磁盘。这种方式可以极大的提升写入性能，但是在数据库或者主机崩溃时会造成索引损坏，需要执行修复操作。</li>
+<li>MyISAM 更多强调的是性能，每次查询具有原子性，其执行速度比 InnoDB 更快，但不是绝对的。MyISAM 适合 SELECT 密集型的表。</li>
+</ul>
+<p>总结下 InnoDB &amp; MyISAM 的主要区别：事务，并发性 InnoDB支持行级锁，InnoDB 还支持外键和在线热备份，并且崩溃恢复优于MyISAM。MyISAM 简单，强调性能，支持压缩表和空间数据索引。</p>
+<h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><p>定义：数据库管理系统执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成。</p>
+<h4 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h4><ul>
+<li>原子性 Atomicity：事务被视为不可分割的最小单元，事务的所有操作要么全部提交成功，要么全部失败回滚。回滚日志 undo log 记录着事务所执行的修改操作，在回滚时反向执行这些修改操作即可。</li>
+<li>一致性 Consistency：数据库在事务执行前后都保持一致性状态。在一致性状态下，所有事务对一个数据的读取结果都是相同的。</li>
+<li>隔离性 Isolation：一个事务所做的修改在最终提交以前，对其它事务是不可见的。</li>
+<li>持久性 Durability：一旦事务提交，则其所做的修改将会永远保存到数据库中。即使系统发生崩溃，事务执行的结果也不能丢失。系统发生奔溃可以用重做日志 redo log 进行恢复，从而实现持久性。与回滚日志记录数据的逻辑修改不同，重做日志记录的是数据页的物理修改。</li>
+</ul>
+<h4 id="JDBC-实现数据库事务"><a href="#JDBC-实现数据库事务" class="headerlink" title="JDBC 实现数据库事务"></a>JDBC 实现数据库事务</h4><p>JDBC：Java 数据库连接，定义的一套操作所有关系型数据库的接口，不同数据库实现接口，提供 JAR 包。</p>
+<p>JDBC 基本操作：</p>
+<ol>
+<li>注册驱动 DriverManager</li>
+<li>获取连接 Connection</li>
+<li>开启事务</li>
+<li>定义 sql</li>
+<li>获取执行 sql 对象 PreparedStatement</li>
+<li>执行 sql</li>
+<li>事务提交或回滚</li>
+<li>释放资源</li>
+</ol>
+<p>代码</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>由于分享内容过多，我使用上下两篇博客的形式，本篇讲述了 MySQL。下一篇将会记录 Redis 相关的内容。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #555;font-size:14px;">-------------The End-------------</div>
+    
+</div>
+      
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/backend/" rel="tag"># backend</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/19/blog7/" rel="prev" title="SimpleDateFormat 类使用避坑">
+      <i class="fa fa-chevron-left"></i> SimpleDateFormat 类使用避坑
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言部分"><span class="nav-number">1.</span> <span class="nav-text">引言部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-基础"><span class="nav-number">2.</span> <span class="nav-text">MySQL 基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#连接"><span class="nav-number">2.1.</span> <span class="nav-text">连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接管理"><span class="nav-number">2.2.</span> <span class="nav-text">连接管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析与优化"><span class="nav-number">2.3.</span> <span class="nav-text">解析与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查询缓存"><span class="nav-number">2.3.1.</span> <span class="nav-text">查询缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#语法解析"><span class="nav-number">2.3.2.</span> <span class="nav-text">语法解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查询优化"><span class="nav-number">2.3.3.</span> <span class="nav-text">查询优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储引擎"><span class="nav-number">2.4.</span> <span class="nav-text">存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#InnoDB"><span class="nav-number">2.4.1.</span> <span class="nav-text">InnoDB</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MyISAM"><span class="nav-number">2.4.2.</span> <span class="nav-text">MyISAM</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库事务"><span class="nav-number">2.5.</span> <span class="nav-text">数据库事务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ACID"><span class="nav-number">2.5.1.</span> <span class="nav-text">ACID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JDBC-实现数据库事务"><span class="nav-number">2.5.2.</span> <span class="nav-text">JDBC 实现数据库事务</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jieb"
+      src="/images/myAvatar.jpg">
+  <p class="site-author-name" itemprop="name">Jieb</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jiebupup" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jiebupup" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jieb</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

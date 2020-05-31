@@ -1,6 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Selenium IDE 的简单使用</title>
+    <url>/2020/02/20/blog3/</url>
+    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
+<p>首先了解下 Selenium：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
+
+<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
+<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
+
+<p>输入一个 URL，点击按钮</p>
+<p><img src="/images/blog3/a.png" alt="avatar"></p>
+<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
+
+<p>然后点击按钮</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
+
+<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
+<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
+<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
+<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
+
+<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
+
+<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
+
+<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
+<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
+<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
+]]></content>
+      <tags>
+        <tag>other</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSM 整合</title>
+    <url>/2020/02/19/blog2/</url>
+    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
+<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
+<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
+<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
+
+<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
+<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
+<p>编写 AccountDao 接口，实现：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
+
+<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
+<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
+]]></content>
+      <tags>
+        <tag>spring</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>欢迎来到我的网站</title>
+    <url>/2020/02/14/blog1/</url>
+    <content><![CDATA[<p>&emsp;&emsp;Hello, developers!</p>
+<p>&emsp;&emsp;这是本网站的第一篇博客，希望从这以后我能督促自己，以学习和分享为目的，产出高质量的技术博客。如果能带给大家帮助，我将感到万分荣幸！</p>
+<p>&emsp;&emsp;本网站用于记录我日常编程开发的心得体会，主要但不限于 Java 后端开发方向，还会有工具箱用来记录自己平时遇到高频关键的快捷键和命令，以及挂几个小项目。</p>
+<p>&emsp;&emsp;欢迎小伙伴们的到来，衷心希望能与各位成为朋友。</p>
+<p>&emsp;&emsp;Enjoy coding &amp; peace！</p>
+]]></content>
+      <tags>
+        <tag>welcome</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SimpleDateFormat 类使用避坑</title>
     <url>/2020/05/19/blog7/</url>
     <content><![CDATA[<p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
@@ -103,40 +204,6 @@
       </tags>
   </entry>
   <entry>
-    <title>PuTTY 的安装与使用</title>
-    <url>/2020/05/06/blog6/</url>
-    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
-<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
-<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
-<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
-
-<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
-<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
-
-<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
-
-<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
-
-<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
-
-<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
-]]></content>
-      <tags>
-        <tag>other</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MyBatis 与 Hibernate 对比</title>
     <url>/2020/03/30/blog5/</url>
     <content><![CDATA[<p>在我之前写过的 <a href="">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
@@ -173,7 +240,41 @@
 <p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
 ]]></content>
       <tags>
-        <tag>comparison</tag>
+        <tag>backend</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PuTTY 的安装与使用</title>
+    <url>/2020/05/06/blog6/</url>
+    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
+<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
+<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
+<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
+
+<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
+<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
+
+<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
+
+<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
+
+<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
+
+<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
+]]></content>
+      <tags>
+        <tag>other</tag>
       </tags>
   </entry>
   <entry>
@@ -257,104 +358,85 @@
       </tags>
   </entry>
   <entry>
-    <title>Selenium IDE 的简单使用</title>
-    <url>/2020/02/20/blog3/</url>
-    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
-<p>首先了解下 Selenium：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
+    <title>MySQL &amp; Redis 技术分享-上</title>
+    <url>/2020/05/22/blog8/</url>
+    <content><![CDATA[<p>这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。</p>
+<h2 id="引言部分"><a href="#引言部分" class="headerlink" title="引言部分"></a>引言部分</h2><p>首先是后端技术栈介绍，这部分在 <a href="https://jiebupup.github.io/2020/03/01/blog4/#more" target="_blank" rel="noopener">https://jiebupup.github.io/2020/03/01/blog4/#more</a> 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQL &amp; Redis。</p>
+<h2 id="MySQL-基础"><a href="#MySQL-基础" class="headerlink" title="MySQL 基础"></a>MySQL 基础</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>先从 MySQL 开始，MySQL 是典型的 C/S 架构，客户端与服务器的连接简单而言就是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Start MySQL Server &amp; mysql -uroot -p</span><br></pre></td></tr></table></figure>
 
-<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
-<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
+<p>-u 用户名，-p 密码（不建议直接写出来），-h 连接服务器进程所在域名或者 IP 地址（本机则可以忽略），各个参数的摆放顺序没有硬性规定。exit 退出。</p>
+<p>然而客户端与服务器的连接到客户端收到服务器处理结果，并没有看起来的那么简单。下图是一次 SQL 查询在 MySQL 客户端与服务器的执行过程：</p>
+<img src="/images/blog8/图片1.png" />
 
-<p>输入一个 URL，点击按钮</p>
-<p><img src="/images/blog3/a.png" alt="avatar"></p>
-<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
+<p>可以看到，这个执行过程可以分为连接管理、解析与优化和存储引擎三块。</p>
+<h3 id="连接管理"><a href="#连接管理" class="headerlink" title="连接管理"></a>连接管理</h3><p>连接管理中客户端与服务器连接本质上是一个进程间通信的过程，进程的通信方式有：</p>
+<ul>
+<li>TCP/IP</li>
+<li>windows 下的命名管道或共享内存</li>
+<li>unix 域套接字</li>
+</ul>
+<p>在客户端程序发起连接的时候，需要携带主机信息、用户名、密码，服务器程序会对客户端程序提供的这些信息进行认证，如果认证失败，服务器程序会拒绝连接。</p>
+<p>每当有一个客户端进程连接到服务器进程时，服务器进程都会创建一个线程来专门处理与这个客户端的交互。当该客户端退出时会与服务器断开连接，服务器并不会立即把与该客户端交互的线程销毁掉，而是把它缓存起来，在另一个新的客户端再进行连接时，把这个缓存的线程分配给该新客户端。这就是数据库连接池，这样就起到了不频繁创建和销毁线程的效果，从而节省开销。介绍几款第三方数据库连接池：Apache commons-dbcp（不活跃）、c3p0（很久没有更新）和 Druid（阿里）。</p>
+<h3 id="解析与优化"><a href="#解析与优化" class="headerlink" title="解析与优化"></a>解析与优化</h3><p>完成连接的建立后，就进入服务器开始解析与优化。</p>
+<h4 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h4><p>首先查询缓存，服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。</p>
+<p>当判断缓存是否命中时，MySQL 不会进行解析查询语句，而是直接使用 SQL 语句和客户端发送过来的其他原始信息。所以，任何字符上的不同，例如空格、注释等都会导致缓存的不命中。</p>
+<p>如果查询请求中包含某些系统函数（同样的函数的两次调用会产生不一样的结果，比如函数 NOW）、用户自定义变量和函数、一些系统表，如 mysql、information_schema、performance_schema 数据库中的表，那这个请求就不会被缓存。当查询语句中有一些不确定的数据时，也则不会被缓存。</p>
+<p>查询缓存系统会跟踪查询中涉及的每个表，如果这些表发生了变化，那么和这个表相关的所有缓存数据都将失效。</p>
+<p>缓存同时也带来了额外的开销，从 MySQL5.7.20 开始，不推荐使用查询缓存，并在 MySQL8.0 中删除。</p>
+<h4 id="语法解析"><a href="#语法解析" class="headerlink" title="语法解析"></a>语法解析</h4><p>从指定的文本中提取出我们需要的信息，本质上算是一个编译过程。</p>
+<h4 id="查询优化"><a href="#查询优化" class="headerlink" title="查询优化"></a>查询优化</h4><p>优化的结果就是生成一个执行计划，这个执行计划表明了应该使用哪些索引进行查询，表之间的连接顺序是什么样的。我们可以使用 EXPLAIN 语句来查看某个语句的执行计划。</p>
+<h3 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h3><p>MySQL 服务器把数据的存储和提取操作都封装到了一个叫存储引擎的模块里。我们知道表是由一行一行的记录组成的，但这只是一个逻辑上的概念，物理上如何表示记录，怎么从表中读取数据，怎么把数据写入具体的物理存储器上，这都是存储引擎负责的事情。它的功能就是接收上层传下来的指令，然后对表中的数据进行提取或写入操作。</p>
+<p>在 MySQL server 完成了查询优化后，只需按照生成的执行计划调用底层存储引擎提供的 API，获取到数据后返回给客户端就好了。</p>
+<p>进入 MySQL 客户端后可以通过：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SHOW ENGINES;</span><br></pre></td></tr></table></figure>
 
-<p>然后点击按钮</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
+<p>查看 MySQL 支持的存储引擎，如下图：</p>
+<img src="/images/blog8/截屏2020-05-22下午5.01.32.png" />
 
-<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
-<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
-<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
-<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
-
-<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
-
-<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
-
-<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
-<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
-<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
+<p>在这些存储引擎中，比较重要的是 InnoDB 和 MyISAM。</p>
+<h4 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h4><ul>
+<li>MySQL 默认的事务型存储引擎（5.5 版本后），只有在需要它不支持的特性时，才考虑使用其它存储引擎</li>
+<li>实现了四个标准的隔离级别，默认级别是可重复读 REPEATABLE READ。</li>
+<li>主索引是聚簇索引，在索引中保存了数据，从而避免直接读取磁盘，因此对查询性能有很大的提升</li>
+<li>内部优化：从磁盘读取数据时采用的可预测性读、能够加快读操作并且自动创建的自适应哈希索引、能够加速插入操作的插入缓冲区等</li>
+<li>支持真正的在线热备份，读写混合。其它存储引擎不支持在线热备份。</li>
+<li>默认使用行级锁，在无索引无主键情况更新才会锁表。并发度高。</li>
+<li>支持外键，MVCC，宕机恢复。</li>
+</ul>
+<h4 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h4><ul>
+<li>设计简单，数据以紧密格式存储。对于只读数据，或者表比较小、可以容忍修复操作，则依然可以使用它。</li>
+<li>支持压缩表（对于不会进行修改的表，极大减少磁盘空间占用）和空间数据索引。</li>
+<li>只支持表级锁，不支持行级锁。只能对整张表加锁，读取时会对需要读到的所有表加共享锁，写入时则对表加排它锁。但在表有读取操作的同时，也可以往表中插入新的记录，这被称为并发插入。</li>
+<li>崩溃后发生损坏的概率比 InnoDB 高很多，而且恢复的速度也更慢。</li>
+<li>如果指定了延迟更新索引 DELAY_KEY_WRITE 选项，在每次修改执行完成时，不会立即将修改的索引数据写入磁盘，而是会写到内存中的键缓冲区，只有在清理键缓冲区或者关闭表的时候才会将对应的索引块写入磁盘。这种方式可以极大的提升写入性能，但是在数据库或者主机崩溃时会造成索引损坏，需要执行修复操作。</li>
+<li>MyISAM 更多强调的是性能，每次查询具有原子性，其执行速度比 InnoDB 更快，但不是绝对的。MyISAM 适合 SELECT 密集型的表。</li>
+</ul>
+<p>总结下 InnoDB &amp; MyISAM 的主要区别：事务，并发性 InnoDB支持行级锁，InnoDB 还支持外键和在线热备份，并且崩溃恢复优于MyISAM。MyISAM 简单，强调性能，支持压缩表和空间数据索引。</p>
+<h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><p>定义：数据库管理系统执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成。</p>
+<h4 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h4><ul>
+<li>原子性 Atomicity：事务被视为不可分割的最小单元，事务的所有操作要么全部提交成功，要么全部失败回滚。回滚日志 undo log 记录着事务所执行的修改操作，在回滚时反向执行这些修改操作即可。</li>
+<li>一致性 Consistency：数据库在事务执行前后都保持一致性状态。在一致性状态下，所有事务对一个数据的读取结果都是相同的。</li>
+<li>隔离性 Isolation：一个事务所做的修改在最终提交以前，对其它事务是不可见的。</li>
+<li>持久性 Durability：一旦事务提交，则其所做的修改将会永远保存到数据库中。即使系统发生崩溃，事务执行的结果也不能丢失。系统发生奔溃可以用重做日志 redo log 进行恢复，从而实现持久性。与回滚日志记录数据的逻辑修改不同，重做日志记录的是数据页的物理修改。</li>
+</ul>
+<h4 id="JDBC-实现数据库事务"><a href="#JDBC-实现数据库事务" class="headerlink" title="JDBC 实现数据库事务"></a>JDBC 实现数据库事务</h4><p>JDBC：Java 数据库连接，定义的一套操作所有关系型数据库的接口，不同数据库实现接口，提供 JAR 包。</p>
+<p>JDBC 基本操作：</p>
+<ol>
+<li>注册驱动 DriverManager</li>
+<li>获取连接 Connection</li>
+<li>开启事务</li>
+<li>定义 sql</li>
+<li>获取执行 sql 对象 PreparedStatement</li>
+<li>执行 sql</li>
+<li>事务提交或回滚</li>
+<li>释放资源</li>
+</ol>
+<p>代码</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>由于分享内容过多，我使用上下两篇博客的形式，本篇讲述了 MySQL。下一篇将会记录 Redis 相关的内容。</p>
 ]]></content>
       <tags>
-        <tag>other</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSM 整合</title>
-    <url>/2020/02/19/blog2/</url>
-    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
-
-<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
-<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
-<p>编写 AccountDao 接口，实现：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
-
-<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
-<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
-
-<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
-
-<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
-]]></content>
-      <tags>
-        <tag>spring</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>欢迎来到我的网站</title>
-    <url>/2020/02/14/blog1/</url>
-    <content><![CDATA[<p>&emsp;&emsp;Hello, developers!</p>
-<p>&emsp;&emsp;这是本网站的第一篇博客，希望从这以后我能督促自己，以学习和分享为目的，产出高质量的技术博客。如果能带给大家帮助，我将感到万分荣幸！</p>
-<p>&emsp;&emsp;本网站用于记录我日常编程开发的心得体会，主要但不限于 Java 后端开发方向，还会有工具箱用来记录自己平时遇到高频关键的快捷键和命令，以及挂几个小项目。</p>
-<p>&emsp;&emsp;欢迎小伙伴们的到来，衷心希望能与各位成为朋友。</p>
-<p>&emsp;&emsp;Enjoy coding &amp; peace！</p>
-]]></content>
-      <tags>
-        <tag>welcome</tag>
+        <tag>backend</tag>
       </tags>
   </entry>
 </search>
