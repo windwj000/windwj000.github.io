@@ -224,7 +224,19 @@
 
       
           <p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2>
+<h2 id="Redis-基础"><a href="#Redis-基础" class="headerlink" title="Redis 基础"></a>Redis 基础</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis 是速度非常快的非关系型内存键值数据库。<br>Redis 和 MySQL 不同之处在于，Redis 用的是 NoSQL。<br>主要用作缓存，缓存目的：</p>
+<ul>
+<li>高性能：操作缓存就是直接操作内存，所以速度相当快。</li>
+<li>高并发：直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。并且缓存是走内存的，内存天然就支撑高并发。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/06/01/blog9/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
