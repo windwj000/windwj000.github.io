@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.jiebcoder.top/"/>
-  <updated>2020-06-02T03:19:38.109Z</updated>
+  <updated>2020-07-15T10:57:56.363Z</updated>
   <id>http://www.jiebcoder.top/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spring bean 的声明和注入</title>
+    <link href="http://www.jiebcoder.top/2020/07/15/blog10/"/>
+    <id>http://www.jiebcoder.top/2020/07/15/blog10/</id>
+    <published>2020-07-15T08:06:28.000Z</published>
+    <updated>2020-07-15T10:57:56.363Z</updated>
+    
+    <content type="html"><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p><p>通过 @Component 注解将一个类声明为 bean，交给 Spring 管理，并在需要的时候注入获取实例。这就是 Spring 重要的 IOC 功能。</p><p>今天研究的问题出现在<strong><u>注入</u></strong>这一步：在对一个工具类注入 RedisCache（封装了 RedisTemplate 的工具类），由于工具类使用了静态方法，导致无法获取到注入的 RedisCache。</p><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>首先来认识一下 static 可以作用的对象：</p><h4 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h4><p>又称为类变量，也就是说这个变量属于类的，类所有的实例都共享静态变量，可以直接通过类名来访问它。静态变量在内存中只存在一份。当类被 Java 虚拟机加载的时候，会对 static 变量进行初始化。静态变量存放在 Java 内存区域的方法区。而实例变量每创建一个实例就会产生一个，它与该实例同生共死。</p><h4 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h4><p>在类加载的时候就存在了，它不依赖于任何实例。所以静态方法必须有实现，也就是说它不能是抽象方法。只能访问所属类的静态字段和静态方法（初始化顺序），方法中不能有 this 和 super 关键字（静态不需要对象）。调用静态方法可以无需创建对象（如果使用对象.静态方法会在编译后翻译为类.静态方法）。如果方法执行的操作不依赖于其类的各个变量和方法，设置为静态使程序的占用空间更小。</p><h4 id="静态语句块"><a href="#静态语句块" class="headerlink" title="静态语句块"></a>静态语句块</h4><p>静态代码块定义在类中方法外，静态代码块在非静态代码块之前执行。该类不管创建多少对象，在类初始化时运行一次。</p><h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><p>非静态内部类在编译完成之后会隐含地保存着一个引用，该引用是指向创建它的外围类，但是静态内部类却没有。非静态内部类依赖于外部类的实例，也就是说需要先创建外部类实例，才能用这个实例去创建非静态内部类。而静态内部类不需要。静态内部类不能访问外部类的非静态的变量和方法。</p><h4 id="静态导包"><a href="#静态导包" class="headerlink" title="静态导包"></a>静态导包</h4><p>JDK1.5</p><p>我们这里使用的是<u><strong>静态方法</strong></u>，属于类，而不属于某个实例，调用静态方法时不会创建对象。</p><p>静态方法还提到了初始化顺序：</p><h4 id="初始化顺序"><a href="#初始化顺序" class="headerlink" title="初始化顺序"></a>初始化顺序</h4><p>静态变量和静态语句块 -&gt; 实例变量和普通语句块 -&gt; 构造函数。静态变量和静态语句块的初始化顺序取决于它们在代码中的顺序。</p><p><strong>存在继承时的初始化顺序</strong></p><ol><li><p>父类（静态变量、静态语句块）</p></li><li><p>子类（静态变量、静态语句块）</p></li><li><p>父类（实例变量、普通语句块）</p></li><li><p>父类（构造函数）</p></li><li><p>子类（实例变量、普通语句块）</p></li><li><p>子类（构造函数）</p></li></ol><h3 id="bean-的声明"><a href="#bean-的声明" class="headerlink" title="bean 的声明"></a>bean 的声明</h3><p>共有四种方式将将一个<u><strong>类</strong></u>声明为 bean 的注解：</p><h4 id="Component"><a href="#Component" class="headerlink" title="@Component"></a>@Component</h4><p>通用的注解，可标注任意类为 Spring 组件。如果一个 bean 不知道属于哪个层，可以使用 @Component 注解标注。创建对象，把当前对象存入 Spring 容器中，相当于 XML 的 &lt; bean&gt;。</p><h4 id="Repository"><a href="#Repository" class="headerlink" title="@Repository"></a>@Repository</h4><p>对应持久层，主要用于数据库相关操作。</p><h4 id="Service"><a href="#Service" class="headerlink" title="@Service"></a>@Service</h4><p>对应服务层，主要涉及一些复杂的逻辑。</p><h4 id="Controller"><a href="#Controller" class="headerlink" title="@Controller"></a>@Controller</h4><p>对应控制层，主要用户接受用户请求并返回数据给前端页面。</p><p>@Bean 注解作用于<u><strong>方法</strong></u>，对比一下 @Component ：</p><h4 id="Component-和-Bean-的区别"><a href="#Component-和-Bean-的区别" class="headerlink" title="@Component 和 @Bean 的区别"></a>@Component 和 @Bean 的区别</h4><p>@Component 注解作用于类，而 @Bean 注解作用于方法。</p><p>@Component 通常是通过类路径扫描来自动侦测以及自动装配到 Spring 容器中，@Bean 注解通常是在标有该注解的方法中定义产生这个 bean。</p><p>@Bean 注解比 Component 注解的自定义性更强，而且很多地方我们只能通过 @Bean 注解来注册 bean。比如当我们引用第三方库中的类需要装配到 Spring 容器时，则只能通过 @Bean 来实现。</p><h3 id="bean-的注入"><a href="#bean-的注入" class="headerlink" title="bean 的注入"></a>bean 的注入</h3><p>@Autowired 可以实现自动装配，对象无需自己查找或创建与其关联的其他对象，由容器负责把需要相互协作的对象引用赋予各个对象。</p><h4 id="容器中查询对应类型的-bean"><a href="#容器中查询对应类型的-bean" class="headerlink" title="容器中查询对应类型的 bean"></a>容器中查询对应类型的 bean</h4><ol><li><p>如果查询结果刚好为一个，就将该 bean 装配给 @Autowired 指定的数据。</p></li><li><p>如果查询的结果不止一个，那么 @Autowired 会根据名称来查找。</p></li><li><p>如果上述查找的结果为空，那么会抛出异常。解决方法：使用 required=false。</p></li></ol><p>@Resource、@Inject、@Qualifier 和 @Value 也可以实现同样的装配效果。</p><h4 id="Autowired-和-Resource-之间的区别"><a href="#Autowired-和-Resource-之间的区别" class="headerlink" title="@Autowired 和 @Resource 之间的区别"></a>@Autowired 和 @Resource 之间的区别</h4><ul><li><p>@Autowired 默认是按照类型装配注入的。</p></li><li><p>@Resource 默认是按照名称来装配注入的，只有当找不到与名称匹配的 bean 才会按照类型来装配注入。</p></li></ul><h4 id="Qualifier"><a href="#Qualifier" class="headerlink" title="@Qualifier"></a>@Qualifier</h4><p>在按照类注入的基础上再根据名称注入。给类注入时不能单独使用，需要配合 @Autowired。给方法和变量注入时可以单独使用。</p><h4 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h4><p>基本类型和 String 无法用 @Autowired、@Resource 和 @Qualifier 实现，需要使用 @Value。可以配合 Spring 的 EL 表达式 SpEL。</p><h3 id="问题的分析和解决方案"><a href="#问题的分析和解决方案" class="headerlink" title="问题的分析和解决方案"></a>问题的分析和解决方案</h3><p>了解了 static、bean 的声明和注入后，来看一下出问题的代码：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> RedisCache redisCache;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sendSms</span><span class="params">(String[] phoneNumbers)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    redisCache.setCacheObject(key,code);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>原来为了 TxsmsUtils.sendSms() 方便而将这个方法设置为 static，在方法内使用 redisCache 时需要 redisCache 也是静态的。</p><p>然而像上面分析的，静态变量属于类，而不属于某个实例，不会由 Spring 注入并创建对象。因此 sendSms() 这个方法中是获取不到 redisCache 对象的，因此出错。</p><p>解决：将 sendSms() 和 redisCache 设置为非静态，即去除 static。</p><p>另外，对于工具类，如果需要使用其他组件，需要将工具类也声明为 Spring bean，交给 Spring 来控制，这样才能获取到组件的实例。</p><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>静态方法中无法进行获取到 Spring bean 的实例，看似直接明了的结论，若不是像我一样在实际开发过程中遇到过 bug，并从头到尾排查一边，真的得很难有完整的理解。</p><p>读万卷书，行万里路。要在懂得理论知识的前提下，积极实践，总结错误。我的这条路才刚刚开始。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Spring bean 就是可重用组件，是 Spring 的基础。&lt;/p&gt;
+&lt;p&gt;通过 @Component 注解将一个类声明为 bean，交给 Spring 管理，并在需要的时候注入获取实例。这就是 Spring 重要的 IOC 功能。&lt;/p&gt;
+&lt;p&gt;今天研究的问题出现在&lt;strong&gt;&lt;u&gt;注入&lt;/u&gt;&lt;/strong&gt;这一步：在对一个工具类注入 RedisCache（封装了 RedisTemplate 的工具类），由于工具类使用了静态方法，导致无法获取到注入的 RedisCache。&lt;/p&gt;
+&lt;h3 id=&quot;static&quot;&gt;&lt;a href=&quot;#static&quot; class=&quot;headerlink&quot; title=&quot;static&quot;&gt;&lt;/a&gt;static&lt;/h3&gt;&lt;p&gt;首先来认识一下 static 可以作用的对象：&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="spring" scheme="http://www.jiebcoder.top/tags/spring/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL &amp; Redis 技术分享-下</title>
