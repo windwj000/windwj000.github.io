@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>欢迎来到我的网站</title>
+    <url>/2020/02/14/blog1/</url>
+    <content><![CDATA[<p>欢迎各位!</p>
+<p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p>
+<p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>
+]]></content>
+      <tags>
+        <tag>welcome</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Spring bean 的声明和注入</title>
     <url>/2020/07/15/blog10/</url>
     <content><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
@@ -72,45 +83,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Selenium IDE 的简单使用</title>
-    <url>/2020/02/20/blog3/</url>
-    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
-<p>首先了解下 Selenium：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
-
-<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
-<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
-
-<p>输入一个 URL，点击按钮</p>
-<p><img src="/images/blog3/a.png" alt="avatar"></p>
-<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
-
-<p>然后点击按钮</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
-
-<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
-<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
-<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
-<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
-
-<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
-
-<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
-
-<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
-<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
-<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
-]]></content>
-      <tags>
-        <tag>other</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SSM 整合</title>
     <url>/2020/02/19/blog2/</url>
     <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
@@ -160,102 +132,159 @@
       </tags>
   </entry>
   <entry>
-    <title>SimpleDateFormat 类使用避坑</title>
-    <url>/2020/05/19/blog7/</url>
-    <content><![CDATA[<p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
-<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+    <title>Selenium IDE 的简单使用</title>
+    <url>/2020/02/20/blog3/</url>
+    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
+<p>首先了解下 Selenium：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
 
-<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
-<h2 id="配合-Calendar-完成日期的加减"><a href="#配合-Calendar-完成日期的加减" class="headerlink" title="配合 Calendar 完成日期的加减"></a>配合 Calendar 完成日期的加减</h2><p>Calendar 的 getInstance() 获取 Calendar 实例，setTime() 设置起始时间，add() 进行日期的加减。add() 中 Calendar.DAY_OF_MONTH 表示以天作为计算的单位，Calendar.DATE 也是相同的效果，方法的第二个参数 amount 取负数即可实现减法。如下计算下个月的日期：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);</span><br><span class="line">Calendar calendar &#x3D; Calendar.getInstance();</span><br><span class="line">calendar.setTime(date);</span><br><span class="line">calendar.add(Calendar.DAY_OF_MONTH, 31);</span><br><span class="line">String endTime &#x3D; simpleDateFormat.format(calendar.getTime());    &#x2F;&#x2F; 2020-06-19 15:06:13</span><br></pre></td></tr></table></figure>
+<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
+<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
 
-<h2 id="SimpleDateFormat-避坑"><a href="#SimpleDateFormat-避坑" class="headerlink" title="SimpleDateFormat 避坑"></a>SimpleDateFormat 避坑</h2><p><u>重点来惹</u>！一定要按照日期格式的标准写法，比如使用错误的日期格式 “YYYY-MM-dd” 时，format() 将会出现奇怪的日期：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;YYYY-MM-dd&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19&quot;);    &#x2F;&#x2F; Sun Dec 29 00:00:00 CST 2019</span><br></pre></td></tr></table></figure>
+<p>输入一个 URL，点击按钮</p>
+<p><img src="/images/blog3/a.png" alt="avatar"></p>
+<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
 
-<p>标准表示日期的字符和其含义：</p>
-<table>
-<thead>
-<tr>
-<th align="center">字符</th>
-<th align="center">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">yyyy</td>
-<td align="center">年</td>
-</tr>
-<tr>
-<td align="center">MM</td>
-<td align="center">月</td>
-</tr>
-<tr>
-<td align="center">dd</td>
-<td align="center">日</td>
-</tr>
-<tr>
-<td align="center">hh</td>
-<td align="center">12小时制</td>
-</tr>
-<tr>
-<td align="center">HH</td>
-<td align="center">24小时制</td>
-</tr>
-<tr>
-<td align="center">mm</td>
-<td align="center">分</td>
-</tr>
-<tr>
-<td align="center">ss</td>
-<td align="center">秒</td>
-</tr>
-<tr>
-<td align="center">S</td>
-<td align="center">毫秒</td>
-</tr>
-<tr>
-<td align="center">E</td>
-<td align="center">星期几</td>
-</tr>
-<tr>
-<td align="center">D</td>
-<td align="center">一年中的第几天</td>
-</tr>
-<tr>
-<td align="center">F</td>
-<td align="center">一月中的第几个星期(会把这个月总共过的天数除以7)</td>
-</tr>
-<tr>
-<td align="center">w</td>
-<td align="center">一年中的第几个星期</td>
-</tr>
-<tr>
-<td align="center">W</td>
-<td align="center">一月中的第几星期(会根据实际情况来算)</td>
-</tr>
-<tr>
-<td align="center">a</td>
-<td align="center">上下午标识</td>
-</tr>
-<tr>
-<td align="center">k</td>
-<td align="center">和HH差不多，表示24小时制</td>
-</tr>
-<tr>
-<td align="center">K</td>
-<td align="center">和hh差不多，表示12小时制</td>
-</tr>
-<tr>
-<td align="center">z</td>
-<td align="center">表示时区</td>
-</tr>
-</tbody></table>
-<h2 id="SimpleDateFormat-为什么不是线程安全的？"><a href="#SimpleDateFormat-为什么不是线程安全的？" class="headerlink" title="SimpleDateFormat 为什么不是线程安全的？"></a>SimpleDateFormat 为什么不是线程安全的？</h2><p>额外拓展一个知识点，SimpleDateFormat 不是线程安全的。</p>
-<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>在 SimpleDateFormat 转换日期是通过 Calendar 对象来操作的，SimpleDateFormat 继承 DateFormat 类，DateFormat 类中维护一个 Calendar 对象，Calendar 实例被用来进行日期-时间计算，既被用于 format 方法也被用于 parse 方法。</p>
-<p>在 parse 方法的最后，会调用 CalendarBuilder 的 establish 方法，入参就是 SimpleDateFormat 维护的 Calendar 实例，在 establish 方法中会调用 calendar 的 clear 方法。</p>
-<p>SimpleDateFormat 维护的用于 format 和 parse 方法计算日期-时间的 calendar 被清空了，如果此时线程 A 将 calendar 清空且没有设置新值，线程 B 也进入 parse 方法用到了 SimpleDateFormat 对象中的 calendar 对象，此时就会产生线程安全问题。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>每一个使用 SimpleDateFormat 对象进行日期-时间进行 format 和 parse 方法的时候就创建一个新的 SimpleDateFormat 对象，用完就销毁。此时就可以使用 ThreadLocal 将 SimpleDateFormat 绑定到线程上。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SimpleDateFormat 虽小，但是有坑有拓展点，使用起来还是需要注意的。</p>
+<p>然后点击按钮</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
+
+<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
+<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
+<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
+<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
+
+<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
+
+<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
+
+<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
+<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
+<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
+]]></content>
+      <tags>
+        <tag>other</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MyBatis 与 Hibernate 对比</title>
+    <url>/2020/03/30/blog5/</url>
+    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
+<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
+<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
+<p>Spring Data JPA 是对 JPA 的封装。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
+<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
+<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
+<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
+<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
+
+<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
+<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
+<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
+
+<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
+<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
+<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
+<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
+<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
+<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
+<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
+<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
+<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
+<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
+<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
+<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
+<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
+<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
+<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
+<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
+<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
+]]></content>
+      <tags>
+        <tag>backend</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 后端开发技术选型</title>
+    <url>/2020/03/01/blog4/</url>
+    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
+<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
+<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
+<img src="/images/blog4/java.svg" width="30%" />
+
+<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
+<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
+<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
+<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
+<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
+<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
+<p>1.lambda 表达式和函数式接口</p>
+<p>2.Optional</p>
+<p>3.Stream</p>
+<p>4.新的日期和时间 API</p>
+<p>5.接口的默认方法</p>
+<p>6.多重注解</p>
+<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
+<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
+<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
+<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
+<img src="/images/blog4/linux.png" width="30%" />
+
+<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
+<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
+<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
+<p>网络部分还有两个重点：UNP 和 HTTP。</p>
+<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
+<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
+<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
+<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
+<img src="/images/blog4/mysql.png" width="30%" />
+
+<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
+<img src="/images/blog4/redis.png" width="30%" />
+
+<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
+<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
+<img src="/images/blog4/spring.png" width="30%" />
+
+<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
+<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
+<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
+<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
+<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
+<img src="/images/blog4/dubbo.png" width="10%" />
+
+<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
+<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
+<img src="/images/blog4/elasticsearch.png" width="30%" />
+
+<p>Hystrix 资源隔离、降级和熔断。</p>
+<img src="/images/blog4/hystrix.png" width="30%" />
+
+<p>Nginx 反向代理和负载均衡服务器。</p>
+<img src="/images/blog4/nginx.png" width="30%" />
+
+<p>ZooKeeper 配置和管理分布式组件。</p>
+<img src="/images/blog4/zookeeper.jpeg" width="30%" />
+
+<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
+<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
+<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
+<img src="/images/blog4/docker.png" width="30%" />
+
+<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
+<img src="/images/blog4/git.png" width="30%" />
+
+<img src="/images/blog4/maven.png" width="30%" />
+
 ]]></content>
       <tags>
         <tag>java</tag>
@@ -455,139 +484,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MyBatis 与 Hibernate 对比</title>
-    <url>/2020/03/30/blog5/</url>
-    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
-<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
-<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
-<p>Spring Data JPA 是对 JPA 的封装。</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
-<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
-<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
-<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
-<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
-
-<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
-<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
-<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
-
-<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
-<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
-<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
-<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
-<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
-<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
-<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
-<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
-<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
-<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
-<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
-<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
-<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
-<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
-<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
-<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
-<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
-]]></content>
-      <tags>
-        <tag>backend</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>欢迎来到我的网站</title>
-    <url>/2020/02/14/blog1/</url>
-    <content><![CDATA[<p>&emsp;&emsp;Hello, developers!</p>
-<p>&emsp;&emsp;这是本网站的第一篇博客，希望从这以后我能督促自己，以学习和分享为目的，产出高质量的技术博客。如果能带给大家帮助，我将感到万分荣幸！</p>
-<p>&emsp;&emsp;本网站用于记录我日常编程开发的心得体会，主要但不限于 Java 后端开发方向，还会有工具箱用来记录自己平时遇到高频关键的快捷键和命令，以及挂几个小项目。</p>
-<p>&emsp;&emsp;欢迎小伙伴们的到来，衷心希望能与各位成为朋友。</p>
-<p>&emsp;&emsp;Enjoy coding &amp; peace！</p>
-]]></content>
-      <tags>
-        <tag>welcome</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 后端开发技术选型</title>
-    <url>/2020/03/01/blog4/</url>
-    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
-<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
-<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
-<img src="/images/blog4/java.svg" width="30%" />
-
-<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
-<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
-<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
-<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
-<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
-<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
-<p>1.lambda 表达式和函数式接口</p>
-<p>2.Optional</p>
-<p>3.Stream</p>
-<p>4.新的日期和时间 API</p>
-<p>5.接口的默认方法</p>
-<p>6.多重注解</p>
-<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
-<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
-<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
-<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
-<img src="/images/blog4/linux.png" width="30%" />
-
-<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
-<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
-<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
-<p>网络部分还有两个重点：UNP 和 HTTP。</p>
-<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
-<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
-<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
-<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
-<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
-<img src="/images/blog4/mysql.png" width="30%" />
-
-<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
-<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
-<img src="/images/blog4/redis.png" width="30%" />
-
-<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
-<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
-<img src="/images/blog4/spring.png" width="30%" />
-
-<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
-<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
-<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
-<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
-<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
-<img src="/images/blog4/dubbo.png" width="10%" />
-
-<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
-<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
-<img src="/images/blog4/elasticsearch.png" width="30%" />
-
-<p>Hystrix 资源隔离、降级和熔断。</p>
-<img src="/images/blog4/hystrix.png" width="30%" />
-
-<p>Nginx 反向代理和负载均衡服务器。</p>
-<img src="/images/blog4/nginx.png" width="30%" />
-
-<p>ZooKeeper 配置和管理分布式组件。</p>
-<img src="/images/blog4/zookeeper.jpeg" width="30%" />
-
-<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
-<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
-<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
-<img src="/images/blog4/docker.png" width="30%" />
-
-<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
-<img src="/images/blog4/git.png" width="30%" />
-
-<img src="/images/blog4/maven.png" width="30%" />
-
-]]></content>
-      <tags>
-        <tag>java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MySQL &amp; Redis 技术分享-下</title>
     <url>/2020/06/01/blog9/</url>
     <content><![CDATA[<p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
@@ -638,6 +534,108 @@
 ]]></content>
       <tags>
         <tag>backend</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SimpleDateFormat 类使用避坑</title>
+    <url>/2020/05/19/blog7/</url>
+    <content><![CDATA[<p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
+<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
+<h2 id="配合-Calendar-完成日期的加减"><a href="#配合-Calendar-完成日期的加减" class="headerlink" title="配合 Calendar 完成日期的加减"></a>配合 Calendar 完成日期的加减</h2><p>Calendar 的 getInstance() 获取 Calendar 实例，setTime() 设置起始时间，add() 进行日期的加减。add() 中 Calendar.DAY_OF_MONTH 表示以天作为计算的单位，Calendar.DATE 也是相同的效果，方法的第二个参数 amount 取负数即可实现减法。如下计算下个月的日期：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);</span><br><span class="line">Calendar calendar &#x3D; Calendar.getInstance();</span><br><span class="line">calendar.setTime(date);</span><br><span class="line">calendar.add(Calendar.DAY_OF_MONTH, 31);</span><br><span class="line">String endTime &#x3D; simpleDateFormat.format(calendar.getTime());    &#x2F;&#x2F; 2020-06-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<h2 id="SimpleDateFormat-避坑"><a href="#SimpleDateFormat-避坑" class="headerlink" title="SimpleDateFormat 避坑"></a>SimpleDateFormat 避坑</h2><p><u>重点来惹</u>！一定要按照日期格式的标准写法，比如使用错误的日期格式 “YYYY-MM-dd” 时，format() 将会出现奇怪的日期：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;YYYY-MM-dd&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19&quot;);    &#x2F;&#x2F; Sun Dec 29 00:00:00 CST 2019</span><br></pre></td></tr></table></figure>
+
+<p>标准表示日期的字符和其含义：</p>
+<table>
+<thead>
+<tr>
+<th align="center">字符</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">yyyy</td>
+<td align="center">年</td>
+</tr>
+<tr>
+<td align="center">MM</td>
+<td align="center">月</td>
+</tr>
+<tr>
+<td align="center">dd</td>
+<td align="center">日</td>
+</tr>
+<tr>
+<td align="center">hh</td>
+<td align="center">12小时制</td>
+</tr>
+<tr>
+<td align="center">HH</td>
+<td align="center">24小时制</td>
+</tr>
+<tr>
+<td align="center">mm</td>
+<td align="center">分</td>
+</tr>
+<tr>
+<td align="center">ss</td>
+<td align="center">秒</td>
+</tr>
+<tr>
+<td align="center">S</td>
+<td align="center">毫秒</td>
+</tr>
+<tr>
+<td align="center">E</td>
+<td align="center">星期几</td>
+</tr>
+<tr>
+<td align="center">D</td>
+<td align="center">一年中的第几天</td>
+</tr>
+<tr>
+<td align="center">F</td>
+<td align="center">一月中的第几个星期(会把这个月总共过的天数除以7)</td>
+</tr>
+<tr>
+<td align="center">w</td>
+<td align="center">一年中的第几个星期</td>
+</tr>
+<tr>
+<td align="center">W</td>
+<td align="center">一月中的第几星期(会根据实际情况来算)</td>
+</tr>
+<tr>
+<td align="center">a</td>
+<td align="center">上下午标识</td>
+</tr>
+<tr>
+<td align="center">k</td>
+<td align="center">和HH差不多，表示24小时制</td>
+</tr>
+<tr>
+<td align="center">K</td>
+<td align="center">和hh差不多，表示12小时制</td>
+</tr>
+<tr>
+<td align="center">z</td>
+<td align="center">表示时区</td>
+</tr>
+</tbody></table>
+<h2 id="SimpleDateFormat-为什么不是线程安全的？"><a href="#SimpleDateFormat-为什么不是线程安全的？" class="headerlink" title="SimpleDateFormat 为什么不是线程安全的？"></a>SimpleDateFormat 为什么不是线程安全的？</h2><p>额外拓展一个知识点，SimpleDateFormat 不是线程安全的。</p>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>在 SimpleDateFormat 转换日期是通过 Calendar 对象来操作的，SimpleDateFormat 继承 DateFormat 类，DateFormat 类中维护一个 Calendar 对象，Calendar 实例被用来进行日期-时间计算，既被用于 format 方法也被用于 parse 方法。</p>
+<p>在 parse 方法的最后，会调用 CalendarBuilder 的 establish 方法，入参就是 SimpleDateFormat 维护的 Calendar 实例，在 establish 方法中会调用 calendar 的 clear 方法。</p>
+<p>SimpleDateFormat 维护的用于 format 和 parse 方法计算日期-时间的 calendar 被清空了，如果此时线程 A 将 calendar 清空且没有设置新值，线程 B 也进入 parse 方法用到了 SimpleDateFormat 对象中的 calendar 对象，此时就会产生线程安全问题。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>每一个使用 SimpleDateFormat 对象进行日期-时间进行 format 和 parse 方法的时候就创建一个新的 SimpleDateFormat 对象，用完就销毁。此时就可以使用 ThreadLocal 将 SimpleDateFormat 绑定到线程上。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SimpleDateFormat 虽小，但是有坑有拓展点，使用起来还是需要注意的。</p>
+]]></content>
+      <tags>
+        <tag>java</tag>
       </tags>
   </entry>
 </search>
