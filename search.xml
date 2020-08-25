@@ -12,6 +12,77 @@
       </categories>
   </entry>
   <entry>
+    <title>Spring bean 的声明和注入</title>
+    <url>/2020/07/15/blog10/</url>
+    <content><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
+<p>通过 @Component 注解将一个类声明为 bean，交给 Spring 管理，并在需要的时候注入获取实例。这就是 Spring 重要的 IOC 功能。</p>
+<p>今天研究的问题出现在<strong><u>注入</u></strong>这一步：在对一个工具类注入 RedisCache（封装了 RedisTemplate 的工具类），由于工具类使用了静态方法，导致无法获取到注入的 RedisCache。</p>
+<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>首先来认识一下 static 可以作用的对象：</p>
+<h4 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h4><p>又称为类变量，也就是说这个变量属于类的，类所有的实例都共享静态变量，可以直接通过类名来访问它。静态变量在内存中只存在一份。当类被 Java 虚拟机加载的时候，会对 static 变量进行初始化。静态变量存放在 Java 内存区域的方法区。而实例变量每创建一个实例就会产生一个，它与该实例同生共死。</p>
+<h4 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h4><p>在类加载的时候就存在了，它不依赖于任何实例。所以静态方法必须有实现，也就是说它不能是抽象方法。只能访问所属类的静态字段和静态方法（初始化顺序），方法中不能有 this 和 super 关键字（静态不需要对象）。调用静态方法可以无需创建对象（如果使用对象.静态方法会在编译后翻译为类.静态方法）。如果方法执行的操作不依赖于其类的各个变量和方法，设置为静态使程序的占用空间更小。</p>
+<h4 id="静态语句块"><a href="#静态语句块" class="headerlink" title="静态语句块"></a>静态语句块</h4><p>静态代码块定义在类中方法外，静态代码块在非静态代码块之前执行。该类不管创建多少对象，在类初始化时运行一次。</p>
+<h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><p>非静态内部类在编译完成之后会隐含地保存着一个引用，该引用是指向创建它的外围类，但是静态内部类却没有。非静态内部类依赖于外部类的实例，也就是说需要先创建外部类实例，才能用这个实例去创建非静态内部类。而静态内部类不需要。静态内部类不能访问外部类的非静态的变量和方法。</p>
+<h4 id="静态导包"><a href="#静态导包" class="headerlink" title="静态导包"></a>静态导包</h4><p>JDK1.5</p>
+<p>我们这里使用的是<u><strong>静态方法</strong></u>，属于类，而不属于某个实例，调用静态方法时不会创建对象。</p>
+<p>静态方法还提到了初始化顺序：</p>
+<h4 id="初始化顺序"><a href="#初始化顺序" class="headerlink" title="初始化顺序"></a>初始化顺序</h4><p>静态变量和静态语句块 -&gt; 实例变量和普通语句块 -&gt; 构造函数。静态变量和静态语句块的初始化顺序取决于它们在代码中的顺序。</p>
+<p><strong>存在继承时的初始化顺序</strong></p>
+<ol>
+<li><p>父类（静态变量、静态语句块）</p>
+</li>
+<li><p>子类（静态变量、静态语句块）</p>
+</li>
+<li><p>父类（实例变量、普通语句块）</p>
+</li>
+<li><p>父类（构造函数）</p>
+</li>
+<li><p>子类（实例变量、普通语句块）</p>
+</li>
+<li><p>子类（构造函数）</p>
+</li>
+</ol>
+<h3 id="bean-的声明"><a href="#bean-的声明" class="headerlink" title="bean 的声明"></a>bean 的声明</h3><p>共有四种方式将将一个<u><strong>类</strong></u>声明为 bean 的注解：</p>
+<h4 id="Component"><a href="#Component" class="headerlink" title="@Component"></a>@Component</h4><p>通用的注解，可标注任意类为 Spring 组件。如果一个 bean 不知道属于哪个层，可以使用 @Component 注解标注。创建对象，把当前对象存入 Spring 容器中，相当于 XML 的 &lt; bean&gt;。</p>
+<h4 id="Repository"><a href="#Repository" class="headerlink" title="@Repository"></a>@Repository</h4><p>对应持久层，主要用于数据库相关操作。</p>
+<h4 id="Service"><a href="#Service" class="headerlink" title="@Service"></a>@Service</h4><p>对应服务层，主要涉及一些复杂的逻辑。</p>
+<h4 id="Controller"><a href="#Controller" class="headerlink" title="@Controller"></a>@Controller</h4><p>对应控制层，主要用户接受用户请求并返回数据给前端页面。</p>
+<p>@Bean 注解作用于<u><strong>方法</strong></u>，对比一下 @Component ：</p>
+<h4 id="Component-和-Bean-的区别"><a href="#Component-和-Bean-的区别" class="headerlink" title="@Component 和 @Bean 的区别"></a>@Component 和 @Bean 的区别</h4><p>@Component 注解作用于类，而 @Bean 注解作用于方法。</p>
+<p>@Component 通常是通过类路径扫描来自动侦测以及自动装配到 Spring 容器中，@Bean 注解通常是在标有该注解的方法中定义产生这个 bean。</p>
+<p>@Bean 注解比 Component 注解的自定义性更强，而且很多地方我们只能通过 @Bean 注解来注册 bean。比如当我们引用第三方库中的类需要装配到 Spring 容器时，则只能通过 @Bean 来实现。</p>
+<h3 id="bean-的注入"><a href="#bean-的注入" class="headerlink" title="bean 的注入"></a>bean 的注入</h3><p>@Autowired 可以实现自动装配，对象无需自己查找或创建与其关联的其他对象，由容器负责把需要相互协作的对象引用赋予各个对象。</p>
+<h4 id="容器中查询对应类型的-bean"><a href="#容器中查询对应类型的-bean" class="headerlink" title="容器中查询对应类型的 bean"></a>容器中查询对应类型的 bean</h4><ol>
+<li><p>如果查询结果刚好为一个，就将该 bean 装配给 @Autowired 指定的数据。</p>
+</li>
+<li><p>如果查询的结果不止一个，那么 @Autowired 会根据名称来查找。</p>
+</li>
+<li><p>如果上述查找的结果为空，那么会抛出异常。解决方法：使用 required=false。</p>
+</li>
+</ol>
+<p>@Resource、@Inject、@Qualifier 和 @Value 也可以实现同样的装配效果。</p>
+<h4 id="Autowired-和-Resource-之间的区别"><a href="#Autowired-和-Resource-之间的区别" class="headerlink" title="@Autowired 和 @Resource 之间的区别"></a>@Autowired 和 @Resource 之间的区别</h4><ul>
+<li><p>@Autowired 默认是按照类型装配注入的。</p>
+</li>
+<li><p>@Resource 默认是按照名称来装配注入的，只有当找不到与名称匹配的 bean 才会按照类型来装配注入。</p>
+</li>
+</ul>
+<h4 id="Qualifier"><a href="#Qualifier" class="headerlink" title="@Qualifier"></a>@Qualifier</h4><p>在按照类注入的基础上再根据名称注入。给类注入时不能单独使用，需要配合 @Autowired。给方法和变量注入时可以单独使用。</p>
+<h4 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h4><p>基本类型和 String 无法用 @Autowired、@Resource 和 @Qualifier 实现，需要使用 @Value。可以配合 Spring 的 EL 表达式 SpEL。</p>
+<h3 id="问题的分析和解决方案"><a href="#问题的分析和解决方案" class="headerlink" title="问题的分析和解决方案"></a>问题的分析和解决方案</h3><p>了解了 static、bean 的声明和注入后，来看一下出问题的代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> RedisCache redisCache;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sendSms</span><span class="params">(String[] phoneNumbers)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    redisCache.setCacheObject(key,code);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原来为了 TxsmsUtils.sendSms() 方便而将这个方法设置为 static，在方法内使用 redisCache 时需要 redisCache 也是静态的。</p>
+<p>然而像上面分析的，静态变量属于类，而不属于某个实例，不会由 Spring 注入并创建对象。因此 sendSms() 这个方法中是获取不到 redisCache 对象的，因此出错。</p>
+<p>解决：将 sendSms() 和 redisCache 设置为非静态，即去除 static。</p>
+<p>另外，对于工具类，如果需要使用其他组件，需要将工具类也声明为 Spring bean，交给 Spring 来控制，这样才能获取到组件的实例。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>静态方法中无法进行获取到 Spring bean 的实例，看似直接明了的结论，若不是像我一样在实际开发过程中遇到过 bug，并从头到尾排查一边，真的得很难有完整的理解。</p>
+<p>读万卷书，行万里路。要在懂得理论知识的前提下，积极实践，总结错误。我的这条路才刚刚开始。</p>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Spring bean 的声明和注入2</title>
     <url>/2020/07/15/blog11/</url>
     <content><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
@@ -122,6 +193,175 @@
       </categories>
   </entry>
   <entry>
+    <title>MyBatis 与 Hibernate 对比</title>
+    <url>/2020/03/30/blog5/</url>
+    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
+<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
+<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
+<p>Spring Data JPA 是对 JPA 的封装。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
+<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
+<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
+<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
+<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
+
+<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
+<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
+<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
+
+<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
+<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
+<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
+<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
+<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
+<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
+<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
+<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
+<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
+<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
+<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
+<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
+<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
+<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
+<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
+<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
+<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
+]]></content>
+      <categories>
+        <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SSM 整合</title>
+    <url>/2020/02/19/blog2/</url>
+    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
+<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
+<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
+<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
+
+<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
+<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
+<p>编写 AccountDao 接口，实现：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
+
+<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
+<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Java 后端开发技术选型</title>
+    <url>/2020/03/01/blog4/</url>
+    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
+<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
+<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
+<img src="/images/blog4/java.svg" width="30%" />
+
+<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
+<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
+<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
+<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
+<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
+<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
+<p>1.lambda 表达式和函数式接口</p>
+<p>2.Optional</p>
+<p>3.Stream</p>
+<p>4.新的日期和时间 API</p>
+<p>5.接口的默认方法</p>
+<p>6.多重注解</p>
+<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
+<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
+<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
+<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
+<img src="/images/blog4/linux.png" width="30%" />
+
+<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
+<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
+<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
+<p>网络部分还有两个重点：UNP 和 HTTP。</p>
+<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
+<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
+<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
+<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
+<img src="/images/blog4/mysql.png" width="30%" />
+
+<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
+<img src="/images/blog4/redis.png" width="30%" />
+
+<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
+<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
+<img src="/images/blog4/spring.png" width="30%" />
+
+<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
+<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
+<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
+<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
+<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
+<img src="/images/blog4/dubbo.png" width="10%" />
+
+<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
+<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
+<img src="/images/blog4/elasticsearch.png" width="30%" />
+
+<p>Hystrix 资源隔离、降级和熔断。</p>
+<img src="/images/blog4/hystrix.png" width="30%" />
+
+<p>Nginx 反向代理和负载均衡服务器。</p>
+<img src="/images/blog4/nginx.png" width="30%" />
+
+<p>ZooKeeper 配置和管理分布式组件。</p>
+<img src="/images/blog4/zookeeper.jpeg" width="30%" />
+
+<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
+<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
+<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
+<img src="/images/blog4/docker.png" width="30%" />
+
+<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
+<img src="/images/blog4/git.png" width="30%" />
+
+<img src="/images/blog4/maven.png" width="30%" />
+
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>PuTTY 的安装与使用</title>
     <url>/2020/05/06/blog6/</url>
     <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
@@ -153,77 +393,6 @@
 ]]></content>
       <categories>
         <category>other</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Spring bean 的声明和注入</title>
-    <url>/2020/07/15/blog10/</url>
-    <content><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
-<p>通过 @Component 注解将一个类声明为 bean，交给 Spring 管理，并在需要的时候注入获取实例。这就是 Spring 重要的 IOC 功能。</p>
-<p>今天研究的问题出现在<strong><u>注入</u></strong>这一步：在对一个工具类注入 RedisCache（封装了 RedisTemplate 的工具类），由于工具类使用了静态方法，导致无法获取到注入的 RedisCache。</p>
-<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>首先来认识一下 static 可以作用的对象：</p>
-<h4 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h4><p>又称为类变量，也就是说这个变量属于类的，类所有的实例都共享静态变量，可以直接通过类名来访问它。静态变量在内存中只存在一份。当类被 Java 虚拟机加载的时候，会对 static 变量进行初始化。静态变量存放在 Java 内存区域的方法区。而实例变量每创建一个实例就会产生一个，它与该实例同生共死。</p>
-<h4 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h4><p>在类加载的时候就存在了，它不依赖于任何实例。所以静态方法必须有实现，也就是说它不能是抽象方法。只能访问所属类的静态字段和静态方法（初始化顺序），方法中不能有 this 和 super 关键字（静态不需要对象）。调用静态方法可以无需创建对象（如果使用对象.静态方法会在编译后翻译为类.静态方法）。如果方法执行的操作不依赖于其类的各个变量和方法，设置为静态使程序的占用空间更小。</p>
-<h4 id="静态语句块"><a href="#静态语句块" class="headerlink" title="静态语句块"></a>静态语句块</h4><p>静态代码块定义在类中方法外，静态代码块在非静态代码块之前执行。该类不管创建多少对象，在类初始化时运行一次。</p>
-<h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><p>非静态内部类在编译完成之后会隐含地保存着一个引用，该引用是指向创建它的外围类，但是静态内部类却没有。非静态内部类依赖于外部类的实例，也就是说需要先创建外部类实例，才能用这个实例去创建非静态内部类。而静态内部类不需要。静态内部类不能访问外部类的非静态的变量和方法。</p>
-<h4 id="静态导包"><a href="#静态导包" class="headerlink" title="静态导包"></a>静态导包</h4><p>JDK1.5</p>
-<p>我们这里使用的是<u><strong>静态方法</strong></u>，属于类，而不属于某个实例，调用静态方法时不会创建对象。</p>
-<p>静态方法还提到了初始化顺序：</p>
-<h4 id="初始化顺序"><a href="#初始化顺序" class="headerlink" title="初始化顺序"></a>初始化顺序</h4><p>静态变量和静态语句块 -&gt; 实例变量和普通语句块 -&gt; 构造函数。静态变量和静态语句块的初始化顺序取决于它们在代码中的顺序。</p>
-<p><strong>存在继承时的初始化顺序</strong></p>
-<ol>
-<li><p>父类（静态变量、静态语句块）</p>
-</li>
-<li><p>子类（静态变量、静态语句块）</p>
-</li>
-<li><p>父类（实例变量、普通语句块）</p>
-</li>
-<li><p>父类（构造函数）</p>
-</li>
-<li><p>子类（实例变量、普通语句块）</p>
-</li>
-<li><p>子类（构造函数）</p>
-</li>
-</ol>
-<h3 id="bean-的声明"><a href="#bean-的声明" class="headerlink" title="bean 的声明"></a>bean 的声明</h3><p>共有四种方式将将一个<u><strong>类</strong></u>声明为 bean 的注解：</p>
-<h4 id="Component"><a href="#Component" class="headerlink" title="@Component"></a>@Component</h4><p>通用的注解，可标注任意类为 Spring 组件。如果一个 bean 不知道属于哪个层，可以使用 @Component 注解标注。创建对象，把当前对象存入 Spring 容器中，相当于 XML 的 &lt; bean&gt;。</p>
-<h4 id="Repository"><a href="#Repository" class="headerlink" title="@Repository"></a>@Repository</h4><p>对应持久层，主要用于数据库相关操作。</p>
-<h4 id="Service"><a href="#Service" class="headerlink" title="@Service"></a>@Service</h4><p>对应服务层，主要涉及一些复杂的逻辑。</p>
-<h4 id="Controller"><a href="#Controller" class="headerlink" title="@Controller"></a>@Controller</h4><p>对应控制层，主要用户接受用户请求并返回数据给前端页面。</p>
-<p>@Bean 注解作用于<u><strong>方法</strong></u>，对比一下 @Component ：</p>
-<h4 id="Component-和-Bean-的区别"><a href="#Component-和-Bean-的区别" class="headerlink" title="@Component 和 @Bean 的区别"></a>@Component 和 @Bean 的区别</h4><p>@Component 注解作用于类，而 @Bean 注解作用于方法。</p>
-<p>@Component 通常是通过类路径扫描来自动侦测以及自动装配到 Spring 容器中，@Bean 注解通常是在标有该注解的方法中定义产生这个 bean。</p>
-<p>@Bean 注解比 Component 注解的自定义性更强，而且很多地方我们只能通过 @Bean 注解来注册 bean。比如当我们引用第三方库中的类需要装配到 Spring 容器时，则只能通过 @Bean 来实现。</p>
-<h3 id="bean-的注入"><a href="#bean-的注入" class="headerlink" title="bean 的注入"></a>bean 的注入</h3><p>@Autowired 可以实现自动装配，对象无需自己查找或创建与其关联的其他对象，由容器负责把需要相互协作的对象引用赋予各个对象。</p>
-<h4 id="容器中查询对应类型的-bean"><a href="#容器中查询对应类型的-bean" class="headerlink" title="容器中查询对应类型的 bean"></a>容器中查询对应类型的 bean</h4><ol>
-<li><p>如果查询结果刚好为一个，就将该 bean 装配给 @Autowired 指定的数据。</p>
-</li>
-<li><p>如果查询的结果不止一个，那么 @Autowired 会根据名称来查找。</p>
-</li>
-<li><p>如果上述查找的结果为空，那么会抛出异常。解决方法：使用 required=false。</p>
-</li>
-</ol>
-<p>@Resource、@Inject、@Qualifier 和 @Value 也可以实现同样的装配效果。</p>
-<h4 id="Autowired-和-Resource-之间的区别"><a href="#Autowired-和-Resource-之间的区别" class="headerlink" title="@Autowired 和 @Resource 之间的区别"></a>@Autowired 和 @Resource 之间的区别</h4><ul>
-<li><p>@Autowired 默认是按照类型装配注入的。</p>
-</li>
-<li><p>@Resource 默认是按照名称来装配注入的，只有当找不到与名称匹配的 bean 才会按照类型来装配注入。</p>
-</li>
-</ul>
-<h4 id="Qualifier"><a href="#Qualifier" class="headerlink" title="@Qualifier"></a>@Qualifier</h4><p>在按照类注入的基础上再根据名称注入。给类注入时不能单独使用，需要配合 @Autowired。给方法和变量注入时可以单独使用。</p>
-<h4 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h4><p>基本类型和 String 无法用 @Autowired、@Resource 和 @Qualifier 实现，需要使用 @Value。可以配合 Spring 的 EL 表达式 SpEL。</p>
-<h3 id="问题的分析和解决方案"><a href="#问题的分析和解决方案" class="headerlink" title="问题的分析和解决方案"></a>问题的分析和解决方案</h3><p>了解了 static、bean 的声明和注入后，来看一下出问题的代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> RedisCache redisCache;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sendSms</span><span class="params">(String[] phoneNumbers)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    redisCache.setCacheObject(key,code);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>原来为了 TxsmsUtils.sendSms() 方便而将这个方法设置为 static，在方法内使用 redisCache 时需要 redisCache 也是静态的。</p>
-<p>然而像上面分析的，静态变量属于类，而不属于某个实例，不会由 Spring 注入并创建对象。因此 sendSms() 这个方法中是获取不到 redisCache 对象的，因此出错。</p>
-<p>解决：将 sendSms() 和 redisCache 设置为非静态，即去除 static。</p>
-<p>另外，对于工具类，如果需要使用其他组件，需要将工具类也声明为 Spring bean，交给 Spring 来控制，这样才能获取到组件的实例。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>静态方法中无法进行获取到 Spring bean 的实例，看似直接明了的结论，若不是像我一样在实际开发过程中遇到过 bug，并从头到尾排查一边，真的得很难有完整的理解。</p>
-<p>读万卷书，行万里路。要在懂得理论知识的前提下，积极实践，总结错误。我的这条路才刚刚开始。</p>
-]]></content>
-      <categories>
-        <category>spring</category>
       </categories>
   </entry>
   <entry>
@@ -326,175 +495,6 @@
 ]]></content>
       <categories>
         <category>java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Java 后端开发技术选型</title>
-    <url>/2020/03/01/blog4/</url>
-    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
-<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
-<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
-<img src="/images/blog4/java.svg" width="30%" />
-
-<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
-<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
-<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
-<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
-<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
-<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
-<p>1.lambda 表达式和函数式接口</p>
-<p>2.Optional</p>
-<p>3.Stream</p>
-<p>4.新的日期和时间 API</p>
-<p>5.接口的默认方法</p>
-<p>6.多重注解</p>
-<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
-<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
-<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
-<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
-<img src="/images/blog4/linux.png" width="30%" />
-
-<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
-<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
-<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
-<p>网络部分还有两个重点：UNP 和 HTTP。</p>
-<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
-<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
-<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
-<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
-<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
-<img src="/images/blog4/mysql.png" width="30%" />
-
-<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
-<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
-<img src="/images/blog4/redis.png" width="30%" />
-
-<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
-<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
-<img src="/images/blog4/spring.png" width="30%" />
-
-<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
-<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
-<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
-<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
-<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
-<img src="/images/blog4/dubbo.png" width="10%" />
-
-<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
-<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
-<img src="/images/blog4/elasticsearch.png" width="30%" />
-
-<p>Hystrix 资源隔离、降级和熔断。</p>
-<img src="/images/blog4/hystrix.png" width="30%" />
-
-<p>Nginx 反向代理和负载均衡服务器。</p>
-<img src="/images/blog4/nginx.png" width="30%" />
-
-<p>ZooKeeper 配置和管理分布式组件。</p>
-<img src="/images/blog4/zookeeper.jpeg" width="30%" />
-
-<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
-<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
-<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
-<img src="/images/blog4/docker.png" width="30%" />
-
-<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
-<img src="/images/blog4/git.png" width="30%" />
-
-<img src="/images/blog4/maven.png" width="30%" />
-
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>SSM 整合</title>
-    <url>/2020/02/19/blog2/</url>
-    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
-
-<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
-<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
-<p>编写 AccountDao 接口，实现：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
-
-<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
-<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
-
-<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
-
-<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>MyBatis 与 Hibernate 对比</title>
-    <url>/2020/03/30/blog5/</url>
-    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
-<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
-<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
-<p>Spring Data JPA 是对 JPA 的封装。</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
-<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
-<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
-<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
-<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
-
-<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
-<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
-<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
-
-<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
-<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
-<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
-<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
-<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
-<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
-<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
-<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
-<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
-<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
-<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
-<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
-<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
-<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
-<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
-<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
-<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
-]]></content>
-      <categories>
-        <category>backend</category>
       </categories>
   </entry>
   <entry>
