@@ -20,16 +20,16 @@
     var CONFIG = {"hostname":"www.jiebcoder.top","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="背景项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。 官方文档：https:&#x2F;&#x2F;opendocs.alipay.com&#x2F;open&#x2F;204&#x2F;105297&#x2F;。 编码前的准备1.创建应用">
+  <meta name="description" content="背景项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。 官方文档：https:&#x2F;&#x2F;opendocs.alipay.com&#x2F;open&#x2F;204&#x2F;105297 。 编码前的准备1.创建应用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 实现支付宝后台支付接口">
 <meta property="og:url" content="http://www.jiebcoder.top/2020/10/16/blog11/index.html">
 <meta property="og:site_name" content="风&#39;s website">
-<meta property="og:description" content="背景项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。 官方文档：https:&#x2F;&#x2F;opendocs.alipay.com&#x2F;open&#x2F;204&#x2F;105297&#x2F;。 编码前的准备1.创建应用">
+<meta property="og:description" content="背景项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。 官方文档：https:&#x2F;&#x2F;opendocs.alipay.com&#x2F;open&#x2F;204&#x2F;105297 。 编码前的准备1.创建应用">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.jiebcoder.top/images/blog11/alipay.png">
 <meta property="article:published_time" content="2020-10-16T06:41:28.000Z">
-<meta property="article:modified_time" content="2020-10-16T08:07:36.318Z">
+<meta property="article:modified_time" content="2020-10-16T08:09:55.869Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.jiebcoder.top/images/blog11/alipay.png">
@@ -247,13 +247,13 @@
 
       
         <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。</p>
-<p>官方文档：<a href="https://opendocs.alipay.com/open/204/105297/。" target="_blank" rel="noopener">https://opendocs.alipay.com/open/204/105297/。</a></p>
+<p>官方文档：<a href="https://opendocs.alipay.com/open/204/105297" target="_blank" rel="noopener">https://opendocs.alipay.com/open/204/105297</a> 。</p>
 <h2 id="编码前的准备"><a href="#编码前的准备" class="headerlink" title="编码前的准备"></a>编码前的准备</h2><p>1.<strong>创建应用</strong></p>
 <p>在支付宝开放平台的开发者中心，创建自己的应用，并取得应用的唯一标识 APPID。</p>
 <p>2.<strong>添加支付能力</strong></p>
 <p>在应用详情页面，添加能力-App 支付，并进行签约。</p>
 <p>3.<strong>密钥生成和配置</strong></p>
-<p>为了保障交易身份与数据的安全，需要进行密钥的配置，这里由于是企业的项目，需要配置公钥证书，这里需要用到支付宝开放平台开发助手，生成 CSR 文件：应用公钥、私钥、证书这 3 个文件。详见官网文档：<a href="https://opendocs.alipay.com/open/291/105971。" target="_blank" rel="noopener">https://opendocs.alipay.com/open/291/105971。</a></p>
+<p>为了保障交易身份与数据的安全，需要进行密钥的配置，这里由于是企业的项目，需要配置公钥证书，这里需要用到支付宝开放平台开发助手，生成 CSR 文件：应用公钥、私钥、证书这 3 个文件。详见官网文档：<a href="https://opendocs.alipay.com/open/291/105971" target="_blank" rel="noopener">https://opendocs.alipay.com/open/291/105971</a> 。</p>
 <p>然后需要在应用的开发信息中，设置接口加签方式，上传 CSR 文件，在线生成应用公钥证书即 .crt 文件，然后上传这个证书。上传完成后，还可以下载对应的支付宝公钥证书和支付宝根证书。</p>
 <p>4.<strong>后台集成支付宝的 SDK</strong></p>
 <p>这个 SDK 用于协助解析并验证客户端同步返回的支付结果和异步通知。</p>
