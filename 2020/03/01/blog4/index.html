@@ -15,40 +15,40 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.jiebcoder.top","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"www.windboy.top","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。 JavaJava 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。 Java 相关的要点有：Java 基础，Java 容器，Java I&#x2F;O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：思维导图，密码为 Pm6j。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 后端开发技术选型">
-<meta property="og:url" content="http://www.jiebcoder.top/2020/03/01/blog4/index.html">
+<meta property="og:url" content="http://www.windboy.top/2020/03/01/blog4/index.html">
 <meta property="og:site_name" content="风的个人网站">
 <meta property="og:description" content="根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。 JavaJava 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。 Java 相关的要点有：Java 基础，Java 容器，Java I&#x2F;O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：思维导图，密码为 Pm6j。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/java.svg">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/linux.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/mysql.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/redis.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/spring.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/mybatis.jpeg">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/hibernate.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/dubbo.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/elasticsearch.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/hystrix.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/nginx.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/zookeeper.jpeg">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/rocketmq.jpeg">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/kafka.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/docker.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/git.png">
-<meta property="og:image" content="http://www.jiebcoder.top/images/blog4/maven.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/java.svg">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/linux.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/mysql.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/redis.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/spring.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/mybatis.jpeg">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/hibernate.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/dubbo.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/elasticsearch.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/hystrix.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/nginx.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/zookeeper.jpeg">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/rocketmq.jpeg">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/kafka.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/docker.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/git.png">
+<meta property="og:image" content="http://www.windboy.top/images/blog4/maven.png">
 <meta property="article:published_time" content="2020-03-01T03:06:28.000Z">
 <meta property="article:modified_time" content="2020-08-25T07:08:28.112Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://www.jiebcoder.top/images/blog4/java.svg">
+<meta name="twitter:image" content="http://www.windboy.top/images/blog4/java.svg">
 
-<link rel="canonical" href="http://www.jiebcoder.top/2020/03/01/blog4/">
+<link rel="canonical" href="http://www.windboy.top/2020/03/01/blog4/">
 
 
 <script id="page-configurations">
@@ -195,7 +195,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.jiebcoder.top/2020/03/01/blog4/">
+    <link itemprop="mainEntityOfPage" href="http://www.windboy.top/2020/03/01/blog4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -211,14 +211,20 @@
           Java 后端开发技术选型
         </h1>
 
-        <div class="post-meta">
+        <div class="post-meta"> 
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
               </span>
+              
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-01 11:06:28" itemprop="dateCreated datePublished" datetime="2020-03-01T11:06:28+08:00">2020-03-01</time>
+              <time title="创建时间：2020-03-01 11:06:28" 
+                itemprop="dateCreated datePublished" 
+                datetime="2020-03-01T11:06:28+08:00">2020-03-01
+                
+              </time>
+
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -469,7 +475,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
