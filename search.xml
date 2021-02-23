@@ -1,166 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Java 实现支付宝后台支付接口</title>
-    <url>/2020/10/16/blog11/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。</p>
-<p>官方文档：<a href="https://opendocs.alipay.com/open/204/105297" target="_blank" rel="noopener">https://opendocs.alipay.com/open/204/105297</a> 。</p>
-<h2 id="编码前的准备"><a href="#编码前的准备" class="headerlink" title="编码前的准备"></a>编码前的准备</h2><p>1.<strong>创建应用</strong></p>
-<p>在支付宝开放平台的开发者中心，创建自己的应用，并取得应用的唯一标识 APPID。</p>
-<p>2.<strong>添加支付能力</strong></p>
-<p>在应用详情页面，添加能力-App 支付，并进行签约。</p>
-<p>3.<strong>密钥生成和配置</strong></p>
-<p>为了保障交易身份与数据的安全，需要进行密钥的配置，这里由于是企业的项目，需要配置公钥证书，这里需要用到支付宝开放平台开发助手，生成 CSR 文件：应用公钥、私钥、证书这 3 个文件。详见官网文档：<a href="https://opendocs.alipay.com/open/291/105971" target="_blank" rel="noopener">https://opendocs.alipay.com/open/291/105971</a> 。</p>
-<p>然后需要在应用的开发信息中，设置接口加签方式，上传 CSR 文件，在线生成应用公钥证书即 .crt 文件，然后上传这个证书。上传完成后，还可以下载对应的支付宝公钥证书和支付宝根证书。</p>
-<p>4.<strong>后台集成支付宝的 SDK</strong></p>
-<p>这个 SDK 用于协助解析并验证客户端同步返回的支付结果和异步通知。</p>
-<p>App 端也需要集成支付宝对应的 SDK。</p>
-<h2 id="编写支付接口"><a href="#编写支付接口" class="headerlink" title="编写支付接口"></a>编写支付接口</h2><h3 id="支付宝支付流程图"><a href="#支付宝支付流程图" class="headerlink" title="支付宝支付流程图"></a>支付宝支付流程图</h3><img src="/images/blog11/alipay.png" width="80%"/>
-
-<h3 id="在-App-端的表现"><a href="#在-App-端的表现" class="headerlink" title="在 App 端的表现"></a>在 App 端的表现</h3><p>用户在 App 上点击立即购买，选择支付方式，点击确定支付调用后台接口并跳转到支付宝 App，付款完成后，跳转回 App，完成支付。</p>
-<h3 id="后台接口的需求"><a href="#后台接口的需求" class="headerlink" title="后台接口的需求"></a>后台接口的需求</h3><p>后台需要提供 3 个接口：订单信息加密、支付宝服务端异步通知、最终付款校验。</p>
-<h3 id="接口-1：订单信息加密"><a href="#接口-1：订单信息加密" class="headerlink" title="接口 1：订单信息加密"></a><strong>接口 1：订单信息加密</strong></h3><p><strong>功能</strong></p>
-<p>传入订单信息，返回加密后的订单字符串，并在项目数据库保存支付宝订单信息。</p>
-<p><strong>密钥验证方式</strong></p>
-<p>支付宝客户端将传送的消息用私钥加密，服务端使用公钥对消息进行验证。</p>
-<p><strong>代码</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/encrypt"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> AjaxResult <span class="title">getAliPayOrder</span><span class="params">(@RequestParam String orderSn)</span> <span class="keyword">throws</span> AlipayApiException </span>&#123;</span><br><span class="line">  </span><br><span class="line">    EOrder eOrder=eOrderService.selectEOrderByOrderSn(orderSn);</span><br><span class="line"></span><br><span class="line">    AlipaymentOrder alipaymentOrder = <span class="keyword">new</span> AlipaymentOrder();</span><br><span class="line">    alipaymentOrder.setOrderId(eOrder.getOrderId().intValue());</span><br><span class="line">    alipaymentOrder.setOutTradeNo(orderSn);</span><br><span class="line">    alipaymentOrder.setAmount(eOrder.getActualPrice());</span><br><span class="line">    <span class="comment">// 订单生成，等待用户付款</span></span><br><span class="line">    alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    CertAlipayRequest certAlipayRequest = <span class="keyword">new</span> CertAlipayRequest();</span><br><span class="line">    <span class="comment">//设置网关地址</span></span><br><span class="line">    certAlipayRequest.setServerUrl(<span class="string">"https://openapi.alipay.com/gateway.do"</span>);</span><br><span class="line">    <span class="comment">//设置应用Id</span></span><br><span class="line">    certAlipayRequest.setAppId(app_id);</span><br><span class="line">    <span class="comment">//设置应用私钥</span></span><br><span class="line">    certAlipayRequest.setPrivateKey(privateKey);</span><br><span class="line">    <span class="comment">//设置请求格式，固定值json</span></span><br><span class="line">    certAlipayRequest.setFormat(<span class="string">"json"</span>);</span><br><span class="line">    <span class="comment">//设置字符集</span></span><br><span class="line">    certAlipayRequest.setCharset(<span class="string">"UTF-8"</span>);</span><br><span class="line">    <span class="comment">//设置签名类型</span></span><br><span class="line">    certAlipayRequest.setSignType(<span class="string">"RSA2"</span>);</span><br><span class="line">    <span class="comment">//设置应用公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setCertPath(certPath);</span><br><span class="line">    <span class="comment">//设置支付宝公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);</span><br><span class="line">    <span class="comment">//设置支付宝根证书路径</span></span><br><span class="line">    certAlipayRequest.setRootCertPath(rootCertPath);</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    AlipayClient alipayClient = <span class="keyword">new</span> DefaultAlipayClient(certAlipayRequest);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay</span></span><br><span class="line">    AlipayTradeAppPayRequest request = <span class="keyword">new</span> AlipayTradeAppPayRequest();</span><br><span class="line">    <span class="comment">//SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。</span></span><br><span class="line">    AlipayTradeAppPayModel model = <span class="keyword">new</span> AlipayTradeAppPayModel();</span><br><span class="line">    model.setBody(<span class="string">"xx"</span>);</span><br><span class="line">    model.setSubject(<span class="string">"xx"</span>);</span><br><span class="line">    model.setOutTradeNo(orderSn);</span><br><span class="line">    model.setTimeoutExpress(<span class="string">"30m"</span>);</span><br><span class="line">    model.setTotalAmount(eOrder.getActualPrice().toString());</span><br><span class="line">    model.setProductCode(<span class="string">"QUICK_MSECURITY_PAY"</span>);</span><br><span class="line">    request.setBizModel(model);</span><br><span class="line">    <span class="comment">// 需要外网需要能直接访问的地址</span></span><br><span class="line">    request.setNotifyUrl(<span class="string">"xxx"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//这里和普通的接口调用不同，使用的是sdkExecute</span></span><br><span class="line">        AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);</span><br><span class="line">        <span class="comment">// 如果未发生异常，则记录支付宝订单</span></span><br><span class="line">        alipaymentOrderService.insertAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> AjaxResult.success(response.getBody());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (AlipayApiException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> AjaxResult.error(<span class="string">"加密失败！"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>入参 orderSn 是订单编号，这里需要在项目后台数据库保存支付宝支付订单，使用 AlipaymentOrder 这个实体类：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AlipaymentOrder</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单ID</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> orderId;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单号</span></span><br><span class="line">    <span class="keyword">private</span> String outTradeNo;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 金额</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> amount;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 交易状态</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> tradeStatus;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知时间</span></span><br><span class="line">    <span class="keyword">private</span> String notifyTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单生成时间</span></span><br><span class="line">    <span class="keyword">private</span> String createTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 付款时间</span></span><br><span class="line">    <span class="keyword">private</span> String payTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 退款时间</span></span><br><span class="line">    <span class="keyword">private</span> String refundTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单结束时间</span></span><br><span class="line">    <span class="keyword">private</span> String closeTime;</span><br><span class="line">  </span><br><span class="line"> 		...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>需要注意的是 response.getBody() 就是加密后的订单字符串，可以直接返回给 App 端进行使用。</p>
-<h3 id="接口-2：支付宝服务端异步通知"><a href="#接口-2：支付宝服务端异步通知" class="headerlink" title="接口 2：支付宝服务端异步通知"></a>接口 2：支付宝服务端异步通知</h3><p><strong>功能</strong></p>
-<ul>
-<li><p>通过异步通知更新支付宝订单信息。</p>
-</li>
-<li><p>防止订单丢失，即页面跳转同步通知没有处理订单更新，它则去处理。</p>
-</li>
-</ul>
-<p><strong>注意</strong></p>
-<ul>
-<li>只有在支付宝的交易管理中存在该笔交易，且发生了交易状态的改变，支付宝才会通过该方式发起服务器通知。</li>
-<li>第一次交易状态改变（即时到账中此时交易状态是交易完成）时，不仅会返回同步处理结果，而且服务器异步通知页面也会收到支付宝发来的处理结果通知。</li>
-</ul>
-<p><strong>代码</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/asyn"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getAsynResult</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> AlipayApiException </span>&#123;</span><br><span class="line">  <span class="comment">//获取支付宝POST过来反馈信息</span></span><br><span class="line">  Map&lt;String,String&gt; params = <span class="keyword">new</span> HashMap&lt;String,String&gt;();</span><br><span class="line">  Map requestParams = request.getParameterMap();</span><br><span class="line">  <span class="keyword">for</span> (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) &#123;</span><br><span class="line">    String name = (String) iter.next();</span><br><span class="line">    String[] values = (String[]) requestParams.get(name);</span><br><span class="line">    String valueStr = <span class="string">""</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; values.length; i++) &#123;</span><br><span class="line">      valueStr = (i == values.length - <span class="number">1</span>) ? valueStr + values[i]</span><br><span class="line">        : valueStr + values[i] + <span class="string">","</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//乱码解决，这段代码在出现乱码时使用。</span></span><br><span class="line">    <span class="comment">//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");</span></span><br><span class="line">    params.put(name, valueStr);</span><br><span class="line">    logger.info(name+<span class="string">" "</span>+valueStr);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//切记alipaypublickey是支付宝的公钥，请去open.alipay.com对应应用下查看。</span></span><br><span class="line">  <span class="comment">//boolean AlipaySignature.rsaCertCheckV1(Map&lt;String, String&gt; params, String publicKeyCertPath, String charset,String signType)</span></span><br><span class="line">  <span class="comment">//调用SDK验证签名</span></span><br><span class="line">  <span class="keyword">boolean</span> flag = AlipaySignature.rsaCertCheckV1(params, alipayPublicCertPath, <span class="string">"UTF-8"</span>,<span class="string">"RSA2"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (flag) &#123;</span><br><span class="line">    <span class="comment">//获取商户之前传给支付宝的订单号（商户系统的唯一订单号）</span></span><br><span class="line">    String outTradeNo = params.get(<span class="string">"out_trade_no"</span>);</span><br><span class="line">    <span class="comment">//订单金额:本次交易支付的订单金额，单位为人民币（元）</span></span><br><span class="line">    String totalAmount=params.get(<span class="string">"total_amount"</span>);</span><br><span class="line">    <span class="comment">//卖家支付宝用户号</span></span><br><span class="line">    String sellerId=params.get(<span class="string">"seller_id"</span>);</span><br><span class="line">    <span class="comment">//支付宝分配给开发者的应用Id</span></span><br><span class="line">    String appId=params.get(<span class="string">"app_id"</span>);</span><br><span class="line">    <span class="comment">//获取交易状态</span></span><br><span class="line">    String tradeStatus = params.get(<span class="string">"trade_status"</span>);</span><br><span class="line">    <span class="comment">//通知时间:yyyy-MM-dd HH:mm:ss</span></span><br><span class="line">    String notifyTime=params.get(<span class="string">"notify_time"</span>);</span><br><span class="line">    <span class="comment">//交易创建时间:yyyy-MM-dd HH:mm:ss</span></span><br><span class="line">    String gmtCreate=params.get(<span class="string">"gmt_create"</span>);</span><br><span class="line">    <span class="comment">//交易付款时间</span></span><br><span class="line">    String gmtPayment=params.get(<span class="string">"gmt_payment"</span>);</span><br><span class="line">    <span class="comment">//交易退款时间</span></span><br><span class="line">    String gmtRefund=params.get(<span class="string">"gmt_refund"</span>);</span><br><span class="line">    <span class="comment">//交易结束时间</span></span><br><span class="line">    String gmtClose=params.get(<span class="string">"gmt_close"</span>);</span><br><span class="line"></span><br><span class="line">    AlipaymentOrder alipaymentOrder = alipaymentOrderService.selectAlipaymentOrder(outTradeNo);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//支付宝官方建议校验的值（out_trade_no、total_amount、sellerId、app_id）</span></span><br><span class="line">    <span class="keyword">if</span> (alipaymentOrder != <span class="keyword">null</span> &amp;&amp; totalAmount.equals(String.valueOf(alipaymentOrder.getAmount())) &amp;&amp; app_id.equals(appId)) &#123;</span><br><span class="line">      <span class="comment">// 更新时间相关的值</span></span><br><span class="line">      alipaymentOrder.setNotifyTime(notifyTime);</span><br><span class="line">      alipaymentOrder.setCreateTime(gmtCreate);</span><br><span class="line">      alipaymentOrder.setPayTime(gmtPayment);</span><br><span class="line">      alipaymentOrder.setRefundTime(gmtRefund);</span><br><span class="line">      alipaymentOrder.setCloseTime(gmtClose);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 判断交易结果</span></span><br><span class="line">      <span class="keyword">switch</span> (tradeStatus)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_FINISHED"</span>: <span class="comment">// 交易结束并不可退款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">3</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_SUCCESS"</span>: <span class="comment">// 交易支付成功</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">2</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_CLOSED"</span>: <span class="comment">// 未付款交易超时关闭或支付完成后全额退款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">1</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"WAIT_BUYER_PAY"</span>: <span class="comment">// 交易创建并等待买家付款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      alipaymentOrderService.updateAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (tradeStatus.equals(<span class="string">"TRADE_SUCCESS"</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//                return AjaxResult.success("验证签名成功但订单未成功支付");</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//            return AjaxResult.error("支付宝官方建议校验的值（out_trade_no、total_amount、sellerId、app_id）不一致！");</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//        return AjaxResult.error("验证签名失败！");</span></span><br><span class="line">  <span class="keyword">return</span> <span class="string">"fail"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注意按照支付宝要求，返回的必须是字符串 “success” 或 “fail”。</p>
-<h3 id="接口-3：最终付款校验"><a href="#接口-3：最终付款校验" class="headerlink" title="接口 3：最终付款校验"></a>接口 3：最终付款校验</h3><p><strong>功能</strong></p>
-<p>最终支付结果必须通过这个接口进行校验。</p>
-<p><strong>代码</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/check"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> AjaxResult <span class="title">check</span><span class="params">(@RequestParam String outTradeNo)</span> <span class="keyword">throws</span> AlipayApiException, ParseException </span>&#123;</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    CertAlipayRequest certAlipayRequest = <span class="keyword">new</span> CertAlipayRequest();</span><br><span class="line">    <span class="comment">//设置网关地址</span></span><br><span class="line">    certAlipayRequest.setServerUrl(<span class="string">"https://openapi.alipay.com/gateway.do"</span>);</span><br><span class="line">    <span class="comment">//设置应用Id</span></span><br><span class="line">    certAlipayRequest.setAppId(app_id);</span><br><span class="line">    <span class="comment">//设置应用私钥</span></span><br><span class="line">    certAlipayRequest.setPrivateKey(privateKey);</span><br><span class="line">    <span class="comment">//设置请求格式，固定值json</span></span><br><span class="line">    certAlipayRequest.setFormat(<span class="string">"json"</span>);</span><br><span class="line">    <span class="comment">//设置字符集</span></span><br><span class="line">    certAlipayRequest.setCharset(<span class="string">"UTF-8"</span>);</span><br><span class="line">    <span class="comment">//设置签名类型</span></span><br><span class="line">    certAlipayRequest.setSignType(<span class="string">"RSA2"</span>);</span><br><span class="line">    <span class="comment">//设置应用公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setCertPath(certPath);</span><br><span class="line">    <span class="comment">//设置支付宝公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);</span><br><span class="line">    <span class="comment">//设置支付宝根证书路径</span></span><br><span class="line">    certAlipayRequest.setRootCertPath(rootCertPath);</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    AlipayClient alipayClient = <span class="keyword">new</span> DefaultAlipayClient(certAlipayRequest);</span><br><span class="line"></span><br><span class="line">    AlipayTradeQueryRequest alipayTradeQueryRequest = <span class="keyword">new</span> AlipayTradeQueryRequest();</span><br><span class="line">    alipayTradeQueryRequest.setBizContent(<span class="string">"&#123;"</span> +</span><br><span class="line">            <span class="string">"\"out_trade_no\":\""</span>+outTradeNo+<span class="string">"\""</span> +</span><br><span class="line">            <span class="string">"&#125;"</span>);</span><br><span class="line"></span><br><span class="line">    AlipayTradeQueryResponse alipayTradeQueryResponse = alipayClient.certificateExecute(alipayTradeQueryRequest);</span><br><span class="line">    <span class="keyword">if</span>(alipayTradeQueryResponse.isSuccess())&#123;</span><br><span class="line">        AlipaymentOrder alipaymentOrder=alipaymentOrderService.selectAlipaymentOrder(outTradeNo);</span><br><span class="line">        EOrder eOrder=eOrderService.selectEOrderByOrderSn(outTradeNo);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//修改数据库支付宝订单表</span></span><br><span class="line">        alipaymentOrder.setAmount(Double.parseDouble(alipayTradeQueryResponse.getTotalAmount()));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 判断交易结果</span></span><br><span class="line">        <span class="keyword">switch</span> (alipayTradeQueryResponse.getTradeStatus())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_FINISHED"</span>: <span class="comment">// 交易结束并不可退款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">3</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_SUCCESS"</span>: <span class="comment">// 交易支付成功</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">2</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_CLOSED"</span>: <span class="comment">// 未付款交易超时关闭或支付完成后全额退款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">1</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"WAIT_BUYER_PAY"</span>: <span class="comment">// 交易创建并等待买家付款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        alipaymentOrderService.updateAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果支付成功，更新订单</span></span><br><span class="line">        <span class="keyword">if</span>(alipayTradeQueryResponse.getTradeStatus()==<span class="string">"TRADE_SUCCESS"</span>)&#123;</span><br><span class="line">            eOrder.setOrderStatus(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">            String payTime=alipaymentOrder.getPayTime();</span><br><span class="line">            SimpleDateFormat simpleDateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">            Date date=simpleDateFormat.parse(payTime);</span><br><span class="line">            eOrder.setPayTime(date);</span><br><span class="line"></span><br><span class="line">            eOrderMapper.updateEOrder(eOrder);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保险订单</span></span><br><span class="line">            <span class="keyword">if</span> (eOrder.getOrderType() == <span class="number">1</span>) &#123;</span><br><span class="line">                EInsuranceOrder eInsuranceOrder=eInsuranceOrderMapper.selectEInsuranceOrderByOrderSn(outTradeNo);</span><br><span class="line">                eInsuranceOrder.setOrderStatus(<span class="number">1</span>);</span><br><span class="line">                eInsuranceOrder.setPayTime(date);</span><br><span class="line"></span><br><span class="line">                eInsuranceOrderMapper.updateEInsuranceOrder(eInsuranceOrder);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> AjaxResult.success(alipaymentOrder);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> AjaxResult.error(<span class="string">"调用支付宝查询接口失败！"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个接口可以加上支付成功后的订单逻辑。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这类通过第三方接口进行开发的工作，基本流程也就是上述这样，主要问题还是出在官方文档与实际操作的不符，这就需要 1.仔细阅读官方文档和理解示例代码 2.多打断点调试和看日志的输出情况。</p>
-<p>比较重要的点是要和自己项目的业务逻辑结合，知道该把自己的代码安插在哪个位置。</p>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a href="https://blog.csdn.net/Ouyzc/article/details/79551714" target="_blank" rel="noopener">https://blog.csdn.net/Ouyzc/article/details/79551714</a></p>
-]]></content>
-      <categories>
-        <category>backend</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>欢迎来到我的网站</title>
-    <url>/2020/02/14/blog1/</url>
-    <content><![CDATA[<p>欢迎各位!</p>
-<p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p>
-<p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>
-]]></content>
-      <categories>
-        <category>welcome</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>SSM 整合</title>
-    <url>/2020/02/19/blog2/</url>
-    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
-
-<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
-<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
-<p>编写 AccountDao 接口，实现：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
-
-<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
-<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
-
-<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
-
-<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
-
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>MyBatis 与 Hibernate 对比</title>
-    <url>/2020/03/30/blog5/</url>
-    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/" target="_blank" rel="noopener">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
-<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
-<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
-<p>Spring Data JPA 是对 JPA 的封装。</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
-<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
-<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
-<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
-<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
-
-<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
-<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
-<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
-
-<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
-<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
-<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
-<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
-<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
-<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
-<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
-<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
-<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
-<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
-<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
-<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
-<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
-<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
-<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
-<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
-<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
-]]></content>
-      <categories>
-        <category>backend</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Spring bean 的声明和注入</title>
     <url>/2020/07/15/blog10/</url>
     <content><![CDATA[<p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
@@ -232,6 +72,115 @@
       </categories>
   </entry>
   <entry>
+    <title>Java 实现支付宝后台支付接口</title>
+    <url>/2020/10/16/blog11/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。</p>
+<p>官方文档：<a href="https://opendocs.alipay.com/open/204/105297" target="_blank" rel="noopener">https://opendocs.alipay.com/open/204/105297</a> 。</p>
+<h2 id="编码前的准备"><a href="#编码前的准备" class="headerlink" title="编码前的准备"></a>编码前的准备</h2><p>1.<strong>创建应用</strong></p>
+<p>在支付宝开放平台的开发者中心，创建自己的应用，并取得应用的唯一标识 APPID。</p>
+<p>2.<strong>添加支付能力</strong></p>
+<p>在应用详情页面，添加能力-App 支付，并进行签约。</p>
+<p>3.<strong>密钥生成和配置</strong></p>
+<p>为了保障交易身份与数据的安全，需要进行密钥的配置，这里由于是企业的项目，需要配置公钥证书，这里需要用到支付宝开放平台开发助手，生成 CSR 文件：应用公钥、私钥、证书这 3 个文件。详见官网文档：<a href="https://opendocs.alipay.com/open/291/105971" target="_blank" rel="noopener">https://opendocs.alipay.com/open/291/105971</a> 。</p>
+<p>然后需要在应用的开发信息中，设置接口加签方式，上传 CSR 文件，在线生成应用公钥证书即 .crt 文件，然后上传这个证书。上传完成后，还可以下载对应的支付宝公钥证书和支付宝根证书。</p>
+<p>4.<strong>后台集成支付宝的 SDK</strong></p>
+<p>这个 SDK 用于协助解析并验证客户端同步返回的支付结果和异步通知。</p>
+<p>App 端也需要集成支付宝对应的 SDK。</p>
+<h2 id="编写支付接口"><a href="#编写支付接口" class="headerlink" title="编写支付接口"></a>编写支付接口</h2><h3 id="支付宝支付流程图"><a href="#支付宝支付流程图" class="headerlink" title="支付宝支付流程图"></a>支付宝支付流程图</h3><img src="/images/blog11/alipay.png" width="80%"/>
+
+<h3 id="在-App-端的表现"><a href="#在-App-端的表现" class="headerlink" title="在 App 端的表现"></a>在 App 端的表现</h3><p>用户在 App 上点击立即购买，选择支付方式，点击确定支付调用后台接口并跳转到支付宝 App，付款完成后，跳转回 App，完成支付。</p>
+<h3 id="后台接口的需求"><a href="#后台接口的需求" class="headerlink" title="后台接口的需求"></a>后台接口的需求</h3><p>后台需要提供 3 个接口：订单信息加密、支付宝服务端异步通知、最终付款校验。</p>
+<h3 id="接口-1：订单信息加密"><a href="#接口-1：订单信息加密" class="headerlink" title="接口 1：订单信息加密"></a><strong>接口 1：订单信息加密</strong></h3><p><strong>功能</strong></p>
+<p>传入订单信息，返回加密后的订单字符串，并在项目数据库保存支付宝订单信息。</p>
+<p><strong>密钥验证方式</strong></p>
+<p>支付宝客户端将传送的消息用私钥加密，服务端使用公钥对消息进行验证。</p>
+<p><strong>代码</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/encrypt"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> AjaxResult <span class="title">getAliPayOrder</span><span class="params">(@RequestParam String orderSn)</span> <span class="keyword">throws</span> AlipayApiException </span>&#123;</span><br><span class="line">  </span><br><span class="line">    EOrder eOrder=eOrderService.selectEOrderByOrderSn(orderSn);</span><br><span class="line"></span><br><span class="line">    AlipaymentOrder alipaymentOrder = <span class="keyword">new</span> AlipaymentOrder();</span><br><span class="line">    alipaymentOrder.setOrderId(eOrder.getOrderId().intValue());</span><br><span class="line">    alipaymentOrder.setOutTradeNo(orderSn);</span><br><span class="line">    alipaymentOrder.setAmount(eOrder.getActualPrice());</span><br><span class="line">    <span class="comment">// 订单生成，等待用户付款</span></span><br><span class="line">    alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    CertAlipayRequest certAlipayRequest = <span class="keyword">new</span> CertAlipayRequest();</span><br><span class="line">    <span class="comment">//设置网关地址</span></span><br><span class="line">    certAlipayRequest.setServerUrl(<span class="string">"https://openapi.alipay.com/gateway.do"</span>);</span><br><span class="line">    <span class="comment">//设置应用Id</span></span><br><span class="line">    certAlipayRequest.setAppId(app_id);</span><br><span class="line">    <span class="comment">//设置应用私钥</span></span><br><span class="line">    certAlipayRequest.setPrivateKey(privateKey);</span><br><span class="line">    <span class="comment">//设置请求格式，固定值json</span></span><br><span class="line">    certAlipayRequest.setFormat(<span class="string">"json"</span>);</span><br><span class="line">    <span class="comment">//设置字符集</span></span><br><span class="line">    certAlipayRequest.setCharset(<span class="string">"UTF-8"</span>);</span><br><span class="line">    <span class="comment">//设置签名类型</span></span><br><span class="line">    certAlipayRequest.setSignType(<span class="string">"RSA2"</span>);</span><br><span class="line">    <span class="comment">//设置应用公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setCertPath(certPath);</span><br><span class="line">    <span class="comment">//设置支付宝公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);</span><br><span class="line">    <span class="comment">//设置支付宝根证书路径</span></span><br><span class="line">    certAlipayRequest.setRootCertPath(rootCertPath);</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    AlipayClient alipayClient = <span class="keyword">new</span> DefaultAlipayClient(certAlipayRequest);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay</span></span><br><span class="line">    AlipayTradeAppPayRequest request = <span class="keyword">new</span> AlipayTradeAppPayRequest();</span><br><span class="line">    <span class="comment">//SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。</span></span><br><span class="line">    AlipayTradeAppPayModel model = <span class="keyword">new</span> AlipayTradeAppPayModel();</span><br><span class="line">    model.setBody(<span class="string">"xx"</span>);</span><br><span class="line">    model.setSubject(<span class="string">"xx"</span>);</span><br><span class="line">    model.setOutTradeNo(orderSn);</span><br><span class="line">    model.setTimeoutExpress(<span class="string">"30m"</span>);</span><br><span class="line">    model.setTotalAmount(eOrder.getActualPrice().toString());</span><br><span class="line">    model.setProductCode(<span class="string">"QUICK_MSECURITY_PAY"</span>);</span><br><span class="line">    request.setBizModel(model);</span><br><span class="line">    <span class="comment">// 需要外网需要能直接访问的地址</span></span><br><span class="line">    request.setNotifyUrl(<span class="string">"xxx"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//这里和普通的接口调用不同，使用的是sdkExecute</span></span><br><span class="line">        AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);</span><br><span class="line">        <span class="comment">// 如果未发生异常，则记录支付宝订单</span></span><br><span class="line">        alipaymentOrderService.insertAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> AjaxResult.success(response.getBody());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (AlipayApiException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> AjaxResult.error(<span class="string">"加密失败！"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>入参 orderSn 是订单编号，这里需要在项目后台数据库保存支付宝支付订单，使用 AlipaymentOrder 这个实体类：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AlipaymentOrder</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单ID</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> orderId;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单号</span></span><br><span class="line">    <span class="keyword">private</span> String outTradeNo;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 金额</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> amount;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 交易状态</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> tradeStatus;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知时间</span></span><br><span class="line">    <span class="keyword">private</span> String notifyTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单生成时间</span></span><br><span class="line">    <span class="keyword">private</span> String createTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 付款时间</span></span><br><span class="line">    <span class="keyword">private</span> String payTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 退款时间</span></span><br><span class="line">    <span class="keyword">private</span> String refundTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订单结束时间</span></span><br><span class="line">    <span class="keyword">private</span> String closeTime;</span><br><span class="line">  </span><br><span class="line"> 		...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是 response.getBody() 就是加密后的订单字符串，可以直接返回给 App 端进行使用。</p>
+<h3 id="接口-2：支付宝服务端异步通知"><a href="#接口-2：支付宝服务端异步通知" class="headerlink" title="接口 2：支付宝服务端异步通知"></a>接口 2：支付宝服务端异步通知</h3><p><strong>功能</strong></p>
+<ul>
+<li><p>通过异步通知更新支付宝订单信息。</p>
+</li>
+<li><p>防止订单丢失，即页面跳转同步通知没有处理订单更新，它则去处理。</p>
+</li>
+</ul>
+<p><strong>注意</strong></p>
+<ul>
+<li>只有在支付宝的交易管理中存在该笔交易，且发生了交易状态的改变，支付宝才会通过该方式发起服务器通知。</li>
+<li>第一次交易状态改变（即时到账中此时交易状态是交易完成）时，不仅会返回同步处理结果，而且服务器异步通知页面也会收到支付宝发来的处理结果通知。</li>
+</ul>
+<p><strong>代码</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/asyn"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getAsynResult</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> AlipayApiException </span>&#123;</span><br><span class="line">  <span class="comment">//获取支付宝POST过来反馈信息</span></span><br><span class="line">  Map&lt;String,String&gt; params = <span class="keyword">new</span> HashMap&lt;String,String&gt;();</span><br><span class="line">  Map requestParams = request.getParameterMap();</span><br><span class="line">  <span class="keyword">for</span> (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) &#123;</span><br><span class="line">    String name = (String) iter.next();</span><br><span class="line">    String[] values = (String[]) requestParams.get(name);</span><br><span class="line">    String valueStr = <span class="string">""</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; values.length; i++) &#123;</span><br><span class="line">      valueStr = (i == values.length - <span class="number">1</span>) ? valueStr + values[i]</span><br><span class="line">        : valueStr + values[i] + <span class="string">","</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//乱码解决，这段代码在出现乱码时使用。</span></span><br><span class="line">    <span class="comment">//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");</span></span><br><span class="line">    params.put(name, valueStr);</span><br><span class="line">    logger.info(name+<span class="string">" "</span>+valueStr);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//切记alipaypublickey是支付宝的公钥，请去open.alipay.com对应应用下查看。</span></span><br><span class="line">  <span class="comment">//boolean AlipaySignature.rsaCertCheckV1(Map&lt;String, String&gt; params, String publicKeyCertPath, String charset,String signType)</span></span><br><span class="line">  <span class="comment">//调用SDK验证签名</span></span><br><span class="line">  <span class="keyword">boolean</span> flag = AlipaySignature.rsaCertCheckV1(params, alipayPublicCertPath, <span class="string">"UTF-8"</span>,<span class="string">"RSA2"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (flag) &#123;</span><br><span class="line">    <span class="comment">//获取商户之前传给支付宝的订单号（商户系统的唯一订单号）</span></span><br><span class="line">    String outTradeNo = params.get(<span class="string">"out_trade_no"</span>);</span><br><span class="line">    <span class="comment">//订单金额:本次交易支付的订单金额，单位为人民币（元）</span></span><br><span class="line">    String totalAmount=params.get(<span class="string">"total_amount"</span>);</span><br><span class="line">    <span class="comment">//卖家支付宝用户号</span></span><br><span class="line">    String sellerId=params.get(<span class="string">"seller_id"</span>);</span><br><span class="line">    <span class="comment">//支付宝分配给开发者的应用Id</span></span><br><span class="line">    String appId=params.get(<span class="string">"app_id"</span>);</span><br><span class="line">    <span class="comment">//获取交易状态</span></span><br><span class="line">    String tradeStatus = params.get(<span class="string">"trade_status"</span>);</span><br><span class="line">    <span class="comment">//通知时间:yyyy-MM-dd HH:mm:ss</span></span><br><span class="line">    String notifyTime=params.get(<span class="string">"notify_time"</span>);</span><br><span class="line">    <span class="comment">//交易创建时间:yyyy-MM-dd HH:mm:ss</span></span><br><span class="line">    String gmtCreate=params.get(<span class="string">"gmt_create"</span>);</span><br><span class="line">    <span class="comment">//交易付款时间</span></span><br><span class="line">    String gmtPayment=params.get(<span class="string">"gmt_payment"</span>);</span><br><span class="line">    <span class="comment">//交易退款时间</span></span><br><span class="line">    String gmtRefund=params.get(<span class="string">"gmt_refund"</span>);</span><br><span class="line">    <span class="comment">//交易结束时间</span></span><br><span class="line">    String gmtClose=params.get(<span class="string">"gmt_close"</span>);</span><br><span class="line"></span><br><span class="line">    AlipaymentOrder alipaymentOrder = alipaymentOrderService.selectAlipaymentOrder(outTradeNo);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//支付宝官方建议校验的值（out_trade_no、total_amount、sellerId、app_id）</span></span><br><span class="line">    <span class="keyword">if</span> (alipaymentOrder != <span class="keyword">null</span> &amp;&amp; totalAmount.equals(String.valueOf(alipaymentOrder.getAmount())) &amp;&amp; app_id.equals(appId)) &#123;</span><br><span class="line">      <span class="comment">// 更新时间相关的值</span></span><br><span class="line">      alipaymentOrder.setNotifyTime(notifyTime);</span><br><span class="line">      alipaymentOrder.setCreateTime(gmtCreate);</span><br><span class="line">      alipaymentOrder.setPayTime(gmtPayment);</span><br><span class="line">      alipaymentOrder.setRefundTime(gmtRefund);</span><br><span class="line">      alipaymentOrder.setCloseTime(gmtClose);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 判断交易结果</span></span><br><span class="line">      <span class="keyword">switch</span> (tradeStatus)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_FINISHED"</span>: <span class="comment">// 交易结束并不可退款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">3</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_SUCCESS"</span>: <span class="comment">// 交易支付成功</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">2</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"TRADE_CLOSED"</span>: <span class="comment">// 未付款交易超时关闭或支付完成后全额退款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">1</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"WAIT_BUYER_PAY"</span>: <span class="comment">// 交易创建并等待买家付款</span></span><br><span class="line">          alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      alipaymentOrderService.updateAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (tradeStatus.equals(<span class="string">"TRADE_SUCCESS"</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//                return AjaxResult.success("验证签名成功但订单未成功支付");</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//            return AjaxResult.error("支付宝官方建议校验的值（out_trade_no、total_amount、sellerId、app_id）不一致！");</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//        return AjaxResult.error("验证签名失败！");</span></span><br><span class="line">  <span class="keyword">return</span> <span class="string">"fail"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意按照支付宝要求，返回的必须是字符串 “success” 或 “fail”。</p>
+<h3 id="接口-3：最终付款校验"><a href="#接口-3：最终付款校验" class="headerlink" title="接口 3：最终付款校验"></a>接口 3：最终付款校验</h3><p><strong>功能</strong></p>
+<p>最终支付结果必须通过这个接口进行校验。</p>
+<p><strong>代码</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/check"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> AjaxResult <span class="title">check</span><span class="params">(@RequestParam String outTradeNo)</span> <span class="keyword">throws</span> AlipayApiException, ParseException </span>&#123;</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    CertAlipayRequest certAlipayRequest = <span class="keyword">new</span> CertAlipayRequest();</span><br><span class="line">    <span class="comment">//设置网关地址</span></span><br><span class="line">    certAlipayRequest.setServerUrl(<span class="string">"https://openapi.alipay.com/gateway.do"</span>);</span><br><span class="line">    <span class="comment">//设置应用Id</span></span><br><span class="line">    certAlipayRequest.setAppId(app_id);</span><br><span class="line">    <span class="comment">//设置应用私钥</span></span><br><span class="line">    certAlipayRequest.setPrivateKey(privateKey);</span><br><span class="line">    <span class="comment">//设置请求格式，固定值json</span></span><br><span class="line">    certAlipayRequest.setFormat(<span class="string">"json"</span>);</span><br><span class="line">    <span class="comment">//设置字符集</span></span><br><span class="line">    certAlipayRequest.setCharset(<span class="string">"UTF-8"</span>);</span><br><span class="line">    <span class="comment">//设置签名类型</span></span><br><span class="line">    certAlipayRequest.setSignType(<span class="string">"RSA2"</span>);</span><br><span class="line">    <span class="comment">//设置应用公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setCertPath(certPath);</span><br><span class="line">    <span class="comment">//设置支付宝公钥证书路径</span></span><br><span class="line">    certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);</span><br><span class="line">    <span class="comment">//设置支付宝根证书路径</span></span><br><span class="line">    certAlipayRequest.setRootCertPath(rootCertPath);</span><br><span class="line">    <span class="comment">//构造client</span></span><br><span class="line">    AlipayClient alipayClient = <span class="keyword">new</span> DefaultAlipayClient(certAlipayRequest);</span><br><span class="line"></span><br><span class="line">    AlipayTradeQueryRequest alipayTradeQueryRequest = <span class="keyword">new</span> AlipayTradeQueryRequest();</span><br><span class="line">    alipayTradeQueryRequest.setBizContent(<span class="string">"&#123;"</span> +</span><br><span class="line">            <span class="string">"\"out_trade_no\":\""</span>+outTradeNo+<span class="string">"\""</span> +</span><br><span class="line">            <span class="string">"&#125;"</span>);</span><br><span class="line"></span><br><span class="line">    AlipayTradeQueryResponse alipayTradeQueryResponse = alipayClient.certificateExecute(alipayTradeQueryRequest);</span><br><span class="line">    <span class="keyword">if</span>(alipayTradeQueryResponse.isSuccess())&#123;</span><br><span class="line">        AlipaymentOrder alipaymentOrder=alipaymentOrderService.selectAlipaymentOrder(outTradeNo);</span><br><span class="line">        EOrder eOrder=eOrderService.selectEOrderByOrderSn(outTradeNo);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//修改数据库支付宝订单表</span></span><br><span class="line">        alipaymentOrder.setAmount(Double.parseDouble(alipayTradeQueryResponse.getTotalAmount()));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 判断交易结果</span></span><br><span class="line">        <span class="keyword">switch</span> (alipayTradeQueryResponse.getTradeStatus())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_FINISHED"</span>: <span class="comment">// 交易结束并不可退款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">3</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_SUCCESS"</span>: <span class="comment">// 交易支付成功</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">2</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"TRADE_CLOSED"</span>: <span class="comment">// 未付款交易超时关闭或支付完成后全额退款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">1</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"WAIT_BUYER_PAY"</span>: <span class="comment">// 交易创建并等待买家付款</span></span><br><span class="line">                alipaymentOrder.setTradeStatus(<span class="number">0</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        alipaymentOrderService.updateAlipaymentOrder(alipaymentOrder);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果支付成功，更新订单</span></span><br><span class="line">        <span class="keyword">if</span>(alipayTradeQueryResponse.getTradeStatus()==<span class="string">"TRADE_SUCCESS"</span>)&#123;</span><br><span class="line">            eOrder.setOrderStatus(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">            String payTime=alipaymentOrder.getPayTime();</span><br><span class="line">            SimpleDateFormat simpleDateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">            Date date=simpleDateFormat.parse(payTime);</span><br><span class="line">            eOrder.setPayTime(date);</span><br><span class="line"></span><br><span class="line">            eOrderMapper.updateEOrder(eOrder);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保险订单</span></span><br><span class="line">            <span class="keyword">if</span> (eOrder.getOrderType() == <span class="number">1</span>) &#123;</span><br><span class="line">                EInsuranceOrder eInsuranceOrder=eInsuranceOrderMapper.selectEInsuranceOrderByOrderSn(outTradeNo);</span><br><span class="line">                eInsuranceOrder.setOrderStatus(<span class="number">1</span>);</span><br><span class="line">                eInsuranceOrder.setPayTime(date);</span><br><span class="line"></span><br><span class="line">                eInsuranceOrderMapper.updateEInsuranceOrder(eInsuranceOrder);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> AjaxResult.success(alipaymentOrder);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> AjaxResult.error(<span class="string">"调用支付宝查询接口失败！"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个接口可以加上支付成功后的订单逻辑。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这类通过第三方接口进行开发的工作，基本流程也就是上述这样，主要问题还是出在官方文档与实际操作的不符，这就需要 1.仔细阅读官方文档和理解示例代码 2.多打断点调试和看日志的输出情况。</p>
+<p>比较重要的点是要和自己项目的业务逻辑结合，知道该把自己的代码安插在哪个位置。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a href="https://blog.csdn.net/Ouyzc/article/details/79551714" target="_blank" rel="noopener">https://blog.csdn.net/Ouyzc/article/details/79551714</a></p>
+]]></content>
+      <categories>
+        <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SSM 整合</title>
+    <url>/2020/02/19/blog2/</url>
+    <content><![CDATA[<p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
+<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
+<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
+<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><h2 id="使用-MySQL-创建-account-表"><a href="#使用-MySQL-创建-account-表" class="headerlink" title="使用 MySQL 创建 account 表"></a>使用 MySQL 创建 account 表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table account(</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    money double</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><img src="/images/blog2/structure.png" width="50%">
+
+<h2 id="使用-Maven-导入项目所需依赖-JAR-包"><a href="#使用-Maven-导入项目所需依赖-JAR-包" class="headerlink" title="使用 Maven 导入项目所需依赖 JAR 包"></a>使用 Maven 导入项目所需依赖 JAR 包</h2><p>aspectj、spring-aop、spring-context、spring-web、spring-webmvc、spring-tx、spring-jdbc、mysql-connector-java、javax.servlet、mybatis、mybatis-spring、c3p0 和其他日志等 JAR 包。</p>
+<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>编写 Account 类，编写属性 id、name 和 money，这一步和上面创建的 account 表属性相对应。并设置 get/set 方法和 toString 方法。</p>
+<p>编写 AccountDao 接口，实现：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 查询所有账户</span><br><span class="line">@Select(&quot;select * from account&quot;)</span><br><span class="line">public List&lt;Account&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 插入帐户信息</span><br><span class="line">@Insert(&quot;insert into account (name,money) values (#&#123;name&#125;,#&#123;money&#125;)&quot;)</span><br><span class="line">public void saveAccount(Account account);</span><br></pre></td></tr></table></figure>
+
+<p>接着 AccountServiceImpl 和 AccountController 就可以逐层调用这里的 find 和 save 方法。<br>编写 JSP 文件用来显示页面。</p>
+<h1 id="整合部分"><a href="#整合部分" class="headerlink" title="整合部分"></a>整合部分</h1><h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>applicationContext.xml 是 Spring 的配置文件，也是 SSM 整合中的核心配置文件。负责依赖注入、声明式事务、AOP 和整合 MyBatis。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解的扫描，并且 Controller 不需要 Spring 去处理--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot; &gt;</span><br><span class="line">    &lt;!--配置哪些注解不扫描--&gt;</span><br><span class="line">    &lt;context:exclude-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--声明式事务--&gt;</span><br><span class="line">&lt;!--事务管理器--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;transactionManager&quot; class&#x3D;&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--事务通知--&gt;</span><br><span class="line">&lt;tx:advice id&#x3D;&quot;txAdvice&quot; transaction-manager&#x3D;&quot;transactionManager&quot;&gt;</span><br><span class="line">    &lt;tx:attributes&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;find*&quot; read-only&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">        &lt;tx:method name&#x3D;&quot;*&quot; isolation&#x3D;&quot;DEFAULT&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;tx:attributes&gt;</span><br><span class="line">&lt;&#x2F;tx:advice&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--AOP--&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">    &lt;aop:advisor advice-ref&#x3D;&quot;txAdvice&quot; pointcut&#x3D;&quot;execution(* com.jieb.service.impl.*ServiceImpl.*(..))&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;aop:config&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Spring-整合-MyBatis"><a href="#Spring-整合-MyBatis" class="headerlink" title="Spring 整合 MyBatis"></a>Spring 整合 MyBatis</h2><p>MyBatis 的主配置文件 configuration.xml 被整合到了 applicationContext.xml 之中。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--Spring 整合 MyBatis--&gt;</span><br><span class="line">&lt;!--配置连接池--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot; class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;driverClass&quot; value&#x3D;&quot;com.mysql.jdbc.Driver&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;jdbcUrl&quot; value&#x3D;&quot;jdbc:mysql:&#x2F;&#x2F;&#x2F;ssm&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;user&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;root&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 SqlSessionFactory 工厂--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;sqlSessionFactory&quot; class&#x3D;&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;dataSource&quot; ref&#x3D;&quot;dataSource&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置 AccountDao 接口所在包--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;mapperScanner&quot; class&#x3D;&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;basePackage&quot; value&#x3D;&quot;com.jieb.dao&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>springmvc.xml 和 web.xml 是 SpringMVC 的配置文件。<br>springmvc.xml 负责开启注解扫描，配置视图解析器以及过滤静态资源。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--开启注解扫描，只扫描 Controller 注解--&gt;</span><br><span class="line">&lt;context:component-scan base-package&#x3D;&quot;com.jieb&quot;&gt;</span><br><span class="line">    &lt;context:include-filter type&#x3D;&quot;annotation&quot; expression&#x3D;&quot;org.springframework.stereotype.Controller&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context:component-scan&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，Spring 整合 SpringMVC，需要把 Controller 类的工作独立出来，交给 SpringMVC 来做。Controller 属于表现层。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置的视图解析器对象--&gt;</span><br><span class="line">&lt;bean id&#x3D;&quot;internalResourceViewResolver&quot; class&#x3D;&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;prefix&quot; value&#x3D;&quot;&#x2F;WEB-INF&#x2F;pages&#x2F;&quot;&#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;suffix&quot; value&#x3D;&quot;.jsp&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--过滤静态资源--&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;css&#x2F;&quot; mapping&#x3D;&quot;&#x2F;css&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;images&#x2F;&quot; mapping&#x3D;&quot;&#x2F;images&#x2F;**&quot; &#x2F;&gt;</span><br><span class="line">&lt;mvc:resources location&#x3D;&quot;&#x2F;js&#x2F;&quot; mapping&#x3D;&quot;&#x2F;js&#x2F;**&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml 负责配置 Spring 的监听器，配置前端控制器和解决中文乱码的过滤器。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置 Spring 监听器，默认只加载 WEB-INF 目录下的 applicationContext.xml 配置文件--&gt;</span><br><span class="line">&lt;listener&gt;</span><br><span class="line">    &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;&#x2F;listener-class&gt;</span><br><span class="line">&lt;&#x2F;listener&gt;</span><br><span class="line">&lt;!--设置配置文件的路径--&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">    &lt;param-name&#x2F;&gt;</span><br><span class="line">    &lt;param-value&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>监听器是 Spring 整合 SpringMVC 的核心，启动 Tomcat 服务器的时候加载 Spring 的配置文件 applicationContext.xml，用到监听器 ContextLoaderListener 监听 ServletContext 对象，让监听器取加载 Spring 的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--配置前端控制器--&gt;</span><br><span class="line">&lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span><br><span class="line">    &lt;!--加载springmvc.xml配置文件--&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;classpath:springmvc.xml&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">    &lt;!--启动服务器，创建该servlet--&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span><br><span class="line">&lt;&#x2F;servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;dispatcherServlet&lt;&#x2F;servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--解决中文乱码的过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;&#x2F;filter-class&gt;</span><br><span class="line">    &lt;init-param&gt;</span><br><span class="line">        &lt;param-name&gt;encoding&lt;&#x2F;param-name&gt;</span><br><span class="line">        &lt;param-value&gt;UTF-8&lt;&#x2F;param-value&gt;</span><br><span class="line">    &lt;&#x2F;init-param&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">    &lt;filter-name&gt;characterEncodingFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>其实写博客就是一个向他人讲述的过程，根据费曼学习法，在向他人讲述一个知识点的过程中，查漏补缺，最终得到知识的升华。写博客确实是一件非常有价值的事。</p>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Selenium IDE 的简单使用</title>
     <url>/2020/02/20/blog3/</url>
     <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
@@ -271,117 +220,43 @@
       </categories>
   </entry>
   <entry>
-    <title>PuTTY 的安装与使用</title>
-    <url>/2020/05/06/blog6/</url>
-    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
-<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
-<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
+    <title>MyBatis 与 Hibernate 对比</title>
+    <url>/2020/03/30/blog5/</url>
+    <content><![CDATA[<p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/" target="_blank" rel="noopener">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
+<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
+<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
+<p>Spring Data JPA 是对 JPA 的封装。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
+<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
+<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
+<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
+<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
 
-<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
+<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
+<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
+<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
 
-<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
-<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
-
-<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
-<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
-
-<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
-
-<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
-
-<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
-
-<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
+<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
+<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
+<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
+<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
+<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
+<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
+<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
+<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
+<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
+<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
+<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
+<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
+<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
+<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
+<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
+<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
+<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
 ]]></content>
       <categories>
-        <category>other</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Java 后端开发技术选型</title>
-    <url>/2020/03/01/blog4/</url>
-    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
-<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
-<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
-<img src="/images/blog4/java.svg" width="30%" />
-
-<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
-<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
-<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
-<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
-<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
-<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
-<p>1.lambda 表达式和函数式接口</p>
-<p>2.Optional</p>
-<p>3.Stream</p>
-<p>4.新的日期和时间 API</p>
-<p>5.接口的默认方法</p>
-<p>6.多重注解</p>
-<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
-<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
-<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
-<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
-<img src="/images/blog4/linux.png" width="30%" />
-
-<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
-<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
-<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
-<p>网络部分还有两个重点：UNP 和 HTTP。</p>
-<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
-<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
-<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
-<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
-<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
-<img src="/images/blog4/mysql.png" width="30%" />
-
-<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
-<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
-<img src="/images/blog4/redis.png" width="30%" />
-
-<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
-<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
-<img src="/images/blog4/spring.png" width="30%" />
-
-<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
-<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
-<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
-<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
-<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
-<img src="/images/blog4/dubbo.png" width="10%" />
-
-<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
-<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
-<img src="/images/blog4/elasticsearch.png" width="30%" />
-
-<p>Hystrix 资源隔离、降级和熔断。</p>
-<img src="/images/blog4/hystrix.png" width="30%" />
-
-<p>Nginx 反向代理和负载均衡服务器。</p>
-<img src="/images/blog4/nginx.png" width="30%" />
-
-<p>ZooKeeper 配置和管理分布式组件。</p>
-<img src="/images/blog4/zookeeper.jpeg" width="30%" />
-
-<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
-<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
-<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
-<img src="/images/blog4/docker.png" width="30%" />
-
-<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
-<img src="/images/blog4/git.png" width="30%" />
-
-<img src="/images/blog4/maven.png" width="30%" />
-
-]]></content>
-      <categories>
-        <category>java</category>
+        <category>backend</category>
       </categories>
   </entry>
   <entry>
@@ -487,56 +362,117 @@
       </categories>
   </entry>
   <entry>
-    <title>MySQL &amp; Redis 技术分享-下</title>
-    <url>/2020/06/01/blog9/</url>
-    <content><![CDATA[<p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
-<h2 id="Redis-基础"><a href="#Redis-基础" class="headerlink" title="Redis 基础"></a>Redis 基础</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis 是速度非常快的非关系型内存键值数据库。<br>Redis 和 MySQL 不同之处在于，Redis 用的是 NoSQL。<br>主要用作缓存，缓存目的：</p>
-<ul>
-<li>高性能：操作缓存就是直接操作内存，所以速度相当快。</li>
-<li>高并发：直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。并且缓存是走内存的，内存天然就支撑高并发。</li>
-</ul>
-<h3 id="为什么速度快？"><a href="#为什么速度快？" class="headerlink" title="为什么速度快？"></a>为什么速度快？</h3><ul>
-<li>核心是基于非阻塞的 I/O 多路复用机制，用很少的线程也能快速处理大量任务。</li>
-<li>完全基于内存，绝大部分请求是纯粹的内存操作，非常快速。数据存在内存中，类似于 HashMap，查找和增删的时间复杂度都是 O(1)。</li>
-<li>采用单线程，数据全都在内存里，单线程去操作就是效率最高的。同时避免了不必要的上下文切换和竞争问题而消耗 CPU，不用去考虑多线程同步和各种锁的问题，如加锁释放锁和死锁导致的性能消耗。另外，单线程天然支持原子操作。</li>
-</ul>
-<p>其他原因：</p>
-<ul>
-<li>数据结构简单，对数据操作也简单。</li>
-<li>底层模型，Redis 构建了自己的 VM 机制。</li>
-<li>C 语言实现。</li>
-<li>客户端与服务端通信使用 Redis 序列化协议 RESP 进行通信。</li>
-</ul>
-<h3 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h3><ul>
-<li>STRING，可以实现常规 key-value 缓存应用和计数。</li>
-<li>LIST，可以实现分页查询和消息队列。</li>
-<li>SET，可以实现共同好友和去重。</li>
-<li>HASH，可以实现存储对象。</li>
-<li>ZSET，可以实现排行榜。ZSET增加了一个权重参数 score，使得集合中的元素能够按 score 进行有序排列。</li>
-</ul>
-<h4 id="Jedis-实现数据类型的基本操作"><a href="#Jedis-实现数据类型的基本操作" class="headerlink" title="Jedis 实现数据类型的基本操作"></a>Jedis 实现数据类型的基本操作</h4><p>同样演示代码在 <a href="https://github.com/Jiebupup/demo" target="_blank" rel="noopener">https://github.com/Jiebupup/demo</a> 中有，介绍了 Jedis 对应上述五个数据类型的操作。 </p>
-<h3 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h3><p>Redis 是内存型数据库，为了保证数据在断电后不会丢失，需要将内存中的数据持久化到硬盘上。</p>
-<h4 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h4><p>创建快照来获得存储在内存里面的数据在某个时间点上的副本，再存放到硬盘上。</p>
-<p>实际操作过程是 fork 一个子进程，先将数据集写入临时文件，写入成功后，再替换之前的文件，用二进制压缩存储。</p>
-<p>可以将快照复制到其它服务器从而创建具有相同数据的服务器副本（就是 Redis 的主从结构），还可以将快照留在原服务器以便重启服务器的时候使用。<br>如果系统发生故障，将会丢失最后一次创建快照之后的数据。<br>如果数据量很大，保存快照的时间会很长。</p>
-<h4 id="AOF-文件"><a href="#AOF-文件" class="headerlink" title="AOF 文件"></a>AOF 文件</h4><p>将写命令添加到 AOF 文件（Append Only File）的末尾。</p>
-<p>设置同步选项：使用 AOF 持久化需要设置同步选项，从而确保写命令同步到磁盘文件上的时机。这是因为对文件进行写入并不会马上将内容同步到磁盘上，而是先存储到缓冲区，然后由操作系统决定什么时候同步到磁盘。</p>
-<ul>
-<li>always：会严重减低服务器的性能。</li>
-<li>everysec：比较合适，可以保证系统崩溃时只会丢失一秒左右的数据，并且 Redis 每秒执行一次同步对服务器性能几乎没有任何影响。</li>
-<li>no：并不能给服务器性能带来多大的提升，而且也会增加系统崩溃时数据丢失的数量。</li>
-</ul>
-<p>AOF 重写：随着服务器写请求的增多，AOF 文件会越来越大。Redis 提供了一种将 AOF 重写的特性，能够去除 AOF 文件中的冗余写命令。</p>
-<h2 id="Redis-高级特性"><a href="#Redis-高级特性" class="headerlink" title="Redis 高级特性"></a>Redis 高级特性</h2><h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>Redis 的复制与 MySQL 主从复制类似。<br>Redis 复制水平扩容支撑读高并发，并且从 Redis 2.8 开始支持断点续传，即主从复制过程中，网络连接断掉了，那么可以接着上次复制的地方，继续复制下去。</p>
-<h3 id="哨兵"><a href="#哨兵" class="headerlink" title="哨兵"></a>哨兵</h3><p>可以监听集群中的服务器，并在主服务器进入下线状态时，自动从从服务器中选举出新的主服务器。<br>用于实现 Redis 集群的高可用，本身也是作为一个哨兵集群去运行，互相协同工作。</p>
-<h3 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h3><p>集群中有多个 master 节点，每个 master 又有多个 slave 节点。和哨兵共同实现了集群的高可用。</p>
-<p>Gossip 协议与集中式协议不同：所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>总结一下这一次的技术分享。首先，分享的内容比较便基础，在整理出大量的知识点的同时，我也准备了几个 demo，争取让参与分享的同学巩固一下数据库这块的知识。</p>
-<p>然后就是自己的表达能力需要提升提升，这也是我写这两篇博客的目的，希望自己能在总结和写作中，锻炼自己的表达能力。</p>
-<p>最后还是谈谈我对 MySQL &amp; Redis 学习的看法，我总结的只是部分知识点，MySQL &amp; Redis 的理论知识点偏多，需要记忆的内容也很多。并且在个人项目或者不需要高并发的项目中，很多内容都用不上，用的最多的还是 CRUD。因此我认为熟练地 CRUD 还是很重要的，毕竟是各种项目的基础。如果要想提高自己的能力，对于高阶的知识点还是该记记该背背，更加重要的是写 demo，用代码实战过。  </p>
+    <title>Java 后端开发技术选型</title>
+    <url>/2020/03/01/blog4/</url>
+    <content><![CDATA[<p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
+<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
+<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
+<img src="/images/blog4/java.svg" width="30%" />
+
+<h2 id="Java-语言的发展"><a href="#Java-语言的发展" class="headerlink" title="Java 语言的发展"></a>Java 语言的发展</h2><p>Java 最初由任职于 Sun Microsystems 的 James Gosling 等人于 1990 年代初开发，最初被命名为 Oak，目标为家用电器等小型系统，应用在电视机、电话、闹钟、烤面包机等家用电器的控制和通信。由于这些智能化家电的市场需求没有预期的高，Sun 放弃了该项计划。</p>
+<p>随着 1990 年代互联网的发展，Sun 看见 Oak 在互联网上应用的前景，于是改造了 Oak，于 1995 年 5 月 23 日以 Java 的名称正式发布。Java 伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。次年 JDK1.0 诞生。</p>
+<p>2004 年 9 月 30 日，J2SE1.5 发布，成为 Java 语言发展史上的里程碑。为了表示该版本的重要性，J2SE1.5 更名为 Java SE 5.0。</p>
+<p>2006 年 Sun 在 JavaOne 公布 Java 开放源代码项目，并推出 OpenJDK 项目。Java 虚拟机、Java 编译器和 Java 类库以 GNU 通用公共许可证公开。</p>
+<p>2009 年 4 月 20 日，Oracle 收购 Sun，此时是 Java 6。</p>
+<p>2014 年 3 月 18 日，Oracle 发布 Java SE 8，成为现在 Java 开发的主流版本。我总结了 Java SE 8 主要的新特性：</p>
+<p>1.lambda 表达式和函数式接口</p>
+<p>2.Optional</p>
+<p>3.Stream</p>
+<p>4.新的日期和时间 API</p>
+<p>5.接口的默认方法</p>
+<p>6.多重注解</p>
+<p>从 2017 年 9 月开始，每半年发布一个 Java SE 版本。到写这篇博客的时候，Java 来到了 Java SE 13。</p>
+<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><p>操作系统和下面将谈到的计算机网络可以说是计算机专业最基础的两门课程，学好两者对于开发大有裨益。</p>
+<p>os 相关的要点有：进程与线程，进程调度，进程同步，进程通信，死锁，内存管理。</p>
+<p>os 主流为 Linux、Microsoft 和 macOS。对于软件开发而言，Linux 已经成为了主流，一个应用的运维离不开 Linux。由于 Linux 的开源、免费和稳定，现在 90% 以上的企业采用 Linux，服务端的市场已经被 Linux 占领。</p>
+<img src="/images/blog4/linux.png" width="30%" />
+
+<p>Linux 相关的要点有：文件，目录，磁盘，vi 和 vim，bash，正则表达式，进程管理，网络。</p>
+<p>另外，除了 Linux，我在使用 Microsoft 和 macOS 两个操作系统后，明显感觉 macOS 会更加舒服，体现在高效的触控板，精美的 UI 和类 Unix 的便捷等等。</p>
+<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><p>network 相关的要点有：分层协议，物理层，数据链路层，网络层，传输层，应用层。</p>
+<p>网络部分还有两个重点：UNP 和 HTTP。</p>
+<p>UNP 的要点包括：套接字，I/O 模型，I/O 复用。</p>
+<p>HTTP 在网站开发部分可谓重中之重，现在流行的 RESTful 软件架构风格就是以 HTTP 为基础的。HTTP 的要点包括：HTTP 方法，HTTP 状态码，HTTP 请求响应报文结构，Cookie &amp; Session，缓存，HTTPS，HTTP/2，同源和跨域策略。</p>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库部分包括计算机专业涉及到的数据库原理部分，以及 MySQL 和 Redis。数据库在后端方向尤为重要。</p>
+<p>数据库原理的要点：SQL 语句，表相关语句，关系数据库，事务，视图等。另外在实际开发中，还需要注意 SQL 注入攻击，数据库连接池和 JDBC。</p>
+<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><p>MySQL 开源免费，而 Oracle 价格较高。作为学习的工具，建议使用 MySQL。另外，推荐使用 Navicat 作为管理 MySQL 的工具。</p>
+<img src="/images/blog4/mysql.png" width="30%" />
+
+<p>MySQL 的要点：索引，查询性能优化，存储引擎，切分，复制，并发一致性问题，隔离级别，封锁，MVCC。</p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis 主要用在缓存上，支持简单的键值对存储。缓存的主要目的是高性能和高可用，在项目的性能优化方面很有用，但吃透 Redis 还是很耗时间的。</p>
+<img src="/images/blog4/redis.png" width="30%" />
+
+<p>Redis 的要点：数据类型，使用场景，与 Memcached 的比较，数据淘汰策略，持久化，事务&amp;事件，复制，哨兵，分片，集群，缓存问题，一致性哈希，单线程模型。</p>
+<h1 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h1><p>Spring 系列是 Java 后端开发结合最紧密的框架，加快了应用的开发，学好用好 Spring 对于项目的开发至关重要。现在流行的 SSM 是首选，即 SpringMVC，Spring，MyBatis。关于三者的整合我写过 <a href="">SSM 整合</a>。</p>
+<img src="/images/blog4/spring.png" width="30%" />
+
+<p>Spring 的要点：AOP，IOC，MVC，bean，注解，事务，Spring Boot 相关。</p>
+<p>相比国内较火的 MyBatis，Hibernate 更加重量级，功能更多且较难上手，不过也是持久层的一个选择。</p>
+<p><img src="/images/blog4/mybatis.jpeg" width="30%" /> <img src="/images/blog4/hibernate.png" width="30%" /></p>
+<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>分布式在现在网络并发量高，流量大的形势下显得尤为重要。分布式部分涉及到：分布式锁，分布式事务，CAP 和 BASE，分布式一致性算法，分布式计算。</p>
+<p>Spring Cloud 和 Dubbo 构成微服务，以服务的形式把一个项目分成多个模块。当然 Spring Cloud 现在有两个分支，一个为 Spring Cloud Alibaba 和 Dubbo，还包括 Sentinel、Nacos、RocketMQ、Seata 等，是国人开发的微服务架构。另一个则是 Spring Cloud Netflix，包括 Ribbon、Feign、Eureka（停止更新）、Hystrix 等。现在开发微服务也可以直接使用 Kubernetes。</p>
+<img src="/images/blog4/dubbo.png" width="10%" />
+
+<p>Dubbo 的要点：RPC，工作原理，通信协议和序列化协议，负载均衡策略和集群容错策略、动态代理策略，spi 思想。</p>
+<p>Elasticsearch 是基于 Lucene 的搜索引擎。</p>
+<img src="/images/blog4/elasticsearch.png" width="30%" />
+
+<p>Hystrix 资源隔离、降级和熔断。</p>
+<img src="/images/blog4/hystrix.png" width="30%" />
+
+<p>Nginx 反向代理和负载均衡服务器。</p>
+<img src="/images/blog4/nginx.png" width="30%" />
+
+<p>ZooKeeper 配置和管理分布式组件。</p>
+<img src="/images/blog4/zookeeper.jpeg" width="30%" />
+
+<p>RocketMQ 和 Kafka 分布式架构的消息队列。</p>
+<p><img src="/images/blog4/rocketmq.jpeg" width="20%" /> <img src="/images/blog4/kafka.png" width="20%" /></p>
+<h1 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h1><p>我在开发过程中主要用到 Git 和 Maven。另外 Docker 是可以解决环境配置问题的一种虚拟化技术。</p>
+<img src="/images/blog4/docker.png" width="30%" />
+
+<p>Git 用来解决分布式版本控制问题，Maven 有依赖管理和一键构建两大功能。</p>
+<img src="/images/blog4/git.png" width="30%" />
+
+<img src="/images/blog4/maven.png" width="30%" />
+
 ]]></content>
       <categories>
-        <category>backend</category>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>PuTTY 的安装与使用</title>
+    <url>/2020/05/06/blog6/</url>
+    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
+<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
+<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
+<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
+
+<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
+<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
+
+<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
+
+<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
+
+<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
+
+<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
+]]></content>
+      <categories>
+        <category>other</category>
       </categories>
   </entry>
   <entry>
@@ -696,6 +632,70 @@
 ]]></content>
       <categories>
         <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>MySQL &amp; Redis 技术分享-下</title>
+    <url>/2020/06/01/blog9/</url>
+    <content><![CDATA[<p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
+<h2 id="Redis-基础"><a href="#Redis-基础" class="headerlink" title="Redis 基础"></a>Redis 基础</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis 是速度非常快的非关系型内存键值数据库。<br>Redis 和 MySQL 不同之处在于，Redis 用的是 NoSQL。<br>主要用作缓存，缓存目的：</p>
+<ul>
+<li>高性能：操作缓存就是直接操作内存，所以速度相当快。</li>
+<li>高并发：直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。并且缓存是走内存的，内存天然就支撑高并发。</li>
+</ul>
+<h3 id="为什么速度快？"><a href="#为什么速度快？" class="headerlink" title="为什么速度快？"></a>为什么速度快？</h3><ul>
+<li>核心是基于非阻塞的 I/O 多路复用机制，用很少的线程也能快速处理大量任务。</li>
+<li>完全基于内存，绝大部分请求是纯粹的内存操作，非常快速。数据存在内存中，类似于 HashMap，查找和增删的时间复杂度都是 O(1)。</li>
+<li>采用单线程，数据全都在内存里，单线程去操作就是效率最高的。同时避免了不必要的上下文切换和竞争问题而消耗 CPU，不用去考虑多线程同步和各种锁的问题，如加锁释放锁和死锁导致的性能消耗。另外，单线程天然支持原子操作。</li>
+</ul>
+<p>其他原因：</p>
+<ul>
+<li>数据结构简单，对数据操作也简单。</li>
+<li>底层模型，Redis 构建了自己的 VM 机制。</li>
+<li>C 语言实现。</li>
+<li>客户端与服务端通信使用 Redis 序列化协议 RESP 进行通信。</li>
+</ul>
+<h3 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h3><ul>
+<li>STRING，可以实现常规 key-value 缓存应用和计数。</li>
+<li>LIST，可以实现分页查询和消息队列。</li>
+<li>SET，可以实现共同好友和去重。</li>
+<li>HASH，可以实现存储对象。</li>
+<li>ZSET，可以实现排行榜。ZSET增加了一个权重参数 score，使得集合中的元素能够按 score 进行有序排列。</li>
+</ul>
+<h4 id="Jedis-实现数据类型的基本操作"><a href="#Jedis-实现数据类型的基本操作" class="headerlink" title="Jedis 实现数据类型的基本操作"></a>Jedis 实现数据类型的基本操作</h4><p>同样演示代码在 <a href="https://github.com/Jiebupup/demo" target="_blank" rel="noopener">https://github.com/Jiebupup/demo</a> 中有，介绍了 Jedis 对应上述五个数据类型的操作。 </p>
+<h3 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h3><p>Redis 是内存型数据库，为了保证数据在断电后不会丢失，需要将内存中的数据持久化到硬盘上。</p>
+<h4 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h4><p>创建快照来获得存储在内存里面的数据在某个时间点上的副本，再存放到硬盘上。</p>
+<p>实际操作过程是 fork 一个子进程，先将数据集写入临时文件，写入成功后，再替换之前的文件，用二进制压缩存储。</p>
+<p>可以将快照复制到其它服务器从而创建具有相同数据的服务器副本（就是 Redis 的主从结构），还可以将快照留在原服务器以便重启服务器的时候使用。<br>如果系统发生故障，将会丢失最后一次创建快照之后的数据。<br>如果数据量很大，保存快照的时间会很长。</p>
+<h4 id="AOF-文件"><a href="#AOF-文件" class="headerlink" title="AOF 文件"></a>AOF 文件</h4><p>将写命令添加到 AOF 文件（Append Only File）的末尾。</p>
+<p>设置同步选项：使用 AOF 持久化需要设置同步选项，从而确保写命令同步到磁盘文件上的时机。这是因为对文件进行写入并不会马上将内容同步到磁盘上，而是先存储到缓冲区，然后由操作系统决定什么时候同步到磁盘。</p>
+<ul>
+<li>always：会严重减低服务器的性能。</li>
+<li>everysec：比较合适，可以保证系统崩溃时只会丢失一秒左右的数据，并且 Redis 每秒执行一次同步对服务器性能几乎没有任何影响。</li>
+<li>no：并不能给服务器性能带来多大的提升，而且也会增加系统崩溃时数据丢失的数量。</li>
+</ul>
+<p>AOF 重写：随着服务器写请求的增多，AOF 文件会越来越大。Redis 提供了一种将 AOF 重写的特性，能够去除 AOF 文件中的冗余写命令。</p>
+<h2 id="Redis-高级特性"><a href="#Redis-高级特性" class="headerlink" title="Redis 高级特性"></a>Redis 高级特性</h2><h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>Redis 的复制与 MySQL 主从复制类似。<br>Redis 复制水平扩容支撑读高并发，并且从 Redis 2.8 开始支持断点续传，即主从复制过程中，网络连接断掉了，那么可以接着上次复制的地方，继续复制下去。</p>
+<h3 id="哨兵"><a href="#哨兵" class="headerlink" title="哨兵"></a>哨兵</h3><p>可以监听集群中的服务器，并在主服务器进入下线状态时，自动从从服务器中选举出新的主服务器。<br>用于实现 Redis 集群的高可用，本身也是作为一个哨兵集群去运行，互相协同工作。</p>
+<h3 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h3><p>集群中有多个 master 节点，每个 master 又有多个 slave 节点。和哨兵共同实现了集群的高可用。</p>
+<p>Gossip 协议与集中式协议不同：所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>总结一下这一次的技术分享。首先，分享的内容比较便基础，在整理出大量的知识点的同时，我也准备了几个 demo，争取让参与分享的同学巩固一下数据库这块的知识。</p>
+<p>然后就是自己的表达能力需要提升提升，这也是我写这两篇博客的目的，希望自己能在总结和写作中，锻炼自己的表达能力。</p>
+<p>最后还是谈谈我对 MySQL &amp; Redis 学习的看法，我总结的只是部分知识点，MySQL &amp; Redis 的理论知识点偏多，需要记忆的内容也很多。并且在个人项目或者不需要高并发的项目中，很多内容都用不上，用的最多的还是 CRUD。因此我认为熟练地 CRUD 还是很重要的，毕竟是各种项目的基础。如果要想提高自己的能力，对于高阶的知识点还是该记记该背背，更加重要的是写 demo，用代码实战过。  </p>
+]]></content>
+      <categories>
+        <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>欢迎来到我的网站</title>
+    <url>/2020/02/14/blog1/</url>
+    <content><![CDATA[<p>欢迎各位!</p>
+<p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p>
+<p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>
+]]></content>
+      <categories>
+        <category>welcome</category>
       </categories>
   </entry>
 </search>
