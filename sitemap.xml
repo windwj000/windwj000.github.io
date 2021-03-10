@@ -116,7 +116,7 @@
 
   <url>
     <loc>http://www.windboy.top/</loc>
-    <lastmod>2021-02-23</lastmod>
+    <lastmod>2021-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -125,36 +125,36 @@
 
   
   <url>
-    <loc>http://www.windboy.top/categories/spring/</loc>
-    <lastmod>2021-02-23</lastmod>
+    <loc>http://www.windboy.top/categories/welcome/</loc>
+    <lastmod>2021-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://www.windboy.top/categories/backend/</loc>
-    <lastmod>2021-02-23</lastmod>
+    <loc>http://www.windboy.top/categories/spring/</loc>
+    <lastmod>2021-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://www.windboy.top/categories/other/</loc>
-    <lastmod>2021-02-23</lastmod>
+    <lastmod>2021-03-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.windboy.top/categories/backend/</loc>
+    <lastmod>2021-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://www.windboy.top/categories/java/</loc>
-    <lastmod>2021-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.windboy.top/categories/welcome/</loc>
-    <lastmod>2021-02-23</lastmod>
+    <lastmod>2021-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
