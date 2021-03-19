@@ -173,6 +173,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.windboy.top/2020/05/19/blog7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/19/blog7/" class="post-title-link" itemprop="url">SimpleDateFormat 类使用避坑</a>
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-19 19:06:28" 
+                itemprop="dateCreated datePublished" 
+                datetime="2020-05-19T19:06:28+08:00">2020-05-19
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
+<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/05/19/blog7/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://www.windboy.top/2020/05/06/blog6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -526,95 +616,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.windboy.top/2020/02/19/blog2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/19/blog2/" class="post-title-link" itemprop="url">SSM 整合</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-19 10:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-02-19T10:06:28+08:00">2020-02-19
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index">
-                    <span itemprop="name">spring</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/19/blog2/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -687,7 +688,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
