@@ -42,6 +42,54 @@
   </entry>
   
   <entry>
+    <title>浪潮之巅读后感</title>
+    <link href="http://www.windboy.top/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/"/>
+    <id>http://www.windboy.top/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/</id>
+    <published>2021-04-11T13:50:00.000Z</published>
+    <updated>2021-10-20T15:41:50.882Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="技术"><a href="#技术" class="headerlink" title="技术"></a>技术</h2><p>技术的浪潮与现今有价值的技术。</p><p>产品</p><p>反摩尔定律：硬件行业的尴尬</p><h4 id="Google"><a href="#Google" class="headerlink" title="Google"></a>Google</h4><p>遗憾的是，雅虎用自己的短处去比别人的长处，就不得不接受Google制 定的游戏规则—一技术决定成败</p><h2 id="商业"><a href="#商业" class="headerlink" title="商业"></a>商业</h2><h2 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h2><p>浪潮</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;技术&quot;&gt;&lt;a href=&quot;#技术&quot; class=&quot;headerlink&quot; title=&quot;技术&quot;&gt;&lt;/a&gt;技术&lt;/h2&gt;&lt;p&gt;技术的浪潮与现今有价值的技术。&lt;/p&gt;
+&lt;p&gt;产品&lt;/p&gt;
+&lt;p&gt;反摩尔定律：硬件行业的尴尬&lt;/p&gt;
+&lt;h4 id=&quot;Google&quot;&gt;&lt;a href=&quot;#Google&quot; class=&quot;headerlink&quot; title=&quot;Google&quot;&gt;&lt;/a&gt;Google&lt;/h4&gt;
+    
+    </summary>
+    
+    
+      <category term="thought" scheme="http://www.windboy.top/categories/thought/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>raft</title>
+    <link href="http://www.windboy.top/2021/04/11/raft/"/>
+    <id>http://www.windboy.top/2021/04/11/raft/</id>
+    <published>2021-04-11T13:50:00.000Z</published>
+    <updated>2021-10-31T03:01:38.232Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h2><h2 id="Leader"><a href="#Leader" class="headerlink" title="Leader"></a>Leader</h2><p>性能</p><p>选举</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Log&quot;&gt;&lt;a href=&quot;#Log&quot; class=&quot;headerlink&quot; title=&quot;Log&quot;&gt;&lt;/a&gt;Log&lt;/h2&gt;&lt;h2 id=&quot;Leader&quot;&gt;&lt;a href=&quot;#Leader&quot; class=&quot;headerlink&quot; title=&quot;Leader&quot;&gt;&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="distributed" scheme="http://www.windboy.top/categories/distributed/"/>
+    
+    
+  </entry>
+  
+  <entry>
     <title>Java 原生 Socket 实现 HTTP 通信</title>
     <link href="http://www.windboy.top/2021/03/19/blog12/"/>
     <id>http://www.windboy.top/2021/03/19/blog12/</id>
