@@ -20,27 +20,34 @@
     var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="风的个人网站">
-<meta property="og:url" content="https://windwj000.github.io/page/3/index.html">
+  <meta name="description" content="在我之前写过的 SSM 整合 中，作为三层架构中的持久层，MyBatis 负责操作数据库。 同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。 JPA要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。 Spring Data JPA 是对 JPA 的封">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis 与 Hibernate 对比">
+<meta property="og:url" content="https://windwj000.github.io/blog5/index.html">
 <meta property="og:site_name" content="风的个人网站">
+<meta property="og:description" content="在我之前写过的 SSM 整合 中，作为三层架构中的持久层，MyBatis 负责操作数据库。 同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。 JPA要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。 Spring Data JPA 是对 JPA 的封">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://windwj000.github.io/images/blog4/hibernate.png">
+<meta property="og:image" content="https://windwj000.github.io/images/blog4/mybatis.jpeg">
+<meta property="article:published_time" content="2020-03-30T13:06:28.000Z">
+<meta property="article:modified_time" content="2020-08-25T07:08:36.566Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog4/hibernate.png">
 
-<link rel="canonical" href="https://windwj000.github.io/page/3/">
+<link rel="canonical" href="https://windwj000.github.io/blog5/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome: true,
-    isPost: false
+    isHome: false,
+    isPost: true
   };
 </script>
 
-  <title>风的个人网站</title>
+  <title>MyBatis 与 Hibernate 对比 | 风的个人网站</title>
   
 
 
@@ -171,11 +178,11 @@
             
 
   <div class="posts-expand">
-        
+      
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog4/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -188,8 +195,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog4/" class="post-title-link" itemprop="url">Java 后端开发技术选型</a>
+          MyBatis 与 Hibernate 对比
         </h1>
 
         <div class="post-meta"> 
@@ -200,9 +206,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-01 11:06:28" 
+              <time title="创建时间：2020-03-30 21:06:28" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-03-01T11:06:28+08:00">2020-03-01
+                datetime="2020-03-30T21:06:28+08:00">2020-03-30
                 
               </time>
 
@@ -213,13 +219,20 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -230,19 +243,39 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
-<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
-<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
-<img src="/images/blog4/java.svg" width="30%">
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog4/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
+        <p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/" target="_blank" rel="noopener">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
+<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
+<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
+<p>Spring Data JPA 是对 JPA 的封装。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>标准化：任何符合 JPA 标准的框架都遵循同样的架构，提供相同的访问 API，经过少量的修改就能够在环境下运行。</p>
+<p>容器级特性的支持：JPA 框架中支持大数据集、事务、并发等容器级事务。</p>
+<p>查询能力：JPA 的查询语言是面向对象而非面向数据库的，它的查询语句 JPQL 查询的是实体类和实体类的属性。</p>
+<p>高级特性：JPA 中能够支持面向对象的高级特性，如类之间的继承、多态和类之间的复杂关系。</p>
+<h1 id="Hibernate"><a href="#Hibernate" class="headerlink" title="Hibernate"></a>Hibernate</h1><img src="/images/blog4/hibernate.png" width="30%" />
+
+<p>Hibernate 是一个开放源代码的对象关系映射框架，它对 JDBC 进行了非常轻量级的对象封装，它将 POJO 与数据库表建立映射关系，是一个全自动的 ORM 框架，Hibernate 可以自动生成 SQL 语句，自动执行，使得 Java 程序员可以随心所欲的使用对象编程思维来操纵数据库。 </p>
+<p>Hibernate 可以应用在任何使用 JDBC 的场合，既可以在 Java 的客户端程序使用，也可以在 Servlet/JSP 的 Web 应用中使用，最具革命意义的是，Hibernate 可以在应用 EJB 的 JaveEE 架构中取代 CMP，完成数据持久化的重任。</p>
+<h1 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h1><img src="/images/blog4/mybatis.jpeg" width="30%" />
+
+<p>MyBatis 是一个 Java 持久化框架，它通过 XML 描述符或注解把对象与存储过程或 SQL 语句关联起来。</p>
+<p>MyBatis 是在 Apache 许可证 2.0 下分发的自由软件，是 iBATIS 3.0 的分支版本。</p>
+<p>与其他的对象关系映射框架不同，MyBatis 并没有将 Java 对象与数据库表关联起来，而是将 Java 方法与 SQL 语句关联。</p>
+<h2 id="对象关系映射-ORM"><a href="#对象关系映射-ORM" class="headerlink" title="对象关系映射 ORM"></a>对象关系映射 ORM</h2><p>用于实现面向对象编程语言里不同类型系统的数据之间的转换。数据库表与实体类相对应，数据库表的字段与实体类的属性相对应。减少对 SQL 语句的关注。</p>
+<p>MyBatis 和 Hibernate 都是实现 ORM 思想的框架。</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>MyBatis 中的 SQL 语句和主要业务代码分离，我们一般会把 MyBatis 中的 SQL 语句统一放在 XML 配置文件中，便于统一维护。解偶，提供 DAO 层，系统的设计更清晰，更容易单元测试。</p>
+<p>本身就很小且简单，没有任何第三方依赖，易于使用。</p>
+<p>MyBatis 屏蔽了原始的 JDBC 样板代码，专注于 SQL 的书写和属性与字段映射上。</p>
+<p>MyBatis 最主要的特点就是可以手动编写 SQL 语句，能够支持多表关联查询。</p>
+<h1 id="MyBatis-与-Hibernate-对比"><a href="#MyBatis-与-Hibernate-对比" class="headerlink" title="MyBatis 与 Hibernate 对比"></a>MyBatis 与 Hibernate 对比</h1><p>MyBatis 轻量级、上手快、插件丰富，Hibernate 重量级、功能齐全、精通较难。</p>
+<p>MyBatis 的 SQL 自由度高，提供灵活的 SQL 编写方式。Hibernate 的 SQL 自由度低，不过也支持手动写 SQL。</p>
+<p>MyBatis 开发效率低，需要自己维护 SQL。Hibernate 开发效率高，DAO 层开发简单，支持 JPA。</p>
+<p>MyBatis 所以 SQL 都是依赖数据库编写的，需要针对特定数据库维护 SQL。Hibernate 高度解偶，封装了 JDBC，只需要在配置中指定数据库。</p>
+<p>MyBatis 自身缓存机制较差，Hibernate 自身缓存机制较好，可避免脏读。</p>
+<p>MyBatis 是 POJO 与 SQL 的映射，半 ORM。Hibernate 是 POJO 与数据库的映射，完全 ORM。</p>
+<p>MyBatis 性能稍高，Hibernate 的封装方法性能低，Native 方法性能与 MyBatis 差不多。</p>
+<p>MyBatis 适合复杂查询，集群间跨数据库事务时。Hibernate 适合单数据库，数据量小，无多表关联，数据库结构不稳定。</p>
+<p>这里注明一点：国内使用 MyBatis 的比较多，而国外使用 Hibernate 比较多。</p>
+
     </div>
 
     
@@ -251,283 +284,38 @@
 
     <div>
       
+        <div>
+    
+        <div style="text-align:center;color: #555;font-size:14px;">-------------The End-------------</div>
+    
+</div>
+      
     </div>
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/blog4/" rel="prev" title="Java 后端开发技术选型">
+      <i class="fa fa-chevron-left"></i> Java 后端开发技术选型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/blog6/" rel="next" title="PuTTY 的安装与使用">
+      PuTTY 的安装与使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
       </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog3/" class="post-title-link" itemprop="url">Selenium IDE 的简单使用</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-20 09:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-02-20T09:06:28+08:00">2020-02-20
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/other/" itemprop="url" rel="index">
-                    <span itemprop="name">other</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
-<p>首先了解下 Selenium：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png">
-
-<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
-<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog2/" class="post-title-link" itemprop="url">SSM 整合</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-19 10:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-02-19T10:06:28+08:00">2020-02-19
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index">
-                    <span itemprop="name">spring</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog2/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog1/" class="post-title-link" itemprop="url">欢迎来到我的网站</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-14 21:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-02-14T21:06:28+08:00">2020-02-14
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/welcome/" itemprop="url" rel="index">
-                    <span itemprop="name">welcome</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>欢迎各位!</p>
-<p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p>
-<p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
   </article>
   
   
   
 
   </div>
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
-  </nav>
-
 
 
           </div>
@@ -578,6 +366,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JPA"><span class="nav-number">1.</span> <span class="nav-text">JPA</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优点"><span class="nav-number">1.1.</span> <span class="nav-text">优点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hibernate"><span class="nav-number">2.</span> <span class="nav-text">Hibernate</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBatis"><span class="nav-number">3.</span> <span class="nav-text">MyBatis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对象关系映射-ORM"><span class="nav-number">3.1.</span> <span class="nav-text">对象关系映射 ORM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特点"><span class="nav-number">3.2.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBatis-与-Hibernate-对比"><span class="nav-number">4.</span> <span class="nav-text">MyBatis 与 Hibernate 对比</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
