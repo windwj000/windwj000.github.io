@@ -1,6 +1,5 @@
 https://windwj000.github.io/2021/04/11/blog13/
 https://windwj000.github.io/2021/04/11/raft/
-https://windwj000.github.io/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/
 https://windwj000.github.io/2021/03/19/blog12/
 https://windwj000.github.io/2020/10/16/blog11/
 https://windwj000.github.io/2020/07/15/blog10/
