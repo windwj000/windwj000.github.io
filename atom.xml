@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://www.windboy.top/"/>
+  <link href="https://windwj000.github.io/"/>
   <updated>2021-04-12T03:03:37.482Z</updated>
-  <id>http://www.windboy.top/</id>
+  <id>https://windwj000.github.io/</id>
   
   <author>
     <name>风</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Java 集合类的 contains 方法与 equals 方法的关系分析</title>
-    <link href="http://www.windboy.top/2021/04/11/blog13/"/>
-    <id>http://www.windboy.top/2021/04/11/blog13/</id>
+    <link href="https://windwj000.github.io/2021/04/11/blog13/"/>
+    <id>https://windwj000.github.io/2021/04/11/blog13/</id>
     <published>2021-04-11T13:50:00.000Z</published>
     <updated>2021-04-12T03:03:37.482Z</updated>
     
@@ -36,39 +36,15 @@
     </summary>
     
     
-      <category term="java" scheme="http://www.windboy.top/categories/java/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>浪潮之巅读后感</title>
-    <link href="http://www.windboy.top/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/"/>
-    <id>http://www.windboy.top/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/</id>
-    <published>2021-04-11T13:50:00.000Z</published>
-    <updated>2021-10-20T15:41:50.882Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="技术"><a href="#技术" class="headerlink" title="技术"></a>技术</h2><p>技术的浪潮与现今有价值的技术。</p><p>产品</p><p>反摩尔定律：硬件行业的尴尬</p><h4 id="Google"><a href="#Google" class="headerlink" title="Google"></a>Google</h4><p>遗憾的是，雅虎用自己的短处去比别人的长处，就不得不接受Google制 定的游戏规则—一技术决定成败</p><h2 id="商业"><a href="#商业" class="headerlink" title="商业"></a>商业</h2><h2 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h2><p>浪潮</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;技术&quot;&gt;&lt;a href=&quot;#技术&quot; class=&quot;headerlink&quot; title=&quot;技术&quot;&gt;&lt;/a&gt;技术&lt;/h2&gt;&lt;p&gt;技术的浪潮与现今有价值的技术。&lt;/p&gt;
-&lt;p&gt;产品&lt;/p&gt;
-&lt;p&gt;反摩尔定律：硬件行业的尴尬&lt;/p&gt;
-&lt;h4 id=&quot;Google&quot;&gt;&lt;a href=&quot;#Google&quot; class=&quot;headerlink&quot; title=&quot;Google&quot;&gt;&lt;/a&gt;Google&lt;/h4&gt;
-    
-    </summary>
-    
-    
-      <category term="thought" scheme="http://www.windboy.top/categories/thought/"/>
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
     
     
   </entry>
   
   <entry>
     <title>raft</title>
-    <link href="http://www.windboy.top/2021/04/11/raft/"/>
-    <id>http://www.windboy.top/2021/04/11/raft/</id>
+    <link href="https://windwj000.github.io/2021/04/11/raft/"/>
+    <id>https://windwj000.github.io/2021/04/11/raft/</id>
     <published>2021-04-11T13:50:00.000Z</published>
     <updated>2021-10-31T03:01:38.232Z</updated>
     
@@ -84,15 +60,39 @@
     </summary>
     
     
-      <category term="distributed" scheme="http://www.windboy.top/categories/distributed/"/>
+      <category term="distributed" scheme="https://windwj000.github.io/categories/distributed/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>浪潮之巅读后感</title>
+    <link href="https://windwj000.github.io/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/"/>
+    <id>https://windwj000.github.io/2021/04/11/%E6%B5%AA%E6%BD%AE%E4%B9%8B%E5%B7%85%E8%AF%BB%E5%90%8E%E6%84%9F/</id>
+    <published>2021-04-11T13:50:00.000Z</published>
+    <updated>2021-10-20T15:41:50.882Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="技术"><a href="#技术" class="headerlink" title="技术"></a>技术</h2><p>技术的浪潮与现今有价值的技术。</p><p>产品</p><p>反摩尔定律：硬件行业的尴尬</p><h4 id="Google"><a href="#Google" class="headerlink" title="Google"></a>Google</h4><p>遗憾的是，雅虎用自己的短处去比别人的长处，就不得不接受Google制 定的游戏规则—一技术决定成败</p><h2 id="商业"><a href="#商业" class="headerlink" title="商业"></a>商业</h2><h2 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h2><p>浪潮</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;技术&quot;&gt;&lt;a href=&quot;#技术&quot; class=&quot;headerlink&quot; title=&quot;技术&quot;&gt;&lt;/a&gt;技术&lt;/h2&gt;&lt;p&gt;技术的浪潮与现今有价值的技术。&lt;/p&gt;
+&lt;p&gt;产品&lt;/p&gt;
+&lt;p&gt;反摩尔定律：硬件行业的尴尬&lt;/p&gt;
+&lt;h4 id=&quot;Google&quot;&gt;&lt;a href=&quot;#Google&quot; class=&quot;headerlink&quot; title=&quot;Google&quot;&gt;&lt;/a&gt;Google&lt;/h4&gt;
+    
+    </summary>
+    
+    
+      <category term="thought" scheme="https://windwj000.github.io/categories/thought/"/>
     
     
   </entry>
   
   <entry>
     <title>Java 原生 Socket 实现 HTTP 通信</title>
-    <link href="http://www.windboy.top/2021/03/19/blog12/"/>
-    <id>http://www.windboy.top/2021/03/19/blog12/</id>
+    <link href="https://windwj000.github.io/2021/03/19/blog12/"/>
+    <id>https://windwj000.github.io/2021/03/19/blog12/</id>
     <published>2021-03-19T08:23:00.000Z</published>
     <updated>2021-03-19T10:09:28.686Z</updated>
     
@@ -109,15 +109,15 @@
     </summary>
     
     
-      <category term="java" scheme="http://www.windboy.top/categories/java/"/>
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
     
     
   </entry>
   
   <entry>
     <title>Java 实现支付宝后台支付接口</title>
-    <link href="http://www.windboy.top/2020/10/16/blog11/"/>
-    <id>http://www.windboy.top/2020/10/16/blog11/</id>
+    <link href="https://windwj000.github.io/2020/10/16/blog11/"/>
+    <id>https://windwj000.github.io/2020/10/16/blog11/</id>
     <published>2020-10-16T06:41:28.000Z</published>
     <updated>2020-10-16T08:09:55.869Z</updated>
     
@@ -132,15 +132,15 @@
     </summary>
     
     
-      <category term="backend" scheme="http://www.windboy.top/categories/backend/"/>
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
     
     
   </entry>
   
   <entry>
     <title>Spring bean 的声明和注入</title>
-    <link href="http://www.windboy.top/2020/07/15/blog10/"/>
-    <id>http://www.windboy.top/2020/07/15/blog10/</id>
+    <link href="https://windwj000.github.io/2020/07/15/blog10/"/>
+    <id>https://windwj000.github.io/2020/07/15/blog10/</id>
     <published>2020-07-15T08:06:28.000Z</published>
     <updated>2020-08-25T07:09:07.875Z</updated>
     
@@ -156,15 +156,15 @@
     </summary>
     
     
-      <category term="spring" scheme="http://www.windboy.top/categories/spring/"/>
+      <category term="spring" scheme="https://windwj000.github.io/categories/spring/"/>
     
     
   </entry>
   
   <entry>
     <title>MySQL &amp; Redis 技术分享-下</title>
-    <link href="http://www.windboy.top/2020/06/01/blog9/"/>
-    <id>http://www.windboy.top/2020/06/01/blog9/</id>
+    <link href="https://windwj000.github.io/2020/06/01/blog9/"/>
+    <id>https://windwj000.github.io/2020/06/01/blog9/</id>
     <published>2020-06-01T02:06:28.000Z</published>
     <updated>2020-08-25T07:09:01.675Z</updated>
     
@@ -182,15 +182,15 @@
     </summary>
     
     
-      <category term="backend" scheme="http://www.windboy.top/categories/backend/"/>
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
     
     
   </entry>
   
   <entry>
     <title>MySQL &amp; Redis 技术分享-上</title>
-    <link href="http://www.windboy.top/2020/05/22/blog8/"/>
-    <id>http://www.windboy.top/2020/05/22/blog8/</id>
+    <link href="https://windwj000.github.io/2020/05/22/blog8/"/>
+    <id>https://windwj000.github.io/2020/05/22/blog8/</id>
     <published>2020-05-22T04:06:28.000Z</published>
     <updated>2020-08-25T07:08:55.764Z</updated>
     
@@ -205,15 +205,15 @@
     </summary>
     
     
-      <category term="backend" scheme="http://www.windboy.top/categories/backend/"/>
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
     
     
   </entry>
   
   <entry>
     <title>SimpleDateFormat 类使用避坑</title>
-    <link href="http://www.windboy.top/2020/05/19/blog7/"/>
-    <id>http://www.windboy.top/2020/05/19/blog7/</id>
+    <link href="https://windwj000.github.io/2020/05/19/blog7/"/>
+    <id>https://windwj000.github.io/2020/05/19/blog7/</id>
     <published>2020-05-19T11:06:28.000Z</published>
     <updated>2020-08-25T07:08:49.701Z</updated>
     
@@ -230,15 +230,15 @@
     </summary>
     
     
-      <category term="java" scheme="http://www.windboy.top/categories/java/"/>
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
     
     
   </entry>
   
   <entry>
     <title>PuTTY 的安装与使用</title>
-    <link href="http://www.windboy.top/2020/05/06/blog6/"/>
-    <id>http://www.windboy.top/2020/05/06/blog6/</id>
+    <link href="https://windwj000.github.io/2020/05/06/blog6/"/>
+    <id>https://windwj000.github.io/2020/05/06/blog6/</id>
     <published>2020-05-06T02:06:28.000Z</published>
     <updated>2020-08-25T07:08:42.605Z</updated>
     
@@ -253,15 +253,15 @@
     </summary>
     
     
-      <category term="other" scheme="http://www.windboy.top/categories/other/"/>
+      <category term="other" scheme="https://windwj000.github.io/categories/other/"/>
     
     
   </entry>
   
   <entry>
     <title>MyBatis 与 Hibernate 对比</title>
-    <link href="http://www.windboy.top/2020/03/30/blog5/"/>
-    <id>http://www.windboy.top/2020/03/30/blog5/</id>
+    <link href="https://windwj000.github.io/2020/03/30/blog5/"/>
+    <id>https://windwj000.github.io/2020/03/30/blog5/</id>
     <published>2020-03-30T13:06:28.000Z</published>
     <updated>2020-08-25T07:08:36.566Z</updated>
     
@@ -277,15 +277,15 @@
     </summary>
     
     
-      <category term="backend" scheme="http://www.windboy.top/categories/backend/"/>
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
     
     
   </entry>
   
   <entry>
     <title>Java 后端开发技术选型</title>
-    <link href="http://www.windboy.top/2020/03/01/blog4/"/>
-    <id>http://www.windboy.top/2020/03/01/blog4/</id>
+    <link href="https://windwj000.github.io/2020/03/01/blog4/"/>
+    <id>https://windwj000.github.io/2020/03/01/blog4/</id>
     <published>2020-03-01T03:06:28.000Z</published>
     <updated>2020-08-25T07:08:28.112Z</updated>
     
@@ -301,15 +301,15 @@
     </summary>
     
     
-      <category term="java" scheme="http://www.windboy.top/categories/java/"/>
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
     
     
   </entry>
   
   <entry>
     <title>Selenium IDE 的简单使用</title>
-    <link href="http://www.windboy.top/2020/02/20/blog3/"/>
-    <id>http://www.windboy.top/2020/02/20/blog3/</id>
+    <link href="https://windwj000.github.io/2020/02/20/blog3/"/>
+    <id>https://windwj000.github.io/2020/02/20/blog3/</id>
     <published>2020-02-20T01:06:28.000Z</published>
     <updated>2020-08-25T07:08:19.930Z</updated>
     
@@ -327,15 +327,15 @@
     </summary>
     
     
-      <category term="other" scheme="http://www.windboy.top/categories/other/"/>
+      <category term="other" scheme="https://windwj000.github.io/categories/other/"/>
     
     
   </entry>
   
   <entry>
     <title>SSM 整合</title>
-    <link href="http://www.windboy.top/2020/02/19/blog2/"/>
-    <id>http://www.windboy.top/2020/02/19/blog2/</id>
+    <link href="https://windwj000.github.io/2020/02/19/blog2/"/>
+    <id>https://windwj000.github.io/2020/02/19/blog2/</id>
     <published>2020-02-19T02:06:28.000Z</published>
     <updated>2020-08-25T07:08:11.993Z</updated>
     
@@ -351,15 +351,15 @@
     </summary>
     
     
-      <category term="spring" scheme="http://www.windboy.top/categories/spring/"/>
+      <category term="spring" scheme="https://windwj000.github.io/categories/spring/"/>
     
     
   </entry>
   
   <entry>
     <title>欢迎来到我的网站</title>
-    <link href="http://www.windboy.top/2020/02/14/blog1/"/>
-    <id>http://www.windboy.top/2020/02/14/blog1/</id>
+    <link href="https://windwj000.github.io/2020/02/14/blog1/"/>
+    <id>https://windwj000.github.io/2020/02/14/blog1/</id>
     <published>2020-02-14T13:06:28.000Z</published>
     <updated>2020-08-25T07:08:00.227Z</updated>
     
@@ -378,7 +378,7 @@
     </summary>
     
     
-      <category term="welcome" scheme="http://www.windboy.top/categories/welcome/"/>
+      <category term="welcome" scheme="https://windwj000.github.io/categories/welcome/"/>
     
     
   </entry>
