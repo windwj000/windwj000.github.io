@@ -2,15 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://windwj000.github.io/raft/</loc>
-    
-    <lastmod>2021-10-31</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://windwj000.github.io/about/index.html</loc>
     
     <lastmod>2021-10-16</lastmod>
@@ -166,7 +157,7 @@
 
   <url>
     <loc>https://windwj000.github.io/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -175,43 +166,36 @@
 
   
   <url>
-    <loc>https://windwj000.github.io/categories/spring/</loc>
-    <lastmod>2022-02-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://windwj000.github.io/categories/welcome/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://windwj000.github.io/categories/other/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <loc>https://windwj000.github.io/categories/spring/</loc>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://windwj000.github.io/categories/backend/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://windwj000.github.io/categories/java/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://windwj000.github.io/categories/distributed/</loc>
-    <lastmod>2022-02-14</lastmod>
+    <loc>https://windwj000.github.io/categories/other/</loc>
+    <lastmod>2022-03-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
