@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://windwj000.github.io/"/>
-  <updated>2021-04-12T03:03:37.482Z</updated>
+  <updated>2023-11-12T15:01:01.182Z</updated>
   <id>https://windwj000.github.io/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ArrayList add null分析</title>
+    <link href="https://windwj000.github.io/blog14/"/>
+    <id>https://windwj000.github.io/blog14/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:01:01.182Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p><img src="/images/blog14/IMG_3551.JPG" width="80%"/><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/><p><strong>ArrayList现状</strong></p><ul><li>add方法先确认容量(包含扩容)，再赋值</li><li>其中，执行扩容的grow方法进行旧元素的拷贝</li></ul><p><strong>add null分析</strong></p><ul><li>后执行的ThreadB扩容时，拷贝旧元素</li><li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li><li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li></ul><h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p><p>代码块</p><p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p><p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p><p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p><p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p><p>}</p><p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p><p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p><p>​     return minCapacity;</p><p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p><p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p><p>​    grow(minCapacity);</p><p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p><p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p><p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;p&gt;清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;amp;存申诉任务到db&amp;amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。&lt;/p&gt;
+&lt;img src=&quot;/images/blog14/IMG_3551.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;h1 id=&quot;结论&quot;&gt;&lt;a href=&quot;#结论&quot; class=&quot;headerlink&quot; title=&quot;结论&quot;&gt;&lt;/a&gt;结论&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3552.JPG&quot; width=&quot;80%&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Java 集合类的 contains 方法与 equals 方法的关系分析</title>
