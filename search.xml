@@ -12,6 +12,82 @@
       </categories>
   </entry>
   <entry>
+    <title>Java 集合类的 contains 方法与 equals 方法的关系分析</title>
+    <url>/blog13/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>我在学习 ArrayList 类主要方法时，写过一段关于 contains() 的代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l1 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l2 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">l1.add(<span class="number">1</span>);</span><br><span class="line">l1.add(<span class="number">2</span>);</span><br><span class="line">l2.add(<span class="number">1</span>);</span><br><span class="line">l2.add(<span class="number">2</span>);</span><br><span class="line">System.out.println(l1.hashCode());</span><br><span class="line">System.out.println(l2.hashCode());</span><br><span class="line">System.out.println(l1 == l2);</span><br><span class="line">System.out.println(l1.equals(l2));</span><br><span class="line">list.add(l1);</span><br><span class="line">System.out.println(list.contains(l2));  <span class="comment">//&lt;-在这里</span></span><br></pre></td></tr></table></figure>
+
+<p>and 输出结果为：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="number">994</span></span><br><span class="line"><span class="number">994</span></span><br><span class="line"><span class="keyword">false</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//equals() 的结果</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//contains() 的结果</span></span><br></pre></td></tr></table></figure>
+
+<p>注意这里判断的是 list.contains(l2)，而 list 内只添加过 l1，结果却是存在！</p>
+<h2 id="contains-源码分析"><a href="#contains-源码分析" class="headerlink" title="contains() 源码分析"></a>contains() 源码分析</h2><p>在 ArrayList 类中，contains() 调用了 indexOf() 进行判断是否包含：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> indexOf(o) &gt;= <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">            <span class="keyword">if</span> (elementData[i]==<span class="keyword">null</span>)</span><br><span class="line">              	<span class="keyword">return</span> i;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">            <span class="keyword">if</span> (o.equals(elementData[i]))</span><br><span class="line">              	<span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，indexOf() 中通过 equals() 比较 elementData[i]，返回一个 index。</p>
+<p>elementData 在 ArrayList 类的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">transient</span> Object[] elementData;</span><br></pre></td></tr></table></figure>
+
+<p>逻辑简单，综合上面输出结果可以看到，equals() 和 contains() 的结果都为 true，而 == 的结果为 false。</p>
+<p>复习一下 == 和 equals() 的比较。</p>
+<h2 id="和-equals-的比较"><a href="#和-equals-的比较" class="headerlink" title="== 和 equals() 的比较"></a>== 和 equals() 的比较</h2><p><strong>==</strong></p>
+<ul>
+<li><p>基本数据类型 == 比较的是值。</p>
+</li>
+<li><p>引用数据类型 == 判断两个变量是否引用同一个对象。</p>
+</li>
+</ul>
+<p><strong>equals()</strong></p>
+<p>equals() 判断引用的对象是否等价。equals 方法不能作用于基本数据类型的变量。</p>
+<p>类没有重写 equals() 方法，则通过 equals() 比较该类的两个对象时，等价于通过 == 比较这两个对象：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> (<span class="keyword">this</span> == obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般，我们都重写 equals() 来比较两个对象的内容是否相等。</p>
+<p><strong>equals() 的重写方法</strong></p>
+<ol>
+<li><p>检查是否为同一个对象的引用，如果是直接返回 true。</p>
+</li>
+<li><p>检查是否是同一个类型，如果不是，直接返回 false。</p>
+</li>
+<li><p>将 Object 对象进行转型。</p>
+</li>
+<li><p>判断每个关键域是否相等。</p>
+</li>
+</ol>
+<h2 id="进一步分析"><a href="#进一步分析" class="headerlink" title="进一步分析"></a>进一步分析</h2><p>回到 contains() 源码中：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.equals(elementData[i])</span><br></pre></td></tr></table></figure>
+
+<p>o 为 Object 类，且 ArrayList 类没有重写 equals()，那么<u><strong>只在 contains() 这一步，是无法使 l1.equals(l2) 为 true 的。</strong></u></p>
+<p>因此我们向上找原因所在，通过 debug 模式进入 equals() 中：</p>
+<img src="/images/blog13/test.png" width="80%"/>
+
+<p>然后进入了 AbstractList 类，这个类就是 ArrayList 类继承来的类：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt;, <span class="title">RandomAccess</span>, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br></pre></td></tr></table></figure>
+
+<p>并且在 AbstractList 类中，我们发现重写了 equals()：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (o == <span class="keyword">this</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (!(o <span class="keyword">instanceof</span> List))</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    ListIterator&lt;E&gt; e1 = listIterator();</span><br><span class="line">    ListIterator&lt;?&gt; e2 = ((List&lt;?&gt;) o).listIterator();</span><br><span class="line">    <span class="keyword">while</span> (e1.hasNext() &amp;&amp; e2.hasNext()) &#123;</span><br><span class="line">        E o1 = e1.next();</span><br><span class="line">        Object o2 = e2.next();</span><br><span class="line">        <span class="keyword">if</span> (!(o1==<span class="keyword">null</span> ? o2==<span class="keyword">null</span> : o1.equals(o2)))</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> !(e1.hasNext() || e2.hasNext());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并且 AbstractList 类重写了 hashCode()：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> hashCode = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (E e : <span class="keyword">this</span>)</span><br><span class="line">        hashCode = <span class="number">31</span>*hashCode + (e==<span class="keyword">null</span> ? <span class="number">0</span> : e.hashCode());</span><br><span class="line">    <span class="keyword">return</span> hashCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>补充一个考点，为什么重写 equals() 为什么要一定要重写 hashCode()？</p>
+<h2 id="为什么重写-equals-为什么要一定要重写-hashCode-？"><a href="#为什么重写-equals-为什么要一定要重写-hashCode-？" class="headerlink" title="为什么重写 equals() 为什么要一定要重写 hashCode()？"></a>为什么重写 equals() 为什么要一定要重写 hashCode()？</h2><ul>
+<li>等价的两个对象哈希值一定相同，哈希值相同的两个对象不一定等价。因为计算哈希值具有随机性，两个值不同的对象可能计算出相同的哈希值。</li>
+<li>如果没有重写 hashCode()，两个对象 hashCode() 得出来的值不同，等价对象无法 equals()。</li>
+<li>因此为了能 equals()，必须重写 hashCode()，保证等价的两个对象哈希值也相等。</li>
+<li>主要是针对 HashSet 和 HashMap 等集合类，如果没有重写 hashCode()，则会导致集合中有两个等价的对象。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>梳理一下 contains() 与 equals() 的关系：</p>
+<ol>
+<li>ArrayList 类继承了 AbstractList 类对 equals() 和 hashCode() 的重写，使 l1.equals(l2) 的结果为 true，因为比较的是两个 list 内存的元素的值。</li>
+<li>ArrayList 类的 contains() 调用了 indexOf()，indexOf() 使用 equals() 进行元素的比较，因此 list.contains(l2) 的结果也为 true。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Java 原生 Socket 实现 HTTP 通信</title>
     <url>/blog12/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们很熟悉编写服务端的一个 Controller：</p>
@@ -54,6 +130,177 @@
 ]]></content>
       <categories>
         <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Mafka Castle启动报错分析</title>
+    <url>/blog16/</url>
+    <content><![CDATA[<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><img src="/images/blog16/IMG_3601.JPG" width="80%"/>
+
+<p>ClassNotFoundException 定位到jar包冲突</p>
+<p>为什么是mafka castle报出问题?</p>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><img src="/images/blog16/IMG_3602.JPG" width="80%"/>
+
+<p>引入frog-sdk后，frog-sdk包含mafka-client包，造成依赖冲突<br>Castle功能</p>
+<img src="/images/blog16/IMG_3603.JPG" width="80%"/>
+
+<p>Castle定位</p>
+<img src="/images/blog16/IMG_3604.JPG" width="80%"/>
+
+
+
+]]></content>
+      <categories>
+        <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>商详页兜底下发原因分析</title>
+    <url>/blog17/</url>
+    <content><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><img src="/images/blog14/IMG_3610.JPG" width="80%"/>
+
+<ul>
+<li><p>每日中午12.20左右达到高峰</p>
+</li>
+<li><p>每日下午14.20左右达到低谷</p>
+</li>
+<li><p>每日晚上23.00左右达到当日最高峰</p>
+</li>
+</ul>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>根因:档期查询为空<br>进一步观察–档期查询未排期raptor:</p>
+<img src="/images/blog14/IMG_3611.JPG" width="80%"/>
+
+<p>与商详页兜底下发raptor较为重合</p>
+<table>
+<thead>
+<tr>
+<th>时间点</th>
+<th>原因</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>中午12.20</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>晚上23.00</td>
+<td>23:00档期日期切换，接口如为查询当天档期，23:00前的排期数据可能23:00    <br/>后变为未排期。导致档期查询为空。</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>档期查询未排期的几种情况:</p>
+<ul>
+<li><p>商品排期侧调整排期:例如排期驳回、超坑踢品</p>
+</li>
+<li><p>物流:19点之后截单</p>
+</li>
+<li><p>用户:加购时有排期，点击商详页时没排期。后续可以增加pageFrom字段埋点，分析有无其他情况。</p>
+</li>
+</ul>
+<h1 id="打点分析"><a href="#打点分析" class="headerlink" title="打点分析"></a>打点分析</h1><p><strong>兜底页大盘配置</strong><br>Name:[“PoiSkuDetailBizEmpty”]</p>
+<p>Appkey:com.sankuai.salex.aggregate.goodsrender</p>
+<p>Type:[“sku_detail_monitor”]</p>
+<p>指标:失败次数对应代码代码块</p>
+<ul>
+<li>产生checkSkuEmpty=true条件有两个:查询档期cquery为空|查询cbase为空</li>
+<li>依次分析1.查询档期cquery 2.查询cbase</li>
+</ul>
+<p>代码分析</p>
+<p>1.查询档期cquery</p>
+<p>SkuDetailFacade#getPoiSkuDetail</p>
+<p>2.查询cbase<br>SkuDetailFacade#doHandleProduct</p>
+<p>三种cbase为空，导致返回兜底页的情况:</p>
+<ul>
+<li><p>调cbase接口超时–Timeout。</p>
+</li>
+<li><p>调cbase接口失败–Fail</p>
+</li>
+<li><p>查询cbase结果为空</p>
+</li>
+</ul>
+<p>注:cbase接口返回值状态码，均为默认值code=0，无法区分接口失败具体原因</p>
+<h1 id="全量打点监控"><a href="#全量打点监控" class="headerlink" title="全量打点监控"></a>全量打点监控</h1><p>1.raptor监控类型</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>type</th>
+<th>name</th>
+<th>说明</th>
+<th>兜底页下发原因占比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>已有</td>
+<td>bus_exception</td>
+<td>sku_no_change_null</td>
+<td>SKU有效校验未通过，或未命中一品多规</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>新增</td>
+<td>sku_detail_monitor</td>
+<td>query.schedule.sku.empty</td>
+<td>查询档期cquery结果为空<br />接口:ProductQueryService#queryScheduleSkuList</td>
+<td>99.8%</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>query.cbase.info.empty</td>
+<td>查询cbase结果为空</td>
+<td>0.1%</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>query.cbase.info.timeout</td>
+<td></td>
+<td>0%</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>query.cbase.info.fail</td>
+<td></td>
+<td>0%</td>
+</tr>
+</tbody></table>
+<p>2.0ctoCall 请求超时–占比</p>
+<ul>
+<li>cquery–0.08%</li>
+<li>cbase–0.02%</li>
+</ul>
+]]></content>
+      <categories>
+        <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>generatorConfig.xml获取KMS配置失败分析</title>
+    <url>/blog15/</url>
+    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>from 安全工单，「源码代码安全扫描器」针对仓库代码进行了扫描，检测到存在硬编码敏感信息(detect_secrets)安全漏洞。</p>
+<p>密码、token等数据作为C4等级的数据，依据数据安全管理标准，这类高敏数据应当存储在kms等安全的存储区中。</p>
+<p>generatorConfig.xml：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">jdbcConnection</span> <span class="attr">driverClass</span>=<span class="string">"com.mysql,jdbc.Driver"</span>	</span></span><br><span class="line"><span class="tag">                <span class="attr">connectionURL</span>=<span class="string">"jdbc:mysql://10.48.236.167:5002/interactive_qa?characterEncoding=UTF8<span class="symbol">&amp;amp;</span>socketTimeout=60000<span class="symbol">&amp;amp;</span>allowMultiQueries=true<span class="symbol">&amp;amp;</span>connectTimeout=5000"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">userId</span>=<span class="string">"rds_qa_test"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">password</span>=<span class="string">"$KMS&#123;jdbc-connection-password&#125;"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="获取失败原因分析"><a href="#获取失败原因分析" class="headerlink" title="获取失败原因分析"></a>获取失败原因分析</h1><p>按照上述generatorConfig.xml文件配置，点击Maven-&gt;服务-&gt;Plugins-&gt;mybatis-generator:generate，出现以下报错: Access denied for user ‘rds_qa_test’@’11.39.239.85’ (using password:YES)$KMS{}如何发挥作用?KMS-MDP官方文档-2.2使用说明</p>
+<ul>
+<li><p>properties文件中使用</p>
+</li>
+<li><p>Java 代码中使用</p>
+</li>
+<li><p>Spring XML Context文件中使用(注:非generatorConfig.xml)</p>
+</li>
+</ul>
+<p>但是在generatorConfig.xml中，不能通过$KMS(}获取、并在mybatis-generator:generate中成功生效(同时满足这两个条件)，因为mdp未实现该功能。</p>
+<h1 id="一种可行思路"><a href="#一种可行思路" class="headerlink" title="一种可行思路"></a>一种可行思路</h1><p>按照 MDP MyBatisGenerator 代码生成工具-MDP官方文档-2.1可视化工具，不需要generatorConfig.xml文件，在线下直接使用mdp-mybatis-generator,并将数据库连接信息(账号、密码等)保存在此插件的相关存储位置。但由于需要配置相关的生成类名、路径等，暂不考虑。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>明文密码存在于generatorConfig.xml文件中，暂无从KMS获取配置的方案，待MDP/KMS方给出解决方案后，再进行处理。</p>
+]]></content>
+      <categories>
+        <category>other</category>
       </categories>
   </entry>
   <entry>
@@ -148,97 +395,13 @@
 </ul>
 <h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
 <p>代码块</p>
-<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
-<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
-<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
-<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
-<p>}</p>
-<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
-<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
-<p>​     return minCapacity;</p>
-<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
-<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
-<p>​    grow(minCapacity);</p>
-<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**	</span></span><br><span class="line"><span class="comment"> *The array buffer into which the elements of the ArrayList are stared.	</span></span><br><span class="line"><span class="comment"> *The capacity of the ArrayList is the length of this array buffer.Any	</span></span><br><span class="line"><span class="comment"> *empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA</span></span><br><span class="line"><span class="comment"> *will be expanded to DEFAULT_CAPACITY when the first element is added.	</span></span><br><span class="line"><span class="comment"> *transient Object[] elementData; // non-private to simplify nested class access</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">10	* The size of the ArrayList (the number of elements it contains),	</span></span><br><span class="line"><span class="comment">11</span></span><br><span class="line"><span class="comment">12	*<span class="doctag">@serial</span>	</span></span><br><span class="line"><span class="comment">13	*/</span>	</span><br><span class="line"><span class="number">14</span> <span class="keyword">private</span> <span class="keyword">int</span> size:</span><br><span class="line"><span class="number">18</span>	<span class="comment">/**	</span></span><br><span class="line"><span class="comment">19	*将指定的元素追加到此列表的末尾。	</span></span><br><span class="line"><span class="comment">20  /</span></span><br><span class="line"><span class="comment">21 public boolean add(E e)&#123;</span></span><br><span class="line"><span class="comment">22	// 加元素之前,先调用ensureCapacityInternal方法	</span></span><br><span class="line"><span class="comment">23	ensureCapacityInternal(size +1); // Increments modCount!!	</span></span><br><span class="line"><span class="comment">24	/这里看到ArrayList添加元素的实质就相当于为数组赋值	</span></span><br><span class="line"><span class="comment">25	elementDatalsize++]=e;	</span></span><br><span class="line"><span class="comment">26	return true;	</span></span><br><span class="line"><span class="comment">27&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">28</span></span><br><span class="line"><span class="comment">29// 确保内部容量达到指定的最小容量。</span></span><br><span class="line"><span class="comment">private void ensureCapacityInternal(int minCapacity)&#123;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​	ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">// 根据给定的最小容量和当前数组元素来计算所需容量。</span></span><br><span class="line"><span class="comment">private static int calculateCapacity(0bject[] elementData, int minCapacity) &#123;</span></span><br><span class="line"><span class="comment">// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​	if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) &#123;</span></span><br><span class="line"><span class="comment">​		return Math.max(DEFAULT_CAPACITY,minCapacity);</span></span><br><span class="line"><span class="comment">​	// 否则直接返回最小容量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​	 return minCapacity;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">//判断是否需要扩容</span></span><br><span class="line"><span class="comment">private void ensureExplicitCapacity(intminCapacity) &#123;</span></span><br><span class="line"><span class="comment">	modCount++;</span></span><br><span class="line"><span class="comment">	//判断当前数组容量是否足以存储minCapacity个元素 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​	if (minCapacity -elementData.length &gt; 0)</span></span><br><span class="line"><span class="comment">​	//调用grow方法进行扩容 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​	grow(minCapacity);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">53	/**	</span></span><br><span class="line"><span class="comment">54	* ArrayList扩容的核心方法。	</span></span><br><span class="line"><span class="comment">55	*/</span>	</span><br><span class="line"><span class="number">56</span>	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">grow</span><span class="params">(<span class="keyword">int</span> minCapacity)</span> </span>&#123;	</span><br><span class="line"><span class="number">57</span>	<span class="comment">// oldCapacity为旧容量，newCapacity为新容量	</span></span><br><span class="line"><span class="number">58</span>	<span class="keyword">int</span> oldCapacity =elementData.length;	</span><br><span class="line">	<span class="comment">// 将oldCapacity 右移一位，其效果相当于oldCapacity /2,</span></span><br><span class="line">	<span class="comment">// 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,</span></span><br><span class="line"><span class="number">60</span></span><br><span class="line">	<span class="keyword">int</span> newCapacity = oldCapacity +(oldCapacity &gt;&gt; <span class="number">1</span>);</span><br><span class="line"><span class="number">63</span>	<span class="comment">// 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，	</span></span><br><span class="line"><span class="number">64</span>	<span class="keyword">if</span> (newCapacity - minCapacity &lt;<span class="number">0</span>)	</span><br><span class="line"><span class="number">65</span>		newCapacity = minCapacity;	</span><br><span class="line"><span class="number">66</span></span><br><span class="line"><span class="number">67</span>	<span class="comment">// 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,	</span></span><br><span class="line"><span class="number">68</span>	<span class="comment">// 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8',	</span></span><br><span class="line"><span class="number">69</span>	<span class="keyword">if</span> (newCapacity -MAX_ARRAY_SIZE &gt; <span class="number">0</span>)	</span><br><span class="line"><span class="number">70</span>		newCapacity= hugeCapacity(minCapacity);	</span><br><span class="line"><span class="number">71</span></span><br><span class="line"><span class="number">72</span>	<span class="comment">// minCapacity is usually close to size, so this is a win:	</span></span><br><span class="line"><span class="number">73</span>	elementData = Arrays.copy0f(elementData, newCapacity);	</span><br><span class="line"><span class="number">74</span>&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
 <p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
 <p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Java 集合类的 contains 方法与 equals 方法的关系分析</title>
-    <url>/blog13/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>我在学习 ArrayList 类主要方法时，写过一段关于 contains() 的代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l1 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l2 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">l1.add(<span class="number">1</span>);</span><br><span class="line">l1.add(<span class="number">2</span>);</span><br><span class="line">l2.add(<span class="number">1</span>);</span><br><span class="line">l2.add(<span class="number">2</span>);</span><br><span class="line">System.out.println(l1.hashCode());</span><br><span class="line">System.out.println(l2.hashCode());</span><br><span class="line">System.out.println(l1 == l2);</span><br><span class="line">System.out.println(l1.equals(l2));</span><br><span class="line">list.add(l1);</span><br><span class="line">System.out.println(list.contains(l2));  <span class="comment">//&lt;-在这里</span></span><br></pre></td></tr></table></figure>
-
-<p>and 输出结果为：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="number">994</span></span><br><span class="line"><span class="number">994</span></span><br><span class="line"><span class="keyword">false</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//equals() 的结果</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//contains() 的结果</span></span><br></pre></td></tr></table></figure>
-
-<p>注意这里判断的是 list.contains(l2)，而 list 内只添加过 l1，结果却是存在！</p>
-<h2 id="contains-源码分析"><a href="#contains-源码分析" class="headerlink" title="contains() 源码分析"></a>contains() 源码分析</h2><p>在 ArrayList 类中，contains() 调用了 indexOf() 进行判断是否包含：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> indexOf(o) &gt;= <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">            <span class="keyword">if</span> (elementData[i]==<span class="keyword">null</span>)</span><br><span class="line">              	<span class="keyword">return</span> i;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">            <span class="keyword">if</span> (o.equals(elementData[i]))</span><br><span class="line">              	<span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，indexOf() 中通过 equals() 比较 elementData[i]，返回一个 index。</p>
-<p>elementData 在 ArrayList 类的定义如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">transient</span> Object[] elementData;</span><br></pre></td></tr></table></figure>
-
-<p>逻辑简单，综合上面输出结果可以看到，equals() 和 contains() 的结果都为 true，而 == 的结果为 false。</p>
-<p>复习一下 == 和 equals() 的比较。</p>
-<h2 id="和-equals-的比较"><a href="#和-equals-的比较" class="headerlink" title="== 和 equals() 的比较"></a>== 和 equals() 的比较</h2><p><strong>==</strong></p>
-<ul>
-<li><p>基本数据类型 == 比较的是值。</p>
-</li>
-<li><p>引用数据类型 == 判断两个变量是否引用同一个对象。</p>
-</li>
-</ul>
-<p><strong>equals()</strong></p>
-<p>equals() 判断引用的对象是否等价。equals 方法不能作用于基本数据类型的变量。</p>
-<p>类没有重写 equals() 方法，则通过 equals() 比较该类的两个对象时，等价于通过 == 比较这两个对象：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">  	<span class="keyword">return</span> (<span class="keyword">this</span> == obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>一般，我们都重写 equals() 来比较两个对象的内容是否相等。</p>
-<p><strong>equals() 的重写方法</strong></p>
-<ol>
-<li><p>检查是否为同一个对象的引用，如果是直接返回 true。</p>
-</li>
-<li><p>检查是否是同一个类型，如果不是，直接返回 false。</p>
-</li>
-<li><p>将 Object 对象进行转型。</p>
-</li>
-<li><p>判断每个关键域是否相等。</p>
-</li>
-</ol>
-<h2 id="进一步分析"><a href="#进一步分析" class="headerlink" title="进一步分析"></a>进一步分析</h2><p>回到 contains() 源码中：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.equals(elementData[i])</span><br></pre></td></tr></table></figure>
-
-<p>o 为 Object 类，且 ArrayList 类没有重写 equals()，那么<u><strong>只在 contains() 这一步，是无法使 l1.equals(l2) 为 true 的。</strong></u></p>
-<p>因此我们向上找原因所在，通过 debug 模式进入 equals() 中：</p>
-<img src="/images/blog13/test.png" width="80%"/>
-
-<p>然后进入了 AbstractList 类，这个类就是 ArrayList 类继承来的类：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt;, <span class="title">RandomAccess</span>, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br></pre></td></tr></table></figure>
-
-<p>并且在 AbstractList 类中，我们发现重写了 equals()：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (o == <span class="keyword">this</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (!(o <span class="keyword">instanceof</span> List))</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    ListIterator&lt;E&gt; e1 = listIterator();</span><br><span class="line">    ListIterator&lt;?&gt; e2 = ((List&lt;?&gt;) o).listIterator();</span><br><span class="line">    <span class="keyword">while</span> (e1.hasNext() &amp;&amp; e2.hasNext()) &#123;</span><br><span class="line">        E o1 = e1.next();</span><br><span class="line">        Object o2 = e2.next();</span><br><span class="line">        <span class="keyword">if</span> (!(o1==<span class="keyword">null</span> ? o2==<span class="keyword">null</span> : o1.equals(o2)))</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> !(e1.hasNext() || e2.hasNext());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>并且 AbstractList 类重写了 hashCode()：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> hashCode = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (E e : <span class="keyword">this</span>)</span><br><span class="line">        hashCode = <span class="number">31</span>*hashCode + (e==<span class="keyword">null</span> ? <span class="number">0</span> : e.hashCode());</span><br><span class="line">    <span class="keyword">return</span> hashCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>补充一个考点，为什么重写 equals() 为什么要一定要重写 hashCode()？</p>
-<h2 id="为什么重写-equals-为什么要一定要重写-hashCode-？"><a href="#为什么重写-equals-为什么要一定要重写-hashCode-？" class="headerlink" title="为什么重写 equals() 为什么要一定要重写 hashCode()？"></a>为什么重写 equals() 为什么要一定要重写 hashCode()？</h2><ul>
-<li>等价的两个对象哈希值一定相同，哈希值相同的两个对象不一定等价。因为计算哈希值具有随机性，两个值不同的对象可能计算出相同的哈希值。</li>
-<li>如果没有重写 hashCode()，两个对象 hashCode() 得出来的值不同，等价对象无法 equals()。</li>
-<li>因此为了能 equals()，必须重写 hashCode()，保证等价的两个对象哈希值也相等。</li>
-<li>主要是针对 HashSet 和 HashMap 等集合类，如果没有重写 hashCode()，则会导致集合中有两个等价的对象。</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>梳理一下 contains() 与 equals() 的关系：</p>
-<ol>
-<li>ArrayList 类继承了 AbstractList 类对 equals() 和 hashCode() 的重写，使 l1.equals(l2) 的结果为 true，因为比较的是两个 list 内存的元素的值。</li>
-<li>ArrayList 类的 contains() 调用了 indexOf()，indexOf() 使用 equals() 进行元素的比较，因此 list.contains(l2) 的结果也为 true。</li>
-</ol>
 ]]></content>
       <categories>
         <category>java</category>
@@ -351,6 +514,306 @@
 ]]></content>
       <categories>
         <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>ArrayList add null分析</title>
+    <url>/blog18/</url>
+    <content><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+
+<p><strong>ArrayList现状</strong></p>
+<ul>
+<li>add方法先确认容量(包含扩容)，再赋值</li>
+<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+</ul>
+<p><strong>add null分析</strong></p>
+<ul>
+<li>后执行的ThreadB扩容时，拷贝旧元素</li>
+<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
+<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+</ul>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
+<p>代码块</p>
+<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
+<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
+<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
+<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
+<p>}</p>
+<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
+<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
+<p>​     return minCapacity;</p>
+<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
+<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
+<p>​    grow(minCapacity);</p>
+<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
+<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
+<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>ArrayList add null分析</title>
+    <url>/blog19/</url>
+    <content><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+
+<p><strong>ArrayList现状</strong></p>
+<ul>
+<li>add方法先确认容量(包含扩容)，再赋值</li>
+<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+</ul>
+<p><strong>add null分析</strong></p>
+<ul>
+<li>后执行的ThreadB扩容时，拷贝旧元素</li>
+<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
+<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+</ul>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
+<p>代码块</p>
+<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
+<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
+<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
+<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
+<p>}</p>
+<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
+<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
+<p>​     return minCapacity;</p>
+<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
+<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
+<p>​    grow(minCapacity);</p>
+<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
+<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
+<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>ArrayList add null分析</title>
+    <url>/blog21/</url>
+    <content><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+
+<p><strong>ArrayList现状</strong></p>
+<ul>
+<li>add方法先确认容量(包含扩容)，再赋值</li>
+<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+</ul>
+<p><strong>add null分析</strong></p>
+<ul>
+<li>后执行的ThreadB扩容时，拷贝旧元素</li>
+<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
+<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+</ul>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
+<p>代码块</p>
+<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
+<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
+<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
+<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
+<p>}</p>
+<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
+<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
+<p>​     return minCapacity;</p>
+<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
+<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
+<p>​    grow(minCapacity);</p>
+<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
+<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
+<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>PuTTY 的安装与使用</title>
+    <url>/blog6/</url>
+    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
+<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
+<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
+<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
+
+<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
+<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
+
+<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
+
+<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
+<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
+
+<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
+
+<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
+]]></content>
+      <categories>
+        <category>other</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>ArrayList add null分析</title>
+    <url>/blog20/</url>
+    <content><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+
+<p><strong>ArrayList现状</strong></p>
+<ul>
+<li>add方法先确认容量(包含扩容)，再赋值</li>
+<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+</ul>
+<p><strong>add null分析</strong></p>
+<ul>
+<li>后执行的ThreadB扩容时，拷贝旧元素</li>
+<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
+<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+</ul>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
+<p>代码块</p>
+<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
+<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
+<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
+<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
+<p>}</p>
+<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
+<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
+<p>​     return minCapacity;</p>
+<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
+<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
+<p>​    grow(minCapacity);</p>
+<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
+<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
+<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SimpleDateFormat 类使用避坑</title>
+    <url>/blog7/</url>
+    <content><![CDATA[<p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
+<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
+<h2 id="配合-Calendar-完成日期的加减"><a href="#配合-Calendar-完成日期的加减" class="headerlink" title="配合 Calendar 完成日期的加减"></a>配合 Calendar 完成日期的加减</h2><p>Calendar 的 getInstance() 获取 Calendar 实例，setTime() 设置起始时间，add() 进行日期的加减。add() 中 Calendar.DAY_OF_MONTH 表示以天作为计算的单位，Calendar.DATE 也是相同的效果，方法的第二个参数 amount 取负数即可实现减法。如下计算下个月的日期：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);</span><br><span class="line">Calendar calendar &#x3D; Calendar.getInstance();</span><br><span class="line">calendar.setTime(date);</span><br><span class="line">calendar.add(Calendar.DAY_OF_MONTH, 31);</span><br><span class="line">String endTime &#x3D; simpleDateFormat.format(calendar.getTime());    &#x2F;&#x2F; 2020-06-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<h2 id="SimpleDateFormat-避坑"><a href="#SimpleDateFormat-避坑" class="headerlink" title="SimpleDateFormat 避坑"></a>SimpleDateFormat 避坑</h2><p><u>重点来惹</u>！一定要按照日期格式的标准写法，比如使用错误的日期格式 “YYYY-MM-dd” 时，format() 将会出现奇怪的日期：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;YYYY-MM-dd&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19&quot;);    &#x2F;&#x2F; Sun Dec 29 00:00:00 CST 2019</span><br></pre></td></tr></table></figure>
+
+<p>标准表示日期的字符和其含义：</p>
+<table>
+<thead>
+<tr>
+<th align="center">字符</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">yyyy</td>
+<td align="center">年</td>
+</tr>
+<tr>
+<td align="center">MM</td>
+<td align="center">月</td>
+</tr>
+<tr>
+<td align="center">dd</td>
+<td align="center">日</td>
+</tr>
+<tr>
+<td align="center">hh</td>
+<td align="center">12小时制</td>
+</tr>
+<tr>
+<td align="center">HH</td>
+<td align="center">24小时制</td>
+</tr>
+<tr>
+<td align="center">mm</td>
+<td align="center">分</td>
+</tr>
+<tr>
+<td align="center">ss</td>
+<td align="center">秒</td>
+</tr>
+<tr>
+<td align="center">S</td>
+<td align="center">毫秒</td>
+</tr>
+<tr>
+<td align="center">E</td>
+<td align="center">星期几</td>
+</tr>
+<tr>
+<td align="center">D</td>
+<td align="center">一年中的第几天</td>
+</tr>
+<tr>
+<td align="center">F</td>
+<td align="center">一月中的第几个星期(会把这个月总共过的天数除以7)</td>
+</tr>
+<tr>
+<td align="center">w</td>
+<td align="center">一年中的第几个星期</td>
+</tr>
+<tr>
+<td align="center">W</td>
+<td align="center">一月中的第几星期(会根据实际情况来算)</td>
+</tr>
+<tr>
+<td align="center">a</td>
+<td align="center">上下午标识</td>
+</tr>
+<tr>
+<td align="center">k</td>
+<td align="center">和HH差不多，表示24小时制</td>
+</tr>
+<tr>
+<td align="center">K</td>
+<td align="center">和hh差不多，表示12小时制</td>
+</tr>
+<tr>
+<td align="center">z</td>
+<td align="center">表示时区</td>
+</tr>
+</tbody></table>
+<h2 id="SimpleDateFormat-为什么不是线程安全的？"><a href="#SimpleDateFormat-为什么不是线程安全的？" class="headerlink" title="SimpleDateFormat 为什么不是线程安全的？"></a>SimpleDateFormat 为什么不是线程安全的？</h2><p>额外拓展一个知识点，SimpleDateFormat 不是线程安全的。</p>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>在 SimpleDateFormat 转换日期是通过 Calendar 对象来操作的，SimpleDateFormat 继承 DateFormat 类，DateFormat 类中维护一个 Calendar 对象，Calendar 实例被用来进行日期-时间计算，既被用于 format 方法也被用于 parse 方法。</p>
+<p>在 parse 方法的最后，会调用 CalendarBuilder 的 establish 方法，入参就是 SimpleDateFormat 维护的 Calendar 实例，在 establish 方法中会调用 calendar 的 clear 方法。</p>
+<p>SimpleDateFormat 维护的用于 format 和 parse 方法计算日期-时间的 calendar 被清空了，如果此时线程 A 将 calendar 清空且没有设置新值，线程 B 也进入 parse 方法用到了 SimpleDateFormat 对象中的 calendar 对象，此时就会产生线程安全问题。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>每一个使用 SimpleDateFormat 对象进行日期-时间进行 format 和 parse 方法的时候就创建一个新的 SimpleDateFormat 对象，用完就销毁。此时就可以使用 ThreadLocal 将 SimpleDateFormat 绑定到线程上。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SimpleDateFormat 虽小，但是有坑有拓展点，使用起来还是需要注意的。</p>
+]]></content>
+      <categories>
+        <category>java</category>
       </categories>
   </entry>
   <entry>
@@ -474,181 +937,6 @@
       </categories>
   </entry>
   <entry>
-    <title>PuTTY 的安装与使用</title>
-    <url>/blog6/</url>
-    <content><![CDATA[<p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
-<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
-<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3><p>MacPorts 是一个包管理工具，类似 Homebrew。之所以使用 MacPorts，是因为 MacPorts 和 PuTTY 一样，都是远古时期的老家伙。我用 MacPorts 安装 PuTTY 没有出现问题，首先在<br><a href="https://distfiles.macports.org/MacPorts/" target="_blank" rel="noopener">https://distfiles.macports.org/MacPorts/</a> 上找到自己 macOS 版本所对应的 MacPorts 版本，安装完成后在终端更新 port：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port -v selfupdate</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-GTK"><a href="#安装-GTK" class="headerlink" title="安装 GTK+"></a>安装 GTK+</h3><p>PuTTY 使用的 GTK+ 图形界面，现在可以使用 port 安装 GTK+：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install gtk2</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-XQuartz"><a href="#安装-XQuartz" class="headerlink" title="安装 XQuartz"></a>安装 XQuartz</h3><p>XQuartz 提供绘图层支持，在 <a href="https://www.xquartz.org/" target="_blank" rel="noopener">https://www.xquartz.org/</a> 下载并安装。</p>
-<h3 id="安装-PuTTY"><a href="#安装-PuTTY" class="headerlink" title="安装 PuTTY"></a>安装 PuTTY</h3><p>完成上述三个前置后，通过 port 安装 PuTTY：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo port install putty</span><br></pre></td></tr></table></figure>
-
-<h2 id="PuTTY-的使用"><a href="#PuTTY-的使用" class="headerlink" title="PuTTY 的使用"></a>PuTTY 的使用</h2><h3 id="通过-XQuartz-打开-PuTTY"><a href="#通过-XQuartz-打开-PuTTY" class="headerlink" title="通过 XQuartz 打开 PuTTY"></a>通过 XQuartz 打开 PuTTY</h3><p>完成了 PuTTY 的安装后，首先打开 XQuartz 程序，在菜单栏的应用程序中，找到<u>终端</u>，如图：</p>
-<img src="/images/blog6/截屏2020-05-06上午11.58.17.png" />
-
-<p>打开终端后，输入 <code>putty</code> 即可打开 PuTTY 的配置界面：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.00.20.png" width="50%" />
-
-<p>输入访问的 IP 地址，<code>open</code> 即可打开 PuTTY 的终端：</p>
-<img src="/images/blog6/截屏2020-05-06下午12.02.15.png" />
-
-<p>然鹅，使用 root 登录后出现了 Access denied 的错误，在<br><a href="https://superuser.com/questions/539139/putty-password-access-denied" target="_blank" rel="noopener">https://superuser.com/questions/539139/putty-password-access-denied</a> 这个解答中有很明确的解释，在 <u>/etc/ssh/sshd_config </u>中加上：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
-
-<p>完美解决 Access denied 的问题，连接到了我访问的阿里云服务器。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PuTTY 的安装巨费时间，使用起来也是不太方便，毕竟远古产物，现在不怎么会去使用它。mac 上自带的终端进行 ssh 连接或者阿里云的远程连接都远比 PuTTY 实际。</p>
-]]></content>
-      <categories>
-        <category>other</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Selenium IDE 的简单使用</title>
-    <url>/blog3/</url>
-    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
-<p>首先了解下 Selenium：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
-
-<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
-<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
-
-<p>输入一个 URL，点击按钮</p>
-<p><img src="/images/blog3/a.png" alt="avatar"></p>
-<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
-
-<p>然后点击按钮</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
-
-<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
-<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
-<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
-<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
-
-<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
-
-<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
-
-<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
-<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
-<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
-]]></content>
-      <categories>
-        <category>other</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>SimpleDateFormat 类使用避坑</title>
-    <url>/blog7/</url>
-    <content><![CDATA[<p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
-<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
-
-<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
-<h2 id="配合-Calendar-完成日期的加减"><a href="#配合-Calendar-完成日期的加减" class="headerlink" title="配合 Calendar 完成日期的加减"></a>配合 Calendar 完成日期的加减</h2><p>Calendar 的 getInstance() 获取 Calendar 实例，setTime() 设置起始时间，add() 进行日期的加减。add() 中 Calendar.DAY_OF_MONTH 表示以天作为计算的单位，Calendar.DATE 也是相同的效果，方法的第二个参数 amount 取负数即可实现减法。如下计算下个月的日期：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);</span><br><span class="line">Calendar calendar &#x3D; Calendar.getInstance();</span><br><span class="line">calendar.setTime(date);</span><br><span class="line">calendar.add(Calendar.DAY_OF_MONTH, 31);</span><br><span class="line">String endTime &#x3D; simpleDateFormat.format(calendar.getTime());    &#x2F;&#x2F; 2020-06-19 15:06:13</span><br></pre></td></tr></table></figure>
-
-<h2 id="SimpleDateFormat-避坑"><a href="#SimpleDateFormat-避坑" class="headerlink" title="SimpleDateFormat 避坑"></a>SimpleDateFormat 避坑</h2><p><u>重点来惹</u>！一定要按照日期格式的标准写法，比如使用错误的日期格式 “YYYY-MM-dd” 时，format() 将会出现奇怪的日期：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;YYYY-MM-dd&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19&quot;);    &#x2F;&#x2F; Sun Dec 29 00:00:00 CST 2019</span><br></pre></td></tr></table></figure>
-
-<p>标准表示日期的字符和其含义：</p>
-<table>
-<thead>
-<tr>
-<th align="center">字符</th>
-<th align="center">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">yyyy</td>
-<td align="center">年</td>
-</tr>
-<tr>
-<td align="center">MM</td>
-<td align="center">月</td>
-</tr>
-<tr>
-<td align="center">dd</td>
-<td align="center">日</td>
-</tr>
-<tr>
-<td align="center">hh</td>
-<td align="center">12小时制</td>
-</tr>
-<tr>
-<td align="center">HH</td>
-<td align="center">24小时制</td>
-</tr>
-<tr>
-<td align="center">mm</td>
-<td align="center">分</td>
-</tr>
-<tr>
-<td align="center">ss</td>
-<td align="center">秒</td>
-</tr>
-<tr>
-<td align="center">S</td>
-<td align="center">毫秒</td>
-</tr>
-<tr>
-<td align="center">E</td>
-<td align="center">星期几</td>
-</tr>
-<tr>
-<td align="center">D</td>
-<td align="center">一年中的第几天</td>
-</tr>
-<tr>
-<td align="center">F</td>
-<td align="center">一月中的第几个星期(会把这个月总共过的天数除以7)</td>
-</tr>
-<tr>
-<td align="center">w</td>
-<td align="center">一年中的第几个星期</td>
-</tr>
-<tr>
-<td align="center">W</td>
-<td align="center">一月中的第几星期(会根据实际情况来算)</td>
-</tr>
-<tr>
-<td align="center">a</td>
-<td align="center">上下午标识</td>
-</tr>
-<tr>
-<td align="center">k</td>
-<td align="center">和HH差不多，表示24小时制</td>
-</tr>
-<tr>
-<td align="center">K</td>
-<td align="center">和hh差不多，表示12小时制</td>
-</tr>
-<tr>
-<td align="center">z</td>
-<td align="center">表示时区</td>
-</tr>
-</tbody></table>
-<h2 id="SimpleDateFormat-为什么不是线程安全的？"><a href="#SimpleDateFormat-为什么不是线程安全的？" class="headerlink" title="SimpleDateFormat 为什么不是线程安全的？"></a>SimpleDateFormat 为什么不是线程安全的？</h2><p>额外拓展一个知识点，SimpleDateFormat 不是线程安全的。</p>
-<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>在 SimpleDateFormat 转换日期是通过 Calendar 对象来操作的，SimpleDateFormat 继承 DateFormat 类，DateFormat 类中维护一个 Calendar 对象，Calendar 实例被用来进行日期-时间计算，既被用于 format 方法也被用于 parse 方法。</p>
-<p>在 parse 方法的最后，会调用 CalendarBuilder 的 establish 方法，入参就是 SimpleDateFormat 维护的 Calendar 实例，在 establish 方法中会调用 calendar 的 clear 方法。</p>
-<p>SimpleDateFormat 维护的用于 format 和 parse 方法计算日期-时间的 calendar 被清空了，如果此时线程 A 将 calendar 清空且没有设置新值，线程 B 也进入 parse 方法用到了 SimpleDateFormat 对象中的 calendar 对象，此时就会产生线程安全问题。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>每一个使用 SimpleDateFormat 对象进行日期-时间进行 format 和 parse 方法的时候就创建一个新的 SimpleDateFormat 对象，用完就销毁。此时就可以使用 ThreadLocal 将 SimpleDateFormat 绑定到线程上。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SimpleDateFormat 虽小，但是有坑有拓展点，使用起来还是需要注意的。</p>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
     <title>MySQL &amp; Redis 技术分享-下</title>
     <url>/blog9/</url>
     <content><![CDATA[<p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
@@ -699,6 +987,45 @@
 ]]></content>
       <categories>
         <category>backend</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Selenium IDE 的简单使用</title>
+    <url>/blog3/</url>
+    <content><![CDATA[<p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
+<p>首先了解下 Selenium：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png" />
+
+<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
+<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.02.10.png" width="50%" />
+
+<p>输入一个 URL，点击按钮</p>
+<p><img src="/images/blog3/a.png" alt="avatar"></p>
+<p>Selenium IDE 就会把你在之后对网站各种元素的操作记录下来，录制形成多条命令：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.05.57.png" width="35%" />
+
+<p>然后点击按钮</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.06.11.png" />
+
+<p>就可以重放了。由于是软件测试课，需要加 assert 进行判断结果对错。</p>
+<p>这里注意 assert 和 verify 两个判断：assert 遇到判断为错，会结束整个测试；而 verify 会继续后面的测试命令。</p>
+<p>到这里会发现 Selenium IDE 是真的简单，但是我想说我被坑了，坑在用命令行重放录制的 .py 脚本。这里其实大部分是我是个 Unix 命令行小白，对文件系统不是很熟悉，想要找一个文件在哪还要 Google 基本的 which 命令。但是还有一部分是官方文档有一处坑。</p>
+<p>Selenium IDE 的 Help 可以直接进到官方文档：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.13.37.png" width="50%" />
+
+<p>对，就是这个 Command-line Runner。前置装 node，selenium-side-runner 和 chromedriver，我安装文档给的 npm 装一直报错（一部分是因为图书馆网太差），一部分是版本问题。最后装完了运行 selenium-side-runner /path/to/your-project.side 时，报了 no test 的错误。为什么呢？还好有 Code Export，把前面录制的脚本到处为 .py 文件，发现：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.18.22.png" width="75%" />
+
+<p>这个导出的文件没有 main 函数！因此又回到官方文档，仔细思索端倪：</p>
+<img src="/images/blog3/屏幕快照 2019-12-25 23.19.38.png" width="50%" />
+
+<p>原来得用 pytest 运行这个脚本，按照文档一路搞下来的我上当了，真有你的 selenium-side-runner！然鹅待我装了前置后，运行  pytest /path/to/your-project.py 后，又报错了，这次是 no element 的错误。Google 一番，发现是浏览器打开 URL 太慢，而脚本先执行了 driver.find_element() 这一步。解决办法是用 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable()).click()，等 URL 打开了再执行点击。这一次终于完事了！</p>
+<p>经过两天的苦搞，上台演示的时候还有点小兴奋！最后老师说的一句话肯定了我：Jieb 同学演示的教会了我一些知识。不过确实，在学校教书写论文的教授的思维和如此极速发展的互联网相比，难免滞后，我也不过是官网文档和各类博客的搬运工，都是受到互联万物的网络的启发。</p>
+<p>尽管做的内容很小，但是是自己不断尝错探索出来的，是一种船新的感觉，因此打算写个博客记录一下。相信这迈出的第一步，能是今后千万里长路的开端！</p>
+]]></content>
+      <categories>
+        <category>other</category>
       </categories>
   </entry>
   <entry>

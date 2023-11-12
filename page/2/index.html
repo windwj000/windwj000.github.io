@@ -175,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog9/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog19/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -189,7 +189,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog9/" class="post-title-link" itemprop="url">MySQL & Redis 技术分享-下</a>
+            <a href="/blog19/" class="post-title-link" itemprop="url">ArrayList add null分析</a>
         </h1>
 
         <div class="post-meta"> 
@@ -200,188 +200,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-06-01 10:06:28" 
+              <time title="创建时间：2023-11-05 10:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-06-01T10:06:28+08:00">2020-06-01
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/backend/" itemprop="url" rel="index">
-                    <span itemprop="name">backend</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
-<h2 id="Redis-基础"><a href="#Redis-基础" class="headerlink" title="Redis 基础"></a>Redis 基础</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis 是速度非常快的非关系型内存键值数据库。<br>Redis 和 MySQL 不同之处在于，Redis 用的是 NoSQL。<br>主要用作缓存，缓存目的：</p>
-<ul>
-<li>高性能：操作缓存就是直接操作内存，所以速度相当快。</li>
-<li>高并发：直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。并且缓存是走内存的，内存天然就支撑高并发。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog9/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog8/" class="post-title-link" itemprop="url">MySQL & Redis 技术分享-上</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-22 12:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-05-22T12:06:28+08:00">2020-05-22
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/backend/" itemprop="url" rel="index">
-                    <span itemprop="name">backend</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。</p>
-<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>首先是后端技术栈介绍，这部分在 <a href="http://www.jiebcoder.top/2020/03/01/blog4/" target="_blank" rel="noopener">Java 后端开发技术选型</a> 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQL &amp; Redis。</p>
-<h2 id="MySQL-基础"><a href="#MySQL-基础" class="headerlink" title="MySQL 基础"></a>MySQL 基础</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog7/" class="post-title-link" itemprop="url">SimpleDateFormat 类使用避坑</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-19 19:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-05-19T19:06:28+08:00">2020-05-19
+                datetime="2023-11-05T10:00:00+08:00">2023-11-05
                 
               </time>
 
@@ -409,14 +230,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
-<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+          <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%">
 
-<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%">
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/blog7/#more" rel="contents">
+              <a class="btn" href="/blog19/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -444,7 +264,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog6/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog21/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -458,7 +278,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog6/" class="post-title-link" itemprop="url">PuTTY 的安装与使用</a>
+            <a href="/blog21/" class="post-title-link" itemprop="url">ArrayList add null分析</a>
         </h1>
 
         <div class="post-meta"> 
@@ -469,9 +289,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-05-06 10:06:28" 
+              <time title="创建时间：2023-11-05 10:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-05-06T10:06:28+08:00">2020-05-06
+                datetime="2023-11-05T10:00:00+08:00">2023-11-05
                 
               </time>
 
@@ -482,8 +302,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/other/" itemprop="url" rel="index">
-                    <span itemprop="name">other</span>
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
                   </a>
                 </span>
             </span>
@@ -499,12 +319,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>我在看博客时遇到博主使用 PuTTY 作为 SSH 连接的客户端，打算借助网上其他博客，学习一下 PuTTY 的简单使用。</p>
-<h2 id="PuTTY-是什么？"><a href="#PuTTY-是什么？" class="headerlink" title="PuTTY 是什么？"></a>PuTTY 是什么？</h2><p>PuTTY 是一款集成虚拟终端、系统控制台和网络文件传输为一体的自由及开放源代码的程序。包含 PSCP、PSFTP 等多个特定功能的客户端，</p>
-<h2 id="mac-下-PuTTY-的安装"><a href="#mac-下-PuTTY-的安装" class="headerlink" title="mac 下 PuTTY 的安装"></a>mac 下 PuTTY 的安装</h2><h3 id="安装-MacPorts"><a href="#安装-MacPorts" class="headerlink" title="安装 MacPorts"></a>安装 MacPorts</h3>
+          <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%">
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%">
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/blog6/#more" rel="contents">
+              <a class="btn" href="/blog21/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -532,7 +353,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog5/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -546,7 +367,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog5/" class="post-title-link" itemprop="url">MyBatis 与 Hibernate 对比</a>
+            <a href="/blog20/" class="post-title-link" itemprop="url">ArrayList add null分析</a>
         </h1>
 
         <div class="post-meta"> 
@@ -557,9 +378,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-30 21:06:28" 
+              <time title="创建时间：2023-11-05 10:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-03-30T21:06:28+08:00">2020-03-30
+                datetime="2023-11-05T10:00:00+08:00">2023-11-05
                 
               </time>
 
@@ -570,8 +391,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/backend/" itemprop="url" rel="index">
-                    <span itemprop="name">backend</span>
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
                   </a>
                 </span>
             </span>
@@ -587,13 +408,193 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在我之前写过的 <a href="http://www.jiebcoder.top/2020/02/19/blog2/" target="_blank" rel="noopener">SSM 整合</a> 中，作为三层架构中的持久层，MyBatis 负责操作数据库。</p>
-<p>同样本文和 MyBatis 进行对比的 Hibernate，也是当下十分火热的持久层选项。</p>
-<h1 id="JPA"><a href="#JPA" class="headerlink" title="JPA"></a>JPA</h1><p>要讲 Hibernate，首先需要提到 JPA。JPA 即 Java 持久化 API，是一种规范，而 Hibernate 和 TopLink 都是其实现方式。</p>
-<p>Spring Data JPA 是对 JPA 的封装。</p>
+          <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
+<img src="/images/blog14/IMG_3551.JPG" width="80%">
+
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%">
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/blog5/#more" rel="contents">
+              <a class="btn" href="/blog20/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/blog13/" class="post-title-link" itemprop="url">Java 集合类的 contains 方法与 equals 方法的关系分析</a>
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-11 21:50:00" 
+                itemprop="dateCreated datePublished" 
+                datetime="2021-04-11T21:50:00+08:00">2021-04-11
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>我在学习 ArrayList 类主要方法时，写过一段关于 contains() 的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l1 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l2 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">l1.add(<span class="number">1</span>);</span><br><span class="line">l1.add(<span class="number">2</span>);</span><br><span class="line">l2.add(<span class="number">1</span>);</span><br><span class="line">l2.add(<span class="number">2</span>);</span><br><span class="line">System.out.println(l1.hashCode());</span><br><span class="line">System.out.println(l2.hashCode());</span><br><span class="line">System.out.println(l1 == l2);</span><br><span class="line">System.out.println(l1.equals(l2));</span><br><span class="line">list.add(l1);</span><br><span class="line">System.out.println(list.contains(l2));  <span class="comment">//&lt;-在这里</span></span><br></pre></td></tr></table></figure>
+
+<p>and 输出结果为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">994</span></span><br><span class="line"><span class="number">994</span></span><br><span class="line"><span class="keyword">false</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//equals() 的结果</span></span><br><span class="line"><span class="keyword">true</span>  <span class="comment">//contains() 的结果</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/blog13/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/blog12/" class="post-title-link" itemprop="url">Java 原生 Socket 实现 HTTP 通信</a>
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-19 16:23:00" 
+                itemprop="dateCreated datePublished" 
+                datetime="2021-03-19T16:23:00+08:00">2021-03-19
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们很熟悉编写服务端的一个 Controller：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyController</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    MyService myService;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// 获取</span></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/get"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getUserList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;User&gt; list = myService.findAll();</span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于客户端与服务端之间基于 HTTP 的网络通信，在 Spring Boot 框架的封装下，服务端如何接受 HTTP 请求，如何解析成内存中的对象，完成业务逻辑后如何输出 HTTP 响应，我们不得而知。</p>
+<p>本文将利用 Java 原生 Socket，完成发送 HTTP 请求，并解析 HTTP 响应。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/blog12/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -621,7 +622,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -689,7 +690,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

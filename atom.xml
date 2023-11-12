@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://windwj000.github.io/"/>
-  <updated>2023-11-12T15:01:01.182Z</updated>
+  <updated>2023-11-12T15:29:37.174Z</updated>
   <id>https://windwj000.github.io/</id>
   
   <author>
@@ -17,9 +17,185 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>generatorConfig.xml获取KMS配置失败分析</title>
+    <link href="https://windwj000.github.io/blog15/"/>
+    <id>https://windwj000.github.io/blog15/</id>
+    <published>2023-11-12T14:00:00.000Z</published>
+    <updated>2023-11-12T15:29:37.174Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>from 安全工单，「源码代码安全扫描器」针对仓库代码进行了扫描，检测到存在硬编码敏感信息(detect_secrets)安全漏洞。</p><p>密码、token等数据作为C4等级的数据，依据数据安全管理标准，这类高敏数据应当存储在kms等安全的存储区中。</p><p>generatorConfig.xml：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">jdbcConnection</span> <span class="attr">driverClass</span>=<span class="string">"com.mysql,jdbc.Driver"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">connectionURL</span>=<span class="string">"jdbc:mysql://10.48.236.167:5002/interactive_qa?characterEncoding=UTF8<span class="symbol">&amp;amp;</span>socketTimeout=60000<span class="symbol">&amp;amp;</span>allowMultiQueries=true<span class="symbol">&amp;amp;</span>connectTimeout=5000"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">userId</span>=<span class="string">"rds_qa_test"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">password</span>=<span class="string">"$KMS&#123;jdbc-connection-password&#125;"</span>/&gt;</span></span><br></pre></td></tr></table></figure><h1 id="获取失败原因分析"><a href="#获取失败原因分析" class="headerlink" title="获取失败原因分析"></a>获取失败原因分析</h1><p>按照上述generatorConfig.xml文件配置，点击Maven-&gt;服务-&gt;Plugins-&gt;mybatis-generator:generate，出现以下报错: Access denied for user ‘rds_qa_test’@’11.39.239.85’ (using password:YES)$KMS{}如何发挥作用?KMS-MDP官方文档-2.2使用说明</p><ul><li><p>properties文件中使用</p></li><li><p>Java 代码中使用</p></li><li><p>Spring XML Context文件中使用(注:非generatorConfig.xml)</p></li></ul><p>但是在generatorConfig.xml中，不能通过$KMS(}获取、并在mybatis-generator:generate中成功生效(同时满足这两个条件)，因为mdp未实现该功能。</p><h1 id="一种可行思路"><a href="#一种可行思路" class="headerlink" title="一种可行思路"></a>一种可行思路</h1><p>按照 MDP MyBatisGenerator 代码生成工具-MDP官方文档-2.1可视化工具，不需要generatorConfig.xml文件，在线下直接使用mdp-mybatis-generator,并将数据库连接信息(账号、密码等)保存在此插件的相关存储位置。但由于需要配置相关的生成类名、路径等，暂不考虑。</p><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>明文密码存在于generatorConfig.xml文件中，暂无从KMS获取配置的方案，待MDP/KMS方给出解决方案后，再进行处理。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;from 安全工单，「源码代码安全扫描器」针对仓库代码进行了扫描，检测到存在硬编码敏感信息(detect_secrets)安全漏洞。&lt;/p&gt;
+&lt;p&gt;密码、token等数据作为C4等级的数据，依据数据安全管理标准，这类高敏数据应当存储在kms等安全的存储区中。&lt;/p&gt;
+&lt;p&gt;generatorConfig.xml：&lt;/p&gt;
+&lt;figure class=&quot;highlight xml&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;jdbcConnection&lt;/span&gt; &lt;span class=&quot;attr&quot;&gt;driverClass&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;com.mysql,jdbc.Driver&quot;&lt;/span&gt;	&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;                &lt;span class=&quot;attr&quot;&gt;connectionURL&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;jdbc:mysql://10.48.236.167:5002/interactive_qa?characterEncoding=UTF8&lt;span class=&quot;symbol&quot;&gt;&amp;amp;amp;&lt;/span&gt;socketTimeout=60000&lt;span class=&quot;symbol&quot;&gt;&amp;amp;amp;&lt;/span&gt;allowMultiQueries=true&lt;span class=&quot;symbol&quot;&gt;&amp;amp;amp;&lt;/span&gt;connectTimeout=5000&quot;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;                &lt;span class=&quot;attr&quot;&gt;userId&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;rds_qa_test&quot;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;                &lt;span class=&quot;attr&quot;&gt;password&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;$KMS&amp;#123;jdbc-connection-password&amp;#125;&quot;&lt;/span&gt;/&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="other" scheme="https://windwj000.github.io/categories/other/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Mafka Castle启动报错分析</title>
+    <link href="https://windwj000.github.io/blog16/"/>
+    <id>https://windwj000.github.io/blog16/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:37:10.975Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><img src="/images/blog16/IMG_3601.JPG" width="80%"/><p>ClassNotFoundException 定位到jar包冲突</p><p>为什么是mafka castle报出问题?</p><h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><img src="/images/blog16/IMG_3602.JPG" width="80%"/><p>引入frog-sdk后，frog-sdk包含mafka-client包，造成依赖冲突<br>Castle功能</p><img src="/images/blog16/IMG_3603.JPG" width="80%"/><p>Castle定位</p><img src="/images/blog16/IMG_3604.JPG" width="80%"/>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h1&gt;&lt;img src=&quot;/images/blog16/IMG_3601.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;p&gt;ClassNotFoundException 定位到jar包冲突&lt;/p&gt;
+&lt;p&gt;为什么是mafka castle报出问题?&lt;/p&gt;
+&lt;h1 id=&quot;原因&quot;&gt;&lt;a href=&quot;#原因&quot; class=&quot;headerlink&quot; title=&quot;原因&quot;&gt;&lt;/a&gt;原因&lt;/h1&gt;
+    
+    </summary>
+    
+    
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>商详页兜底下发原因分析</title>
+    <link href="https://windwj000.github.io/blog17/"/>
+    <id>https://windwj000.github.io/blog17/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:53:29.719Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><img src="/images/blog14/IMG_3610.JPG" width="80%"/><ul><li><p>每日中午12.20左右达到高峰</p></li><li><p>每日下午14.20左右达到低谷</p></li><li><p>每日晚上23.00左右达到当日最高峰</p></li></ul><h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>根因:档期查询为空<br>进一步观察–档期查询未排期raptor:</p><img src="/images/blog14/IMG_3611.JPG" width="80%"/><p>与商详页兜底下发raptor较为重合</p><table><thead><tr><th>时间点</th><th>原因</th><th>说明</th></tr></thead><tbody><tr><td>中午12.20</td><td></td><td></td></tr><tr><td>晚上23.00</td><td>23:00档期日期切换，接口如为查询当天档期，23:00前的排期数据可能23:00    <br/>后变为未排期。导致档期查询为空。</td><td></td></tr></tbody></table><p>档期查询未排期的几种情况:</p><ul><li><p>商品排期侧调整排期:例如排期驳回、超坑踢品</p></li><li><p>物流:19点之后截单</p></li><li><p>用户:加购时有排期，点击商详页时没排期。后续可以增加pageFrom字段埋点，分析有无其他情况。</p></li></ul><h1 id="打点分析"><a href="#打点分析" class="headerlink" title="打点分析"></a>打点分析</h1><p><strong>兜底页大盘配置</strong><br>Name:[“PoiSkuDetailBizEmpty”]</p><p>Appkey:com.sankuai.salex.aggregate.goodsrender</p><p>Type:[“sku_detail_monitor”]</p><p>指标:失败次数对应代码代码块</p><ul><li>产生checkSkuEmpty=true条件有两个:查询档期cquery为空|查询cbase为空</li><li>依次分析1.查询档期cquery 2.查询cbase</li></ul><p>代码分析</p><p>1.查询档期cquery</p><p>SkuDetailFacade#getPoiSkuDetail</p><p>2.查询cbase<br>SkuDetailFacade#doHandleProduct</p><p>三种cbase为空，导致返回兜底页的情况:</p><ul><li><p>调cbase接口超时–Timeout。</p></li><li><p>调cbase接口失败–Fail</p></li><li><p>查询cbase结果为空</p></li></ul><p>注:cbase接口返回值状态码，均为默认值code=0，无法区分接口失败具体原因</p><h1 id="全量打点监控"><a href="#全量打点监控" class="headerlink" title="全量打点监控"></a>全量打点监控</h1><p>1.raptor监控类型</p><table><thead><tr><th></th><th>type</th><th>name</th><th>说明</th><th>兜底页下发原因占比</th></tr></thead><tbody><tr><td>已有</td><td>bus_exception</td><td>sku_no_change_null</td><td>SKU有效校验未通过，或未命中一品多规</td><td>0%</td></tr><tr><td>新增</td><td>sku_detail_monitor</td><td>query.schedule.sku.empty</td><td>查询档期cquery结果为空<br />接口:ProductQueryService#queryScheduleSkuList</td><td>99.8%</td></tr><tr><td></td><td></td><td>query.cbase.info.empty</td><td>查询cbase结果为空</td><td>0.1%</td></tr><tr><td></td><td></td><td>query.cbase.info.timeout</td><td></td><td>0%</td></tr><tr><td></td><td></td><td>query.cbase.info.fail</td><td></td><td>0%</td></tr></tbody></table><p>2.0ctoCall 请求超时–占比</p><ul><li>cquery–0.08%</li><li>cbase–0.02%</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3610.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;每日中午12.20左右达到高峰&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;每日下午14.20左右达到低谷&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;每日晚上23.00左右达到当日最高峰&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&quot;原因&quot;&gt;&lt;a href=&quot;#原因&quot; class=&quot;headerlink&quot; title=&quot;原因&quot;&gt;&lt;/a&gt;原因&lt;/h1&gt;&lt;p&gt;根因:档期查询为空&lt;br&gt;进一步观察–档期查询未排期raptor:&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="backend" scheme="https://windwj000.github.io/categories/backend/"/>
+    
+    
+  </entry>
+  
+  <entry>
     <title>ArrayList add null分析</title>
     <link href="https://windwj000.github.io/blog14/"/>
     <id>https://windwj000.github.io/blog14/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:39:47.984Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p><img src="/images/blog14/IMG_3551.JPG" width="80%"/><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/><p><strong>ArrayList现状</strong></p><ul><li>add方法先确认容量(包含扩容)，再赋值</li><li>其中，执行扩容的grow方法进行旧元素的拷贝</li></ul><p><strong>add null分析</strong></p><ul><li>后执行的ThreadB扩容时，拷贝旧元素</li><li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li><li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li></ul><h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p><p>代码块</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *The array buffer into which the elements of the ArrayList are stared.</span></span><br><span class="line"><span class="comment"> *The capacity of the ArrayList is the length of this array buffer.Any</span></span><br><span class="line"><span class="comment"> *empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA</span></span><br><span class="line"><span class="comment"> *will be expanded to DEFAULT_CAPACITY when the first element is added.</span></span><br><span class="line"><span class="comment"> *transient Object[] elementData; // non-private to simplify nested class access</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">10* The size of the ArrayList (the number of elements it contains),</span></span><br><span class="line"><span class="comment">11</span></span><br><span class="line"><span class="comment">12*<span class="doctag">@serial</span></span></span><br><span class="line"><span class="comment">13*/</span></span><br><span class="line"><span class="number">14</span> <span class="keyword">private</span> <span class="keyword">int</span> size:</span><br><span class="line"><span class="number">18</span><span class="comment">/**</span></span><br><span class="line"><span class="comment">19*将指定的元素追加到此列表的末尾。</span></span><br><span class="line"><span class="comment">20  /</span></span><br><span class="line"><span class="comment">21 public boolean add(E e)&#123;</span></span><br><span class="line"><span class="comment">22// 加元素之前,先调用ensureCapacityInternal方法</span></span><br><span class="line"><span class="comment">23ensureCapacityInternal(size +1); // Increments modCount!!</span></span><br><span class="line"><span class="comment">24/这里看到ArrayList添加元素的实质就相当于为数组赋值</span></span><br><span class="line"><span class="comment">25elementDatalsize++]=e;</span></span><br><span class="line"><span class="comment">26return true;</span></span><br><span class="line"><span class="comment">27&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">28</span></span><br><span class="line"><span class="comment">29// 确保内部容量达到指定的最小容量。</span></span><br><span class="line"><span class="comment">private void ensureCapacityInternal(int minCapacity)&#123;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">// 根据给定的最小容量和当前数组元素来计算所需容量。</span></span><br><span class="line"><span class="comment">private static int calculateCapacity(0bject[] elementData, int minCapacity) &#123;</span></span><br><span class="line"><span class="comment">// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) &#123;</span></span><br><span class="line"><span class="comment">​return Math.max(DEFAULT_CAPACITY,minCapacity);</span></span><br><span class="line"><span class="comment">​// 否则直接返回最小容量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​ return minCapacity;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">//判断是否需要扩容</span></span><br><span class="line"><span class="comment">private void ensureExplicitCapacity(intminCapacity) &#123;</span></span><br><span class="line"><span class="comment">modCount++;</span></span><br><span class="line"><span class="comment">//判断当前数组容量是否足以存储minCapacity个元素 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​if (minCapacity -elementData.length &gt; 0)</span></span><br><span class="line"><span class="comment">​//调用grow方法进行扩容 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">​grow(minCapacity);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">53/**</span></span><br><span class="line"><span class="comment">54* ArrayList扩容的核心方法。</span></span><br><span class="line"><span class="comment">55*/</span></span><br><span class="line"><span class="number">56</span><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">grow</span><span class="params">(<span class="keyword">int</span> minCapacity)</span> </span>&#123;</span><br><span class="line"><span class="number">57</span><span class="comment">// oldCapacity为旧容量，newCapacity为新容量</span></span><br><span class="line"><span class="number">58</span><span class="keyword">int</span> oldCapacity =elementData.length;</span><br><span class="line"><span class="comment">// 将oldCapacity 右移一位，其效果相当于oldCapacity /2,</span></span><br><span class="line"><span class="comment">// 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,</span></span><br><span class="line"><span class="number">60</span></span><br><span class="line"><span class="keyword">int</span> newCapacity = oldCapacity +(oldCapacity &gt;&gt; <span class="number">1</span>);</span><br><span class="line"><span class="number">63</span><span class="comment">// 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，</span></span><br><span class="line"><span class="number">64</span><span class="keyword">if</span> (newCapacity - minCapacity &lt;<span class="number">0</span>)</span><br><span class="line"><span class="number">65</span>newCapacity = minCapacity;</span><br><span class="line"><span class="number">66</span></span><br><span class="line"><span class="number">67</span><span class="comment">// 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,</span></span><br><span class="line"><span class="number">68</span><span class="comment">// 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8',</span></span><br><span class="line"><span class="number">69</span><span class="keyword">if</span> (newCapacity -MAX_ARRAY_SIZE &gt; <span class="number">0</span>)</span><br><span class="line"><span class="number">70</span>newCapacity= hugeCapacity(minCapacity);</span><br><span class="line"><span class="number">71</span></span><br><span class="line"><span class="number">72</span><span class="comment">// minCapacity is usually close to size, so this is a win:</span></span><br><span class="line"><span class="number">73</span>elementData = Arrays.copy0f(elementData, newCapacity);</span><br><span class="line"><span class="number">74</span>&#125;</span><br></pre></td></tr></table></figure><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p><p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p><p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;p&gt;清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;amp;存申诉任务到db&amp;amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。&lt;/p&gt;
+&lt;img src=&quot;/images/blog14/IMG_3551.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;h1 id=&quot;结论&quot;&gt;&lt;a href=&quot;#结论&quot; class=&quot;headerlink&quot; title=&quot;结论&quot;&gt;&lt;/a&gt;结论&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3552.JPG&quot; width=&quot;80%&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ArrayList add null分析</title>
+    <link href="https://windwj000.github.io/blog18/"/>
+    <id>https://windwj000.github.io/blog18/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:01:01.182Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p><img src="/images/blog14/IMG_3551.JPG" width="80%"/><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/><p><strong>ArrayList现状</strong></p><ul><li>add方法先确认容量(包含扩容)，再赋值</li><li>其中，执行扩容的grow方法进行旧元素的拷贝</li></ul><p><strong>add null分析</strong></p><ul><li>后执行的ThreadB扩容时，拷贝旧元素</li><li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li><li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li></ul><h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p><p>代码块</p><p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p><p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p><p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p><p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p><p>}</p><p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p><p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p><p>​     return minCapacity;</p><p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p><p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p><p>​    grow(minCapacity);</p><p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p><p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p><p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;p&gt;清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;amp;存申诉任务到db&amp;amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。&lt;/p&gt;
+&lt;img src=&quot;/images/blog14/IMG_3551.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;h1 id=&quot;结论&quot;&gt;&lt;a href=&quot;#结论&quot; class=&quot;headerlink&quot; title=&quot;结论&quot;&gt;&lt;/a&gt;结论&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3552.JPG&quot; width=&quot;80%&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ArrayList add null分析</title>
+    <link href="https://windwj000.github.io/blog19/"/>
+    <id>https://windwj000.github.io/blog19/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:01:01.182Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p><img src="/images/blog14/IMG_3551.JPG" width="80%"/><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/><p><strong>ArrayList现状</strong></p><ul><li>add方法先确认容量(包含扩容)，再赋值</li><li>其中，执行扩容的grow方法进行旧元素的拷贝</li></ul><p><strong>add null分析</strong></p><ul><li>后执行的ThreadB扩容时，拷贝旧元素</li><li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li><li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li></ul><h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p><p>代码块</p><p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p><p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p><p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p><p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p><p>}</p><p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p><p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p><p>​     return minCapacity;</p><p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p><p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p><p>​    grow(minCapacity);</p><p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p><p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p><p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;p&gt;清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;amp;存申诉任务到db&amp;amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。&lt;/p&gt;
+&lt;img src=&quot;/images/blog14/IMG_3551.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;h1 id=&quot;结论&quot;&gt;&lt;a href=&quot;#结论&quot; class=&quot;headerlink&quot; title=&quot;结论&quot;&gt;&lt;/a&gt;结论&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3552.JPG&quot; width=&quot;80%&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ArrayList add null分析</title>
+    <link href="https://windwj000.github.io/blog21/"/>
+    <id>https://windwj000.github.io/blog21/</id>
+    <published>2023-11-05T02:00:00.000Z</published>
+    <updated>2023-11-12T15:01:01.182Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p><img src="/images/blog14/IMG_3551.JPG" width="80%"/><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/><p><strong>ArrayList现状</strong></p><ul><li>add方法先确认容量(包含扩容)，再赋值</li><li>其中，执行扩容的grow方法进行旧元素的拷贝</li></ul><p><strong>add null分析</strong></p><ul><li>后执行的ThreadB扩容时，拷贝旧元素</li><li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li><li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li></ul><h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p><p>代码块</p><p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p><p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p><p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p><p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p><p>}</p><p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p><p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p><p>​     return minCapacity;</p><p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p><p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p><p>​    grow(minCapacity);</p><p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p><p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p><p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h1&gt;&lt;p&gt;清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;amp;存申诉任务到db&amp;amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。&lt;/p&gt;
+&lt;img src=&quot;/images/blog14/IMG_3551.JPG&quot; width=&quot;80%&quot;&gt;
+
+&lt;h1 id=&quot;结论&quot;&gt;&lt;a href=&quot;#结论&quot; class=&quot;headerlink&quot; title=&quot;结论&quot;&gt;&lt;/a&gt;结论&lt;/h1&gt;&lt;img src=&quot;/images/blog14/IMG_3552.JPG&quot; width=&quot;80%&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://windwj000.github.io/categories/java/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ArrayList add null分析</title>
+    <link href="https://windwj000.github.io/blog20/"/>
+    <id>https://windwj000.github.io/blog20/</id>
     <published>2023-11-05T02:00:00.000Z</published>
     <updated>2023-11-12T15:01:01.182Z</updated>
     
@@ -328,33 +504,6 @@
     
     
       <category term="spring" scheme="https://windwj000.github.io/categories/spring/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>欢迎来到我的网站</title>
-    <link href="https://windwj000.github.io/blog1/"/>
-    <id>https://windwj000.github.io/blog1/</id>
-    <published>2020-02-14T13:06:28.000Z</published>
-    <updated>2020-08-25T07:08:00.227Z</updated>
-    
-    <content type="html"><![CDATA[<p>欢迎各位!</p><p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p><p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;欢迎各位!&lt;/p&gt;
-&lt;p&gt;本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。&lt;/p&gt;
-&lt;p&gt;这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。&lt;/p&gt;
-
-      
-    
-    </summary>
-    
-    
-      <category term="welcome" scheme="https://windwj000.github.io/categories/welcome/"/>
     
     
   </entry>

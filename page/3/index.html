@@ -175,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog4/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -189,7 +189,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog4/" class="post-title-link" itemprop="url">Java 后端开发技术选型</a>
+            <a href="/blog11/" class="post-title-link" itemprop="url">Java 实现支付宝后台支付接口</a>
         </h1>
 
         <div class="post-meta"> 
@@ -200,9 +200,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-01 11:06:28" 
+              <time title="创建时间：2020-10-16 14:41:28" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-03-01T11:06:28+08:00">2020-03-01
+                datetime="2020-10-16T14:41:28+08:00">2020-10-16
                 
               </time>
 
@@ -213,8 +213,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -230,13 +230,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>根据我的理解，简单谈下如何选择 Java 后端开发所用到的技术。</p>
-<h1 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h1><p>Java 语言是这篇博客的核心，无论是写业务，还是底层框架的构成，都用到 Java 编写。</p>
-<p>Java 相关的要点有：Java 基础，Java 容器，Java I/O，JVM 和 Java 并发。包括下面列举的要点，都在我整理的思维导图中：<a href="https://naotu.baidu.com/file/801377570e88e491545c2eed6cdfbd42?token=ba146c8e8cbca0be" target="_blank" rel="noopener">思维导图</a>，密码为 Pm6j。</p>
-<img src="/images/blog4/java.svg" width="30%">
+          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>项目中需要对商品订单进行支付，这里记录下自己是如何使用 Java 实现支付宝后台支付接口，支付操作为 App 支付。</p>
+<p>官方文档：<a href="https://opendocs.alipay.com/open/204/105297" target="_blank" rel="noopener">https://opendocs.alipay.com/open/204/105297</a> 。</p>
+<h2 id="编码前的准备"><a href="#编码前的准备" class="headerlink" title="编码前的准备"></a>编码前的准备</h2><p>1.<strong>创建应用</strong></p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/blog4/#more" rel="contents">
+              <a class="btn" href="/blog11/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -264,7 +263,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog3/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog10/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -278,7 +277,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog3/" class="post-title-link" itemprop="url">Selenium IDE 的简单使用</a>
+            <a href="/blog10/" class="post-title-link" itemprop="url">Spring bean 的声明和注入</a>
         </h1>
 
         <div class="post-meta"> 
@@ -289,100 +288,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-20 09:06:28" 
+              <time title="创建时间：2020-07-15 16:06:28" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-02-20T09:06:28+08:00">2020-02-20
-                
-              </time>
-
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/other/" itemprop="url" rel="index">
-                    <span itemprop="name">other</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>研一上的软件测试课接到的任务，要求上去给大伙儿演示使用 Selenium 做自动测试，实现录制和重放 Selenium 脚本，并在命令行运行脚本。由于没有任何文档，只能硬着头皮面向 Google 学习，力求能做出个玩样儿交差。</p>
-<p>首先了解下 Selenium：</p>
-<img src="/images/blog3/屏幕快照 2019-12-25 22.59.02.png">
-
-<p>这是官网给的定义，大致是说 Selenium 主要是用来构建网站上的自动测试。</p>
-<p>我这次的任务主要使用 Selenium IDE 这个插件来做的，特点是录制和重放特别得傻瓜式。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/blog3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <div>
-      
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="风的个人网站">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/blog2/" class="post-title-link" itemprop="url">SSM 整合</a>
-        </h1>
-
-        <div class="post-meta"> 
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-19 10:06:28" 
-                itemprop="dateCreated datePublished" 
-                datetime="2020-02-19T10:06:28+08:00">2020-02-19
+                datetime="2020-07-15T16:06:28+08:00">2020-07-15
                 
               </time>
 
@@ -410,13 +318,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>我写篇博客记录上个阶段学习的 SSM 整合，加深一下自己对 Spring 这块知识的理解。</p>
-<h1 id="什么是-SSM"><a href="#什么是-SSM" class="headerlink" title="什么是 SSM"></a>什么是 SSM</h1><p>SSM 是 Spring、SpringMVC、MyBatis 三者的缩写。根据三者的职能对应 SSM 的三层架构：<br>表现层 SpringMVC：接受用户参数，显示页面。<br>业务层 Spring：处理业务逻辑。<br>持久层 MyBatis：操作数据库。</p>
-<p><img src="/images/blog2/SSM.png" alt="avatar"></p>
-<p>从上图我们可以看到三层模型之间的依赖关系，并且 Spring 是三者的核心。</p>
+          <p>Spring bean 就是可重用组件，是 Spring 的基础。</p>
+<p>通过 @Component 注解将一个类声明为 bean，交给 Spring 管理，并在需要的时候注入获取实例。这就是 Spring 重要的 IOC 功能。</p>
+<p>今天研究的问题出现在<strong><u>注入</u></strong>这一步：在对一个工具类注入 RedisCache（封装了 RedisTemplate 的工具类），由于工具类使用了静态方法，导致无法获取到注入的 RedisCache。</p>
+<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>首先来认识一下 static 可以作用的对象：</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/blog2/#more" rel="contents">
+              <a class="btn" href="/blog10/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -444,7 +352,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog1/">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog9/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -458,7 +366,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/blog1/" class="post-title-link" itemprop="url">欢迎来到我的网站</a>
+            <a href="/blog9/" class="post-title-link" itemprop="url">MySQL & Redis 技术分享-下</a>
         </h1>
 
         <div class="post-meta"> 
@@ -469,9 +377,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-14 21:06:28" 
+              <time title="创建时间：2020-06-01 10:06:28" 
                 itemprop="dateCreated datePublished" 
-                datetime="2020-02-14T21:06:28+08:00">2020-02-14
+                datetime="2020-06-01T10:06:28+08:00">2020-06-01
                 
               </time>
 
@@ -482,8 +390,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/welcome/" itemprop="url" rel="index">
-                    <span itemprop="name">welcome</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -499,10 +407,198 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>欢迎各位!</p>
-<p>本网站用于记录我日常编程与开发的心得体会，主要但不限于 Java 后端开发方向。</p>
-<p>这是本网站的第一篇博客，以后我会以学习和分享为目的，用心产出高质量的技术博客，希望能和大家多多交流，共同进步。</p>
+          <p>上一篇博客主要谈到 MySQL 的基础知识和高级特性，现在让我们看一下 Redis 部分。</p>
+<h2 id="Redis-基础"><a href="#Redis-基础" class="headerlink" title="Redis 基础"></a>Redis 基础</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis 是速度非常快的非关系型内存键值数据库。<br>Redis 和 MySQL 不同之处在于，Redis 用的是 NoSQL。<br>主要用作缓存，缓存目的：</p>
+<ul>
+<li>高性能：操作缓存就是直接操作内存，所以速度相当快。</li>
+<li>高并发：直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。并且缓存是走内存的，内存天然就支撑高并发。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/blog9/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
 
+    
+    
+    
+
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/blog8/" class="post-title-link" itemprop="url">MySQL & Redis 技术分享-上</a>
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-22 12:06:28" 
+                itemprop="dateCreated datePublished" 
+                datetime="2020-05-22T12:06:28+08:00">2020-05-22
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>这块内容是 5.9 在项目组做的技术分享，由于是第一次做这种技术分享，组内的也有各种大佬，当时内心激动不已，必须写篇博客记录一下。</p>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>首先是后端技术栈介绍，这部分在 <a href="http://www.jiebcoder.top/2020/03/01/blog4/" target="_blank" rel="noopener">Java 后端开发技术选型</a> 这篇博客中比较详细的讲述过，主要是计算机网络、操作系统、Spring、分布式、Java、算法和数据库这几部分，引出主题 MySQL &amp; Redis。</p>
+<h2 id="MySQL-基础"><a href="#MySQL-基础" class="headerlink" title="MySQL 基础"></a>MySQL 基础</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/blog8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/blog7/" class="post-title-link" itemprop="url">SimpleDateFormat 类使用避坑</a>
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-19 19:06:28" 
+                itemprop="dateCreated datePublished" 
+                datetime="2020-05-19T19:06:28+08:00">2020-05-19
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>我在参加学校老师手下的一个项目时，负责的云存储套餐这块业务的后端开发，遇到了计算套餐开始和结束时间的问题，并使用了 SimpleDateFormat 类。SimpleDateFormat 是 Java 中使用较多的格式化日期的工具，配合 Calendar 类可以实现时间的计算。</p>
+<h2 id="SimpleDateFormat-的使用"><a href="#SimpleDateFormat-的使用" class="headerlink" title="SimpleDateFormat 的使用"></a>SimpleDateFormat 的使用</h2><p>SimpleDateFormat 的构造方法传入想要的日期格式，parse() 将字符串转化为日期，format 则是将日期转化为字符：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SimpleDateFormat simpleDateFormat &#x3D; new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">Date date &#x3D; simpleDateFormat.parse(&quot;2020-05-19 15:06:13&quot;);    &#x2F;&#x2F; Tue May 19 15:06:13 CST 2020</span><br><span class="line">String time &#x3D; simpleDateFormat.format(date);    &#x2F;&#x2F; 2020-05-19 15:06:13</span><br></pre></td></tr></table></figure>
+
+<p>注意 parse() 中当字符串和日期格式 pattern 不一样时，会抛 ParseException。ParseException 属于受检型的异常，需要在 try…catch… 代码块中捕获并进行处理 。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/blog7/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -525,7 +621,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -593,7 +689,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
