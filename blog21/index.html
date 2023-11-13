@@ -20,20 +20,21 @@
     var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+  <meta name="description" content="C端特殊性面向用户，巨大的并发访问量，海量的数据存储，对系统稳定性和性能的要求高。 因此，C端复杂系统的三类技术挑战：  高并发 高可用 高性能  大型系统建设">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ArrayList add null分析">
+<meta property="og:title" content="C端技术挑战">
 <meta property="og:url" content="https://windwj000.github.io/blog21/index.html">
 <meta property="og:site_name" content="风的个人网站">
-<meta property="og:description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+<meta property="og:description" content="C端特殊性面向用户，巨大的并发访问量，海量的数据存储，对系统稳定性和性能的要求高。 因此，C端复杂系统的三类技术挑战：  高并发 高可用 高性能  大型系统建设">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3552.JPG">
-<meta property="article:published_time" content="2023-11-05T02:00:00.000Z">
-<meta property="article:modified_time" content="2023-11-12T15:01:01.182Z">
+<meta property="og:image" content="https://windwj000.github.io/images/blog21/IMG_3646.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog21/IMG_3647.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog21/IMG_3648JPG">
+<meta property="article:published_time" content="2023-11-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-13T01:51:53.842Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog21/IMG_3646.JPG">
 
 <link rel="canonical" href="https://windwj000.github.io/blog21/">
 
@@ -47,7 +48,7 @@
   };
 </script>
 
-  <title>ArrayList add null分析 | 风的个人网站</title>
+  <title>C端技术挑战 | 风的个人网站</title>
   
 
 
@@ -195,7 +196,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ArrayList add null分析
+          C端技术挑战
         </h1>
 
         <div class="post-meta"> 
@@ -206,9 +207,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-11-05 10:00:00" 
+              <time title="创建时间：2023-11-12 22:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2023-11-05T10:00:00+08:00">2023-11-05
+                datetime="2023-11-12T22:00:00+08:00">2023-11-12
                 
               </time>
 
@@ -219,8 +220,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -243,39 +244,183 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
-<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
-
-<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
-
-<p><strong>ArrayList现状</strong></p>
+        <h1 id="C端特殊性"><a href="#C端特殊性" class="headerlink" title="C端特殊性"></a>C端特殊性</h1><p>面向用户，巨大的并发访问量，海量的数据存储，对系统稳定性和性能的要求高。</p>
+<p>因此，C端复杂系统的三类技术挑战：</p>
 <ul>
-<li>add方法先确认容量(包含扩容)，再赋值</li>
-<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+<li>高并发</li>
+<li>高可用</li>
+<li>高性能</li>
 </ul>
-<p><strong>add null分析</strong></p>
+<h1 id="大型系统建设"><a href="#大型系统建设" class="headerlink" title="大型系统建设"></a>大型系统建设</h1><ul>
+<li>octo 服务拆分、服务治理：将大型系统拆分为多个子系统，每个系统连一个数据库。</li>
+<li>squirrel、cellar 两类KV型缓存：能够应对高并发读，内存存储数据保证读的性能。</li>
+<li>mafka：异步削峰，增大系统同时处理任务能力，应对消息量高峰。</li>
+<li>rds 分库分表、读写分离</li>
+<li>数据库、中间件的集群分布、主从架构</li>
+<li>es 应对高并发查询</li>
+</ul>
+<h1 id="稳定性建设"><a href="#稳定性建设" class="headerlink" title="稳定性建设"></a>稳定性建设</h1><p>解决可用性挑战</p>
+<h2 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h2><img src="/images/blog21/IMG_3646.JPG" width="80%"/>
+
 <ul>
-<li>后执行的ThreadB扩容时，拷贝旧元素</li>
-<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
-<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+<li><strong>统一模型，提高团队在稳定性领域的专业性：</strong>专项组带头构建稳定性全景图、解决方案、成熟度衡量的指标和方式。丰富研发同学的相关知识，形成团队积累，更好指导建设和治理工作。</li>
+<li><strong>量化过程，基于模型拆解指标推进治理过程：</strong>从能力域、能力项、评估项制定评估指标（定量+定性），进行全面评估，推动系统改造，实现能力提升。</li>
+<li><strong>建设工具，提高治理效率，提供运营抓手：</strong>建设Moss平台（下部分阐述），补充集团基建能力，整合或创新部分工具，为业务RD在稳定性的治理和运营的过程降本增效。</li>
+<li><strong>建立机制，推进各组进度，提高重视程度：</strong>通过周期的review和汇报机制，在低成本的情况下，各组制定计划并落地实施，互相review查漏补缺。</li>
 </ul>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
-<p>代码块</p>
-<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
-<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
-<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
-<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
-<p>}</p>
-<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
-<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
-<p>​     return minCapacity;</p>
-<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
-<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
-<p>​    grow(minCapacity);</p>
-<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
-<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
-<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+<h2 id="稳定性模型"><a href="#稳定性模型" class="headerlink" title="稳定性模型"></a>稳定性模型</h2><h3 id="全景图"><a href="#全景图" class="headerlink" title="全景图"></a>全景图</h3><img src="/images/blog21/IMG_3647.JPG" width="80%"/>
+
+<ul>
+<li>事前：流程规范、埋点监控、线上变更管理、系统运维、稳定性平台建设</li>
+<li>事中：可观测、告警、定位、排查、响应、上下游沟通、容量容错容灾手段</li>
+<li>事后、COE复盘、总结、工具建设</li>
+</ul>
+<h3 id="评估模型"><a href="#评估模型" class="headerlink" title="评估模型"></a>评估模型</h3><p>将全景图的众多事项，按照重要程度、ROI、收益等维度进行分析，得出如下七层评估模型，进而可以按“自底向上”的优先级推进并量化过程。</p>
+<img src="/images/blog21/IMG_3648JPG" width="80%"/>
+
+<ol>
+<li>【基础】「可观测性」是一切的基础，在风险预防和故障处理中起到至关重要的作用。「故障处理」要求我们在“故障不可完全避免”的事实下，降低技术问题对业务的影响。</li>
+<li>【必要】大多数故障的发生都是由于变更，一方面要明确落实’六要两不要（测试、灰度）”，另一方面能够通过卡控和审批拦截风险，降低故障的发生。</li>
+<li>【建设】提高系统的容量、容错、容灾的基础能力，可以有效降低发生概率和故障影响，投入相对大，但长期看可持续发展。</li>
+</ol>
+<h2 id="可观测指标建设"><a href="#可观测指标建设" class="headerlink" title="可观测指标建设"></a>可观测指标建设</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>观测内容</th>
+<th>监控指标</th>
+<th>衡量方式</th>
+<th>投入方案</th>
+<th>是否完善</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>业务</td>
+<td>流量</td>
+<td>业务量、成功率、错误码 + （下钻）</td>
+<td>日/周环比、波动、阈值</td>
+<td>分析-埋点-监控-告警</td>
+<td><strong>有</strong></td>
+</tr>
+<tr>
+<td>数据</td>
+<td>要素下发量、率</td>
+<td>日/周环比、波动、阈值</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>正确性</td>
+<td>数据准确性、约束条件校验</td>
+<td>波动、阈值、个例</td>
+<td>回算、BCP、DQC</td>
+<td><strong>-</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>应用服务</td>
+<td>接口</td>
+<td>（URL、OctoService）QPS、TP、可用性</td>
+<td>日/周环比、波动、阈值</td>
+<td>实时大盘周期报告统一告警</td>
+<td><strong>有</strong></td>
+</tr>
+<tr>
+<td>下游</td>
+<td>（OctoCall）QPS、TP、可用性</td>
+<td>日/周环比、波动、阈值</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>异常</td>
+<td>Errorlog、WarnEvent</td>
+<td>error告警、event波动</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>存储</td>
+<td>MysqlES</td>
+<td>连接数、读写QPS/TP、慢查大表、磁盘、容灾</td>
+<td>安全值风险项</td>
+<td>实时告警风险工单周期巡检</td>
+<td><strong>有</strong></td>
+</tr>
+<tr>
+<td>中间件</td>
+<td>mafka</td>
+<td>流速、积压、负载</td>
+<td>波动风险</td>
+<td><strong>有</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>crane</td>
+<td>配置合理性、执行时间</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>redis</td>
+<td>大key热key、命中率、QPS/TP</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>cellar</td>
+<td>大key热key、命中率、QPS/TP</td>
+<td><strong>有</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>容器</td>
+<td>Host</td>
+<td>cpu、gc、thread</td>
+<td>安全值</td>
+<td><strong>有</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="高性能建设"><a href="#高性能建设" class="headerlink" title="高性能建设"></a>高性能建设</h1><p>高性能主要体现在两个方面：</p>
+<ul>
+<li>响应时间</li>
+<li>吞吐量</li>
+</ul>
+<h2 id="如何提高性能"><a href="#如何提高性能" class="headerlink" title="如何提高性能"></a>如何提高性能</h2><ul>
+<li><p>提高硬件能力、增加系统服务器。</p>
+</li>
+<li><p>使用缓存：本地缓存 JDK 自带的 Map、Guava Cache，分布式缓存 Redis、Memcache。</p>
+</li>
+<li><p>消息队列：异步 + 削峰 + 解耦。</p>
+</li>
+<li><p>采用分布式开发：不同的服务部署在不同的机器节点上，并且一个服务也可以部署在多台机器上，然后利用 Nginx 负载均衡访问。这样就解决了单点部署的缺点，大大提高的系统并发量。</p>
+</li>
+<li><p>业务拆分，架构重构。</p>
+</li>
+<li><p>数据库分库分表：读写分离、水平分表、垂直分表。</p>
+</li>
+<li><p>采用集群：多台机器提供相同的服务。</p>
+</li>
+<li><p>CDN 加速：将一些静态资源比如图片、视频等等缓存到离用户最近的网络节点。</p>
+</li>
+<li><p>浏览器缓存。</p>
+</li>
+<li><p>使用合适的连接池：数据库连接池、线程池等等。</p>
+</li>
+<li><p>适当使用多线程进行开发。</p>
+</li>
+</ul>
+<h2 id="主要解决问题"><a href="#主要解决问题" class="headerlink" title="主要解决问题"></a>主要解决问题</h2><p>慢缓存、慢服务、慢sql</p>
 
     </div>
 
@@ -301,12 +446,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog20/" rel="prev" title="ArrayList add null分析">
-      <i class="fa fa-chevron-left"></i> ArrayList add null分析
+    <a href="/blog20/" rel="prev" title="高性能队列 Disruptor">
+      <i class="fa fa-chevron-left"></i> 高性能队列 Disruptor
     </a></div>
       <div class="post-nav-item">
-    <a href="/blog19/" rel="next" title="ArrayList add null分析">
-      ArrayList add null分析 <i class="fa fa-chevron-right"></i>
+    <a href="/blog23/" rel="next" title="blog23">
+      blog23 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -367,7 +512,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#现象"><span class="nav-number">1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">2.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文档"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C端特殊性"><span class="nav-number">1.</span> <span class="nav-text">C端特殊性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#大型系统建设"><span class="nav-number">2.</span> <span class="nav-text">大型系统建设</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#稳定性建设"><span class="nav-number">3.</span> <span class="nav-text">稳定性建设</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#整体思路"><span class="nav-number">3.1.</span> <span class="nav-text">整体思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#稳定性模型"><span class="nav-number">3.2.</span> <span class="nav-text">稳定性模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全景图"><span class="nav-number">3.2.1.</span> <span class="nav-text">全景图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#评估模型"><span class="nav-number">3.2.2.</span> <span class="nav-text">评估模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可观测指标建设"><span class="nav-number">3.3.</span> <span class="nav-text">可观测指标建设</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#高性能建设"><span class="nav-number">4.</span> <span class="nav-text">高性能建设</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何提高性能"><span class="nav-number">4.1.</span> <span class="nav-text">如何提高性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主要解决问题"><span class="nav-number">4.2.</span> <span class="nav-text">主要解决问题</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -383,7 +528,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

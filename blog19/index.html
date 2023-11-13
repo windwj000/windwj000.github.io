@@ -20,20 +20,28 @@
     var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+  <meta name="description" content="业界对标产品 字节跳动CloudWeGo、阿里Dubbo、蚂蚁金服Sofa、华为ServiceComb、开源Spring Cloud。 产品功能概览   OCTO目前依赖KMS、Lion、Rhino、Cellar、MySQL等基础组件或服务，它本身不含鉴权、限流、配置等数据源，比如OCTO RPC SDK基于KMS实现服务鉴权、基于Rhino实现熔断限流等功能。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ArrayList add null分析">
+<meta property="og:title" content="服务治理平台 OCTO2.0-学习笔记">
 <meta property="og:url" content="https://windwj000.github.io/blog19/index.html">
 <meta property="og:site_name" content="风的个人网站">
-<meta property="og:description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+<meta property="og:description" content="业界对标产品 字节跳动CloudWeGo、阿里Dubbo、蚂蚁金服Sofa、华为ServiceComb、开源Spring Cloud。 产品功能概览   OCTO目前依赖KMS、Lion、Rhino、Cellar、MySQL等基础组件或服务，它本身不含鉴权、限流、配置等数据源，比如OCTO RPC SDK基于KMS实现服务鉴权、基于Rhino实现熔断限流等功能。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3552.JPG">
-<meta property="article:published_time" content="2023-11-05T02:00:00.000Z">
-<meta property="article:modified_time" content="2023-11-12T15:01:01.182Z">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3626.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3629.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3630.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3631.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3633.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3634.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3635.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3636.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3637.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog19/IMG_3638.JPG">
+<meta property="article:published_time" content="2023-11-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-13T01:10:41.307Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog19/IMG_3626.JPG">
 
 <link rel="canonical" href="https://windwj000.github.io/blog19/">
 
@@ -47,7 +55,7 @@
   };
 </script>
 
-  <title>ArrayList add null分析 | 风的个人网站</title>
+  <title>服务治理平台 OCTO2.0-学习笔记 | 风的个人网站</title>
   
 
 
@@ -195,7 +203,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ArrayList add null分析
+          服务治理平台 OCTO2.0-学习笔记
         </h1>
 
         <div class="post-meta"> 
@@ -206,9 +214,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-11-05 10:00:00" 
+              <time title="创建时间：2023-11-12 22:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2023-11-05T10:00:00+08:00">2023-11-05
+                datetime="2023-11-12T22:00:00+08:00">2023-11-12
                 
               </time>
 
@@ -219,8 +227,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -243,39 +251,94 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
-<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+        <p><strong>业界对标产品</strong></p>
+<p>字节跳动CloudWeGo、阿里Dubbo、蚂蚁金服Sofa、华为ServiceComb、开源Spring Cloud。</p>
+<p><strong>产品功能概览</strong></p>
+<img src="/images/blog19/IMG_3626.JPG" width="80%"/>
 
-<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+<p>OCTO目前依赖KMS、Lion、Rhino、Cellar、MySQL等基础组件或服务，它本身不含鉴权、限流、配置等数据源，比如OCTO RPC SDK基于KMS实现服务鉴权、基于Rhino实现熔断限流等功能。</p>
+<h1 id="RPC相关"><a href="#RPC相关" class="headerlink" title="RPC相关"></a>RPC相关</h1><h2 id="服务注册发现"><a href="#服务注册发现" class="headerlink" title="服务注册发现"></a><strong>服务注册发现</strong></h2><img src="/images/blog19/IMG_3629.JPG" width="80%"/>
 
-<p><strong>ArrayList现状</strong></p>
+<h2 id="ServiceMesh调用"><a href="#ServiceMesh调用" class="headerlink" title="ServiceMesh调用"></a>ServiceMesh调用</h2><img src="/images/blog19/IMG_3630.JPG" width="80%"/>
+
+<h2 id="RPC调用全链路"><a href="#RPC调用全链路" class="headerlink" title="RPC调用全链路"></a>RPC调用全链路</h2><img src="/images/blog19/IMG_3631.JPG" width="80%"/>
+
+<h1 id="OCTO1-0"><a href="#OCTO1-0" class="headerlink" title="OCTO1.0"></a>OCTO1.0</h1><p>2018年正式发布，实现服务注册发现、负载均衡、容错处理、降级熔断、灰度发布、调用数据可视化等服务治理功能。</p>
+<p>OCTO 1.0和开源Dubbo/Spring Cloud体系类似。</p>
+<img src="/images/blog19/IMG_3633.JPG" width="80%"/>
+
 <ul>
-<li>add方法先确认容量(包含扩容)，再赋值</li>
-<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+<li><p>Provider将服务信息注册到Sg_agent中，由Sg_agent统一将节点信息注册到MNS注册中心中</p>
+</li>
+<li><p>Consumer则通过SgAgent从MNS中获取服务数据</p>
+</li>
+<li><p>MNS基于ZooKeeper(<strong>满足CP，存在性能瓶颈</strong>)持久化实例存储服务节点信息</p>
+</li>
+<li><p>Scanner用于对服务节点做健康检查</p>
+</li>
+<li><p>MNS-Controller作为ZK的缓存层，承担ZK的读请求和数据推送</p>
+</li>
+<li><p>Watt是OCTO数据指标建设的计算平台</p>
+</li>
+<li><p>MSGP是OCTO的服务治理平台门户，用户可以在其上查询服务状态以及修改应用规则</p>
+</li>
 </ul>
-<p><strong>add null分析</strong></p>
+<p><strong>痛点</strong></p>
 <ul>
-<li>后执行的ThreadB扩容时，拷贝旧元素</li>
-<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
-<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+<li>中间件和业务绑定在一起，制约着彼此迭代。核心的治理能力主要由通信框架承载，虽然做到了逻辑隔离，但中间件的逻辑不可避免会和业务在物理上耦合在一起。这种模式下，中间件引入Bug和新特性的发布 需要所有业务配合升级，这对业务的研发效率也会造成损害；</li>
+<li>对多语言支持不够好。公司技术栈使用的语言主要是 Java，而其他语言也占20%；</li>
+<li>异构治理体系技术治理分散，应用分布在多个部门，不能统一与其他节点协同。</li>
 </ul>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
-<p>代码块</p>
-<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
-<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
-<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
-<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
-<p>}</p>
-<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
-<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
-<p>​     return minCapacity;</p>
-<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
-<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
-<p>​    grow(minCapacity);</p>
-<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
-<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
-<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+<h1 id="Mesh架构"><a href="#Mesh架构" class="headerlink" title="Mesh架构"></a>Mesh架构</h1><img src="/images/blog19/IMG_3634.JPG" width="80%"/>
+
+<ul>
+<li>数据面Envoy，Sidecar通过对业务进程做流量拦截完成整体服务调用的注册/发现、负载均衡、服务路由等基本特性</li>
+<li>控制面Istio，则由Pilot负责对Sidecar进行流量管理、规则管理等来治理流量</li>
+</ul>
+<img src="/images/blog19/IMG_3635.JPG" width="80%"/>
+
+<p>对于社区 Istio 方案，要想实现超大规模应用集群落地，需要完成较多的技术改造。主要是因为 Istio 水平扩展能力相对薄弱，内部冗余操作较多，整体稳定性建设较为薄弱。</p>
+<ul>
+<li>控制面每个节点并不承载所有治理数据，系统整体做水平扩展，在此基础上提升每个实例的整体吞吐量和性能。</li>
+<li>当出现机房断网等异常情况时，可以应对瞬时流量骤增的能力。</li>
+<li>只做必要的 P2P 模式健康检查，配合集中式健康检查进行百万级节点管理。</li>
+</ul>
+<h1 id="Mesh化的OCTO2-0"><a href="#Mesh化的OCTO2-0" class="headerlink" title="Mesh化的OCTO2.0"></a>Mesh化的OCTO2.0</h1><img src="/images/blog19/IMG_3636.JPG" width="80%"/>
+
+<p>OCTO 2.0控制平面摒弃了社区的Istio，完全自研。</p>
+<p>数据平面基于开源Envoy改造。</p>
+<p>运维系统负责数据面组件的升级、发布等运维工作</p>
+<h2 id="流量劫持"><a href="#流量劫持" class="headerlink" title="流量劫持"></a>流量劫持</h2><p>OCTO 2.0并未采用Envoy原生方案-使用iptables对进出POD的流量进行劫持，主要考量了以下几个因素：</p>
+<ol>
+<li>iptables自身存在性能损失大、管控性差的问题</li>
+<li>在美团现有的环境下，使用iptables存在以下几个问题：</li>
+</ol>
+<ul>
+<li><p>HULK容器为富容器形态，业务进程和其他所有基础组件都处于同一容器中，这些组件使用了各种各样的端口。使用iptables容易造成误拦截；</p>
+</li>
+<li><p>美团现在存在物理机、虚拟机、容器等多个业务运行场景，基于iptables的流量劫持方案在适配这些场景时复杂度很高。</p>
+</li>
+</ul>
+<p>鉴于上述问题，最终采用了<strong>Unix Domain Socket直连</strong>方式来实现业务进程和OCTO-Proxy之间的流量转发。</p>
+<img src="/images/blog19/IMG_3637.JPG" width="80%"/>
+
+<p>性能：</p>
+<ul>
+<li><p>Unix Domain Socket与iptables相比，不存在规则较多场景下iptables性能低下的问题；</p>
+</li>
+<li><p>Unix Domain Socket与TCP协议相比，也不需要经过网络协议栈，只是将应用层数据从一个进程拷贝到另一个进程，性能进一步提升。</p>
+</li>
+</ul>
+<h2 id="无损重启"><a href="#无损重启" class="headerlink" title="无损重启"></a>无损重启</h2><p>在基础组件升级过程中(Proxy)提供持续、不间断的服务，做到业务流量无损及业务无感知。</p>
+<p><strong>Envoy在长连接时的流量损耗</strong></p>
+<img src="/images/blog19/IMG_3638.JPG" width="80%"/>
+
+<ul>
+<li><p>对于短连接，所有新的连接会在新的Proxy上创建，旧Proxy上已有的连接在响应到来后主动断开。旧Proxy的所有短连接逐渐断开，这就是“drain”（排空）的过程。连接排空之后，旧Proxy主动退出，新的Proxy继续工作。整个过程中的流量完全无损。</p>
+</li>
+<li><p>对于长连接，Client和旧Proxy维持一条长连接不断开，并持续使用该连接发送请求。旧Proxy进程最终退出时，该连接被动断开，此时可能尚有部分响应未返回，导致Client端请求超时。因此，Envoy的热重启对长连接场景的支持并不完美<strong>。</strong></p>
+</li>
+</ul>
 
     </div>
 
@@ -301,12 +364,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog21/" rel="prev" title="ArrayList add null分析">
-      <i class="fa fa-chevron-left"></i> ArrayList add null分析
+    <a href="/blog18/" rel="prev" title="thrift">
+      <i class="fa fa-chevron-left"></i> thrift
     </a></div>
       <div class="post-nav-item">
-    <a href="/blog18/" rel="next" title="ArrayList add null分析">
-      ArrayList add null分析 <i class="fa fa-chevron-right"></i>
+    <a href="/blog17/" rel="next" title="商详页兜底下发原因分析">
+      商详页兜底下发原因分析 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -367,7 +430,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#现象"><span class="nav-number">1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">2.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文档"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RPC相关"><span class="nav-number">1.</span> <span class="nav-text">RPC相关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册发现"><span class="nav-number">1.1.</span> <span class="nav-text">服务注册发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServiceMesh调用"><span class="nav-number">1.2.</span> <span class="nav-text">ServiceMesh调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RPC调用全链路"><span class="nav-number">1.3.</span> <span class="nav-text">RPC调用全链路</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OCTO1-0"><span class="nav-number">2.</span> <span class="nav-text">OCTO1.0</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mesh架构"><span class="nav-number">3.</span> <span class="nav-text">Mesh架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mesh化的OCTO2-0"><span class="nav-number">4.</span> <span class="nav-text">Mesh化的OCTO2.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#流量劫持"><span class="nav-number">4.1.</span> <span class="nav-text">流量劫持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无损重启"><span class="nav-number">4.2.</span> <span class="nav-text">无损重启</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -383,7 +446,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

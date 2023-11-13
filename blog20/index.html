@@ -20,20 +20,25 @@
     var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+  <meta name="description" content="Disruptor 是英国外汇交易公司 LMAX 开发的一个高性能队列，研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与 I&#x2F;O 操作处于同样的数量级）。基于Disruptor 开发的系统单线程能支撑每秒 600 万订单。 特点 RingBuffer（环形数组） : Disruptor 内部的 RingBuffer 是通过数组实现的。 由于这个数组中的所有元素在初始化时一次性全部创建，因">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ArrayList add null分析">
+<meta property="og:title" content="高性能队列 Disruptor">
 <meta property="og:url" content="https://windwj000.github.io/blog20/index.html">
 <meta property="og:site_name" content="风的个人网站">
-<meta property="og:description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+<meta property="og:description" content="Disruptor 是英国外汇交易公司 LMAX 开发的一个高性能队列，研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与 I&#x2F;O 操作处于同样的数量级）。基于Disruptor 开发的系统单线程能支撑每秒 600 万订单。 特点 RingBuffer（环形数组） : Disruptor 内部的 RingBuffer 是通过数组实现的。 由于这个数组中的所有元素在初始化时一次性全部创建，因">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3552.JPG">
-<meta property="article:published_time" content="2023-11-05T02:00:00.000Z">
-<meta property="article:modified_time" content="2023-11-12T15:01:01.182Z">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3639.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3640.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3641.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3642.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3643.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3644.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog20/IMG_3645.JPG">
+<meta property="article:published_time" content="2023-11-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-13T01:46:22.738Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog20/IMG_3639.JPG">
 
 <link rel="canonical" href="https://windwj000.github.io/blog20/">
 
@@ -47,7 +52,7 @@
   };
 </script>
 
-  <title>ArrayList add null分析 | 风的个人网站</title>
+  <title>高性能队列 Disruptor | 风的个人网站</title>
   
 
 
@@ -195,7 +200,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ArrayList add null分析
+          高性能队列 Disruptor
         </h1>
 
         <div class="post-meta"> 
@@ -206,9 +211,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-11-05 10:00:00" 
+              <time title="创建时间：2023-11-12 22:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2023-11-05T10:00:00+08:00">2023-11-05
+                datetime="2023-11-12T22:00:00+08:00">2023-11-12
                 
               </time>
 
@@ -219,8 +224,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -243,39 +248,138 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
-<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
-
-<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
-
-<p><strong>ArrayList现状</strong></p>
-<ul>
-<li>add方法先确认容量(包含扩容)，再赋值</li>
-<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+        <p>Disruptor 是英国外汇交易公司 LMAX 开发的一个高性能队列，研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与 I/O 操作处于同样的数量级）。基于Disruptor 开发的系统单线程能支撑每秒 600 万订单。</p>
+<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><ul>
+<li><strong>RingBuffer（环形数组）</strong> : Disruptor 内部的 RingBuffer 是通过数组实现的。<ul>
+<li>由于这个数组中的所有元素在初始化时一次性全部创建，因此这些元素的内存地址一般来说是连续的。这样做的好处是，当生产者不断往 RingBuffer 中插入新的事件对象时，这些事件对象的<strong>内存地址就能够保持连续</strong>，从而利用 CPU 缓存的局部性原理，将相邻的事件对象一起加载到缓存中，提高程序的性能。</li>
+<li>这类似于 MySQL 的预读机制，将连续的几个页预读到内存里。</li>
+<li>除此之外，RingBuffer 基于数组还支持批量操作（一次处理多个元素）、还可以避免频繁的内存分配和垃圾回收（RingBuffer 是一个固定大小的数组，当向数组中添加新元素时，如果数组已满，则新元素将覆盖掉最旧的元素）。</li>
 </ul>
-<p><strong>add null分析</strong></p>
-<ul>
-<li>后执行的ThreadB扩容时，拷贝旧元素</li>
-<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
-<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+</li>
+<li><strong>避免了伪共享问题</strong>：CPU 缓存内部是按照 Cache Line（缓存行）管理的，一般的 Cache Line 大小在 64 字节左右。Disruptor 为了确保目标字段独占一个 Cache Line，会在目标字段前后增加了 64 个字节的填充（前 56 个字节和后 8 个字节），这样可以避免 Cache Line 的伪共享（False Sharing）问题。</li>
+<li><strong>无锁设计</strong>：Disruptor 采用无锁设计，避免了传统锁机制带来的竞争和延迟。<ul>
+<li>Disruptor 的无锁实现起来比较复杂，主要是基于 CAS、内存屏障（Memory Barrier）、RingBuffer 等技术实现的。</li>
 </ul>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
-<p>代码块</p>
-<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
-<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
-<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
-<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
-<p>}</p>
-<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
-<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
-<p>​     return minCapacity;</p>
-<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
-<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
-<p>​    grow(minCapacity);</p>
-<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
-<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
-<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+</li>
+</ul>
+<h1 id="CPU高速缓存"><a href="#CPU高速缓存" class="headerlink" title="CPU高速缓存"></a>CPU高速缓存</h1><img src="/images/blog20/IMG_3639.JPG" width="80%"/>
+
+<p>如果你用一种能被预测的方式访问内存的话，CPU 可以预测下个可能访问的值从内存先缓存到缓存中，来降低下次访问的延迟。 这就是利用 CPU 高速缓存的特性</p>
+<h1 id="JVM内置加锁有界队列ArrayBlockingQueue"><a href="#JVM内置加锁有界队列ArrayBlockingQueue" class="headerlink" title="JVM内置加锁有界队列ArrayBlockingQueue"></a>JVM内置加锁有界队列ArrayBlockingQueue</h1><h2 id="JVM内置队列"><a href="#JVM内置队列" class="headerlink" title="JVM内置队列"></a><strong>JVM内置队列</strong></h2><table>
+<thead>
+<tr>
+<th><strong>队列</strong></th>
+<th><strong>有界性</strong></th>
+<th><strong>锁</strong></th>
+<th><strong>数据结构</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ArrayBlockingQueue</td>
+<td>bounded</td>
+<td>加锁</td>
+<td>arraylist</td>
+</tr>
+<tr>
+<td>LinkedBlockingQueue</td>
+<td>optionally-bounded</td>
+<td>加锁</td>
+<td>linkedlist</td>
+</tr>
+<tr>
+<td>ConcurrentLinkedQueue</td>
+<td>unbounded</td>
+<td>无锁</td>
+<td>linkedlist</td>
+</tr>
+<tr>
+<td>LinkedTransferQueue</td>
+<td>unbounded</td>
+<td>无锁</td>
+<td>linkedlist</td>
+</tr>
+<tr>
+<td>PriorityBlockingQueue</td>
+<td>unbounded</td>
+<td>加锁</td>
+<td>heap</td>
+</tr>
+<tr>
+<td>DelayQueue</td>
+<td>unbounded</td>
+<td>加锁</td>
+<td>heap</td>
+</tr>
+</tbody></table>
+<p>通过不加锁(CAS)的方式实现的队列都是无界的，而加锁的方式可以实现有界队列。在稳定性要求特别高的系统中，为了防止生产者速度过快，导致内存溢出，只能选择有界队列。</p>
+<p>同时，为了减少Java的垃圾回收对系统性能的影响，会尽量选择array/heap格式的数据结构。这样筛选下来，符合条件的队列就只有ArrayBlockingQueue。</p>
+<p><strong>不加锁/CAS/加锁 的性能对比</strong></p>
+<p>单线程情况下，不加锁的性能 &gt; CAS操作的性能 &gt; 加锁的性能。</p>
+<p>在多线程情况下，为了保证线程安全，必须使用CAS或锁，这种情况下，CAS的性能超过锁的性能，前者大约是后者的8倍。</p>
+<h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a><strong>ArrayBlockingQueue</strong></h2><p><strong>加ReentrantLock锁的offer操作</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public boolean offer(E e) &#123;</span><br><span class="line">    checkNotNull(e);</span><br><span class="line">    final ReentrantLock lock &#x3D; this.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">    try &#123;</span><br><span class="line">        if (count &#x3D;&#x3D; items.length)</span><br><span class="line">            return false;</span><br><span class="line">        else &#123;</span><br><span class="line">            insert(e);</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>CAS例子 AtomicInteger的getAndAdd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public final int getAndAdd(int delta) &#123;</span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        int current &#x3D; get();</span><br><span class="line">        int next &#x3D; current + delta;</span><br><span class="line">        if (compareAndSet(current, next))</span><br><span class="line">            return current;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public final boolean compareAndSet(int expect, int update) &#123;</span><br><span class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>管理生产者申请队列的 head，消费者申请队列的 tail，以及中间节点的存储，这些问题使得并发实现的设计非常复杂，除了在队列上使用一个粗粒度的锁之外，还难以管理。</p>
+<p>对于 put 和 take 操作，使用整个队列上的粗粒度锁实现起来很简单，但对吞吐量来说是一个很大的瓶颈。</p>
+<img src="/images/blog20/IMG_3640.JPG" width="80%"/>
+
+<p><strong>伪共享问题</strong></p>
+<p>使用相同的 cacheline 会产生伪共享问题。比如 ArrayBlockingQueue 有三个成员变量：</p>
+<ul>
+<li>takeIndex：需要被取走的元素下标；</li>
+<li>putIndex：可被元素插入的位置的下标；</li>
+<li>count：队列中元素的数量；</li>
+</ul>
+<p>这三个变量很容易放到一个缓存行中，但是之间修改没有太多的关联。所以每次修改，都会使之前缓存的数据失效，从而不能完全达到共享的效果。</p>
+<p>当生产者线程 put 一个元素到 ArrayBlockingQueue 时，putIndex 会修改，从而导致消费者线程的缓存中的缓存行无效，需要从主存中重新读取。</p>
+<p>一般的解决方案是，增大数组元素的间隔使得由不同线程存取的元素位于不同的缓存行上，以空间换时间。</p>
+<p>在JDK1.8中，有专门的注解@Contended来避免伪共享。</p>
+<h1 id="Disruptor环形数组"><a href="#Disruptor环形数组" class="headerlink" title="Disruptor环形数组"></a>Disruptor环形数组</h1><img src="/images/blog20/IMG_3641.JPG" width="80%"/>
+
+<p>启动时，将预先分配环形缓冲区的所有内存，这些 entry 中的每一个通常不是传递的数据本身，类似对象池机制，而是它的容器。</p>
+<ul>
+<li>问题：ringbuffer默认size 256*1024，比较吃内存，曾有过OOM case；disruptor ringbuffer满时个别场景也会引起cpu飙高。</li>
+</ul>
+<h2 id="单生产者"><a href="#单生产者" class="headerlink" title="单生产者"></a><strong>单生产者</strong></h2><img src="/images/blog20/IMG_3642.JPG" width="80%"/>
+
+<h2 id="多生产者"><a href="#多生产者" class="headerlink" title="多生产者"></a><strong>多生产者</strong></h2><p>多个生产者的情况下，会遇到“如何防止多个线程重复写同一个元素”的问题。</p>
+<ul>
+<li>Disruptor的解决方法：每个线程获取不同的一段数组空间进行操作。这个通过CAS很容易达到。只需要在分配元素的时候，通过CAS判断一下这段空间是否已经分配出去即可。</li>
+</ul>
+<p>但是会遇到一个新问题：如何防止读取的时候，读到还未写的元素。</p>
+<ul>
+<li>Disruptor在多个生产者的情况下，引入了一个与Ring Buffer大小相同的buffer：available Buffer。当某个位置写入成功的时候，便把availble Buffer相应的位置置位，标记为写入成功。读取的时候，会遍历available Buffer，来判断元素是否已经就绪。</li>
+</ul>
+<h3 id="读数据"><a href="#读数据" class="headerlink" title="读数据"></a>读数据</h3><img src="/images/blog20/IMG_3643.JPG" width="80%"/>
+
+<ul>
+<li><p>读线程读到下标为2的元素，三个线程Writer1/Writer2/Writer3正在向RingBuffer相应位置写数据，写线程被分配到的<strong>最大元素下标</strong>是11。</p>
+</li>
+<li><p>读线程申请读取到下标从3到11的元素，判断writer cursor&gt;=11。然后开始读取<strong>availableBuffer</strong>，从3开始，往后读取，发现下标为7的元素没有生产成功，于是WaitFor(11)返回6。</p>
+</li>
+<li><p>然后，消费者读取下标从3到6共计4个元素。</p>
+</li>
+<li><p>最后reader cursor指向6。</p>
+</li>
+</ul>
+<h3 id="写数据"><a href="#写数据" class="headerlink" title="写数据"></a>写数据</h3><img src="/images/blog20/IMG_3644.JPG" width="80%"/>
+
+<ul>
+<li>Writer1和Writer2两个线程写入数组，都<strong>申请可写的数组空间</strong>。Writer1被分配了下标3到下表5的空间，Writer2被分配了下标6到下标9的空间。</li>
+<li>Writer1写入下标3位置的元素，同时把available Buffer相应位置置位，标记已经写入成功，往后移一位，开始写下标4位置的元素。Writer2同样的方式。最终都写入完成。</li>
+</ul>
+<h1 id="Disruptor对CAT性能优化"><a href="#Disruptor对CAT性能优化" class="headerlink" title="Disruptor对CAT性能优化"></a>Disruptor对CAT性能优化</h1><h2 id="优化方向"><a href="#优化方向" class="headerlink" title="优化方向"></a>优化方向</h2><ul>
+<li>线程模型优化：目的是降低上下文切换带来的开销；</li>
+<li>内存优化：CAT 作为 APM 应用，每秒摄入的数据在几十到一百多 MB 级别，数据经过反序列化之后，还需要对内存报表做大量的更新操作，这个过程会创建特别多的临时对象，会造成频繁的 Young GC。CAT 内存中维护了当前小时的报表，每一个小时中，常驻内存随着时间推移逐渐增大，造成可用内存减少，频繁触发 Full GC。</li>
+<li>JVM/OS/网络设置优化：JVM 已经发布到版本 11，新版本带来了一部分免费的性能提升， 另外 GC 的方式和参数也可以调整。 开启 OS 内存大页和调整网络参数等在理论上也能带来性能提升。</li>
+</ul>
+<h2 id="CAT服务端通过BlockingQueue生成报表"><a href="#CAT服务端通过BlockingQueue生成报表" class="headerlink" title="CAT服务端通过BlockingQueue生成报表"></a>CAT服务端通过BlockingQueue生成报表</h2><img src="/images/blog20/IMG_3645.JPG" width="80%"/>
+
+<p>Netty Worker 线程生成 MessageTree 后，offer 到每个 Analyzer 专有队列（Blocking Queue）中，由 Analyzer 线程从队列中拉去后处理并生成对应的内存报表。</p>
+<p>一组线程生成 MessageTree，并采用 BlockingQueue 发送到另一组线程来处理，这是典型的消息传递场景。适合使用Disruptor。</p>
 
     </div>
 
@@ -301,12 +405,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog13/" rel="prev" title="Java 集合类的 contains 方法与 equals 方法的关系分析">
-      <i class="fa fa-chevron-left"></i> Java 集合类的 contains 方法与 equals 方法的关系分析
+    <a href="/blog14/" rel="prev" title="ArrayList add null分析">
+      <i class="fa fa-chevron-left"></i> ArrayList add null分析
     </a></div>
       <div class="post-nav-item">
-    <a href="/blog21/" rel="next" title="ArrayList add null分析">
-      ArrayList add null分析 <i class="fa fa-chevron-right"></i>
+    <a href="/blog21/" rel="next" title="C端技术挑战">
+      C端技术挑战 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -367,7 +471,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#现象"><span class="nav-number">1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">2.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文档"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#特点"><span class="nav-number">1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CPU高速缓存"><span class="nav-number">2.</span> <span class="nav-text">CPU高速缓存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JVM内置加锁有界队列ArrayBlockingQueue"><span class="nav-number">3.</span> <span class="nav-text">JVM内置加锁有界队列ArrayBlockingQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM内置队列"><span class="nav-number">3.1.</span> <span class="nav-text">JVM内置队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayBlockingQueue"><span class="nav-number">3.2.</span> <span class="nav-text">ArrayBlockingQueue</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Disruptor环形数组"><span class="nav-number">4.</span> <span class="nav-text">Disruptor环形数组</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单生产者"><span class="nav-number">4.1.</span> <span class="nav-text">单生产者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多生产者"><span class="nav-number">4.2.</span> <span class="nav-text">多生产者</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#读数据"><span class="nav-number">4.2.1.</span> <span class="nav-text">读数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写数据"><span class="nav-number">4.2.2.</span> <span class="nav-text">写数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Disruptor对CAT性能优化"><span class="nav-number">5.</span> <span class="nav-text">Disruptor对CAT性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优化方向"><span class="nav-number">5.1.</span> <span class="nav-text">优化方向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAT服务端通过BlockingQueue生成报表"><span class="nav-number">5.2.</span> <span class="nav-text">CAT服务端通过BlockingQueue生成报表</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -383,7 +487,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

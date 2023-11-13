@@ -20,20 +20,23 @@
     var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+  <meta name="description" content="0.定义Thrift是一种接口描述语言和二进制通讯协议，它被用来定义和创建跨语言的服务。它被当作一个RPC框架来使用，是由Facebook为“大规模跨语言服务开发”而开发的。现在是Apache软件基金会的开源项目, 1.RPC定义 远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ArrayList add null分析">
+<meta property="og:title" content="thrift">
 <meta property="og:url" content="https://windwj000.github.io/blog18/index.html">
 <meta property="og:site_name" content="风的个人网站">
-<meta property="og:description" content="现象清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。   结论">
+<meta property="og:description" content="0.定义Thrift是一种接口描述语言和二进制通讯协议，它被用来定义和创建跨语言的服务。它被当作一个RPC框架来使用，是由Facebook为“大规模跨语言服务开发”而开发的。现在是Apache软件基金会的开源项目, 1.RPC定义 远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
-<meta property="og:image" content="https://windwj000.github.io/images/blog14/IMG_3552.JPG">
-<meta property="article:published_time" content="2023-11-05T02:00:00.000Z">
-<meta property="article:modified_time" content="2023-11-12T15:01:01.182Z">
+<meta property="og:image" content="https://windwj000.github.io/images/blog18/IMG_3621.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog18/IMG_3622.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog18/IMG_3623.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog18/IMG_3624.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog18/IMG_3625.JPG">
+<meta property="article:published_time" content="2023-11-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-13T00:54:19.330Z">
 <meta property="article:author" content="风">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://windwj000.github.io/images/blog14/IMG_3551.JPG">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog18/IMG_3621.JPG">
 
 <link rel="canonical" href="https://windwj000.github.io/blog18/">
 
@@ -47,7 +50,7 @@
   };
 </script>
 
-  <title>ArrayList add null分析 | 风的个人网站</title>
+  <title>thrift | 风的个人网站</title>
   
 
 
@@ -195,7 +198,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ArrayList add null分析
+          thrift
         </h1>
 
         <div class="post-meta"> 
@@ -206,9 +209,9 @@
               
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-11-05 10:00:00" 
+              <time title="创建时间：2023-11-12 22:00:00" 
                 itemprop="dateCreated datePublished" 
-                datetime="2023-11-05T10:00:00+08:00">2023-11-05
+                datetime="2023-11-12T22:00:00+08:00">2023-11-12
                 
               </time>
 
@@ -219,8 +222,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
                   </a>
                 </span>
             </span>
@@ -243,39 +246,211 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>清单申诉迁移第二阶段，灰度网店中批量多条提交申诉，且并发的代码里跳过了提交审批中心&amp;存申诉任务到db&amp;es，没有写操作，所以代码内部很快走到了写上下文list(ArrayList类)这行代码，导致并发问题。</p>
-<img src="/images/blog14/IMG_3551.JPG" width="80%"/>
+        <h1 id="0-定义"><a href="#0-定义" class="headerlink" title="0.定义"></a>0.定义</h1><p>Thrift是一种接口描述语言和二进制通讯协议，它被用来定义和创建跨语言的服务。它被当作一个RPC框架来使用，是由Facebook为“大规模跨语言服务开发”而开发的。现在是Apache软件基金会的开源项目,</p>
+<h1 id="1-RPC"><a href="#1-RPC" class="headerlink" title="1.RPC"></a>1.RPC</h1><p><strong>定义</strong></p>
+<p>远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。</p>
+<p><strong>目标</strong></p>
+<p>让分布式或者微服务系统中不同服务之间的调用像本地调用一样简单。为此，RPC的把服务调用步骤都封装起来。</p>
+<p><strong>其他</strong></p>
+<p>RPC 协议假定某些传输协议的存在，如TCP/IP或UDP，为通信程序之间携带信息数据。在OSI 网络通信模型中，RPC跨域了传输层和应用层。</p>
+<p>采用客户端(服务调用方)/服务器端(服务提供方)模式，都运行在自己的JVM中。客户端只需要引入要使用的接口，接口的实现和运行都在服务器端。</p>
+<p>RPC 是对同步服务调用。 </p>
+<p><strong>RPC方案</strong></p>
+<p>RMI(JDK 自带)、Dubbo、Motan、gRPC、Hessian、Thrift. </p>
+<p><strong>RPC和 HTTP</strong></p>
+<p>如果需要和 HTTP 协议打交道，解析和封装 HTTP请求和响应，这类框架并不能算是RPC框架，比如Feign。 </p>
+<p>RPC调用是面向服务的封装，比HTTP调用提高了服务的可用性和效率等。 </p>
+<p><strong>RPC和 RESTfu</strong></p>
+<p>RPC 主要指内部服务之间的调用，RESTful也可以用于内部服务之间的调用，但其主要用途还在于外部系统提供服务。</p>
+<h2 id="RPC-调用过程"><a href="#RPC-调用过程" class="headerlink" title="RPC 调用过程"></a>RPC 调用过程</h2><p>最简单的RPC 框架</p>
+<img src="/images/blog18/IMG_3621.JPG" width="80%"/>
 
-<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><img src="/images/blog14/IMG_3552.JPG" width="80%"/>
+<p>自己设计一个RPC框架</p>
+<img src="/images/blog18/IMG_3622.JPG" width="80%"/>
 
-<p><strong>ArrayList现状</strong></p>
+<p>1.客户端 client 以本地调用方式(即以接口的方式)调用服务。</p>
+<p>2.客户端存根 client stub 接收到调用后，负责将方法、参数等组装成能够进行网络传输的消息体(将消息体对象序列化为二进制)</p>
+<p>3.客户端通过 sockets将消息发送到服务端。</p>
+<p>4.服务端存根 server stub 收到消息后进行解码(将消息对象反序列化)。</p>
+<p>5.服务端存根根据解码结果调用本地的服务。</p>
+<p>6.本地服务执行并将结果返回给服务端存根。</p>
+<p>7.服务端存根将返回结果打包成消息(将结果消息对象序列化)。</p>
+<p>8.服务端 server 通过sockets将消息发送到客户端。</p>
+<p>9.客户端存根接收到结果消息，并进行解码(将结果消息发序列化)。</p>
+<p>10.客户端得到最终结果。</p>
+<h1 id="2-架构模型"><a href="#2-架构模型" class="headerlink" title="2.架构模型"></a>2.架构模型</h1><p>cs架构</p>
+<img src="/images/blog18/IMG_3623.JPG" width="80%"/>
+
+<p>Thrif软件栈分层从下向上分别为:传输层、协议层、处理层和服务层。</p>
 <ul>
-<li>add方法先确认容量(包含扩容)，再赋值</li>
-<li>其中，执行扩容的grow方法进行旧元素的拷贝</li>
+<li><p>传输层(Transport Layer):传输层负责直接从网络中读取和写入数据，它定义了具体的网络传输协议;比如说TCP/IP传输等。</p>
+</li>
+<li><p>协议层(Protocol Layer):协议层定义了数据传输格式，负责网络传输数据的序列化和反序列化;比如说JSON、XML、二进制数据等。</p>
+</li>
+<li><p>处理层(Processor Layer):处理层是由具体的IDL(接口描述语言)生成的，封装了具体的底层网络传输和序列化方式，并委托给用户实现的Handler进行处理。</p>
+</li>
+<li><p>服务层(Server Layer):整合上述组件，提供具体的网络线程/I0服务模型，形成最终的服务。</p>
+</li>
 </ul>
-<p><strong>add null分析</strong></p>
+<h1 id="3-Thrift支持的协议"><a href="#3-Thrift支持的协议" class="headerlink" title="3.Thrift支持的协议"></a>3.Thrift支持的协议</h1><h2 id="通讯协议"><a href="#通讯协议" class="headerlink" title="通讯协议"></a>通讯协议</h2><p>TBinaryProtocol</p>
+<p>一种简单的二进制格式，简单，但没有为空间效率而优化。比文本协议处理起来更快，但更难于调试。</p>
+<p>TCompactProtocol</p>
+<p>更紧凑的二进制格式，处理起来通常同样高效。</p>
+<p>TDebugProtocol</p>
+<p>一种人类可读的文本格式，用来协助调试。</p>
+<p>TDenseProtocol</p>
+<p>与TCompactProtocol类似，将传输数据的元信息剥离。</p>
+<p>TJSONProtocol</p>
+<p>使用JSON对数据编码。</p>
+<p>TSimpleJSONProtocol</p>
+<p>一种只写协议，它不能被Thrift解析，因为它使用JSON时丢弃了元数据。适合用脚本语言来解析</p>
+<h2 id="传输协议"><a href="#传输协议" class="headerlink" title="传输协议"></a>传输协议</h2><p>TFileTransport</p>
+<p>该传输协议会写文件。</p>
+<p>TFramedTransport</p>
+<p>当使用一个非阻塞服务器时，要求使用这个传输协议。它按帧来发送数据，其中每一帧的开头是长度信息。</p>
+<p>TMemoryTransport</p>
+<p>使用存储器映射输入输出。(Java的实现使用了一个简单的ByteArrayOutputStream.) </p>
+<p>TSocket</p>
+<p>使用阻塞的套接字I/O来传输。</p>
+<p>TZlibTransport</p>
+<p>用zlib执行压缩。用于连接另一个传输协议。</p>
+<h2 id="服务模型"><a href="#服务模型" class="headerlink" title="服务模型"></a>服务模型</h2><p>TNonblockingServer</p>
+<p>一个多线程服务器，它使用非阻塞IO(Java的实现使用了NIO通道)。TFramedTransport必须跟这个服务器配套使用。</p>
+<p>TSimpleServer</p>
+<p>一个单线程服务器，它使用标准的阻塞IO。测试时很有用。</p>
+<p>TThreadPoolServer</p>
+<p>一个多线程服务器，它使用标准的阻塞I/O </p>
+<p>THsHaServer</p>
+<p>YHsHa引入了线程池去处理(需要使用TFramedTransport数据传输方式)，其模型把读写任务放到线程池去处理;Half-sync/Half-async(半同步半异步)的处理模式;Halt-sync是在处理I0时间上(sccept/read/writr io)</p>
+<p>TThreadedSelectorServer</p>
+<p>多线程选择器服务器端，对THsHaServer在异步IO模型上进行增强</p>
+<h1 id="4-Thrift的数据类型"><a href="#4-Thrift的数据类型" class="headerlink" title="4.Thrift的数据类型"></a>4.Thrift的数据类型</h1><p>Thrit脚本可定义的数据类型包括以下几种类型:</p>
+<p>1.基本类型:</p>
 <ul>
-<li>后执行的ThreadB扩容时，拷贝旧元素</li>
-<li>而ThreadB读取size时，先执行的ThreadA已经执行完成整体add操作，添加了一个值A到11位置，并使size++，使ThreadB读取size=12</li>
-<li>ThreadB在12位置添加另一个值B，但是在ThreadB中11位置为扩容后默认值null，覆盖了11位置，导致最终结果中添加了null‘</li>
+<li><p>bool:布尔值</p>
+</li>
+<li><p>byte:8位有符号整数.</p>
+</li>
+<li><p>i16:16位有符号整数</p>
+</li>
+<li><p>i32:32位有符号整数</p>
+</li>
+<li><p>i64:64位有符号整数</p>
+</li>
+<li><p>douuble:64位浮点数</p>
+</li>
+<li><p>string:UTF-8编码的字符串</p>
+</li>
+<li><p>binary:二进制串</p>
+</li>
 </ul>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>from JDK8<br><strong>ArrayList.add()</strong>    </p>
-<p>代码块</p>
-<p>1    /**<br>2    * The array buffer into which the elements of the ArrayList are stared.<br>3    The capacity of the ArrayList is the length of this array buffer.Any    </p>
-<p>4    empty ArrayList with elementData -DEFAULTCAPACITY_EMPTY_ELEMENTOATA<br>5     will be expanded to DEFAULT_CAPACITY when the first element is added.<br>7     transient Object[] elementData; // non-private to simplify nested class access<br>9    /**<br>10    * The size of the ArrayList (the number of elements it contains),<br>11<br>12    <em>@serial<br>13    <em>/<br>14 private int size:<br>18    /</em></em><br>19    *将指定的元素追加到此列表的末尾。<br>20  /<br>21 public boolean add(E e){<br>22    // 加元素之前,先调用ensureCapacityInternal方法<br>23    ensureCapacityInternal(size +1); // Increments modCount!!<br>24    /这里看到ArrayList添加元素的实质就相当于为数组赋值<br>25    elementDatalsize++]=e;<br>26    return true;<br>27}</p>
-<p>28<br>29// 确保内部容量达到指定的最小容量。<br>private void ensureCapacityInternal(int minCapacity){</p>
-<p>​    ensureExplicitCapacity(calculateCapacity(elementData,minCapacity));</p>
-<p>}</p>
-<p>// 根据给定的最小容量和当前数组元素来计算所需容量。<br>private static int calculateCapacity(0bject[] elementData, int minCapacity) {<br>// 如果当前数组元素为空数组(初始情况)，返回默认容量和最小容量中的较大值作为所需容量</p>
-<p>​    if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {<br>​        return Math.max(DEFAULT_CAPACITY,minCapacity);<br>​    // 否则直接返回最小容量</p>
-<p>​     return minCapacity;</p>
-<p>//判断是否需要扩容<br>private void ensureExplicitCapacity(intminCapacity) {<br>    modCount++;<br>    //判断当前数组容量是否足以存储minCapacity个元素 </p>
-<p>​    if (minCapacity -elementData.length &gt; 0)<br>​    //调用grow方法进行扩容 </p>
-<p>​    grow(minCapacity);</p>
-<p>}<br>53    /**<br>54    * ArrayList扩容的核心方法。<br>55    */<br>56    private void grow(int minCapacity) {<br>57    // oldCapacity为旧容量，newCapacity为新容量<br>58    int oldCapacity =elementData.length;<br>    // 将oldCapacity 右移一位，其效果相当于oldCapacity /2,<br>    // 我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍,<br>60<br>    int newCapacity = oldCapacity +(oldCapacity &gt;&gt; 1);<br>63    // 然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，<br>64    if (newCapacity - minCapacity &lt;0)<br>65        newCapacity = minCapacity;<br>66<br>67    // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行)、hugeCapacity()方法来比较minCapacity和MAX_ARRAY_SIZE,<br>68    // 如果minCapacity大于最大容量，则新容量则为Integer,MAX_VALUE’，否则，新容量大小则为MAX_ARRAY_SIZE 即为‘Integer.MAX_VALUE -8’,<br>69    if (newCapacity -MAX_ARRAY_SIZE &gt; 0)<br>70        newCapacity= hugeCapacity(minCapacity);<br>71<br>72    // minCapacity is usually close to size, so this is a win:<br>73    elementData = Arrays.copy0f(elementData, newCapacity);<br>74}</p>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://javaguide.cn/java/collection/arraylist-source-code.html" target="_blank" rel="noopener">https://javaguide.cn/java/collection/arraylist-source-code.html</a> </p>
-<p><a href="https://cloud.tencent.com/developer/article/1684989" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1684989</a></p>
-<p><a href="https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507" target="_blank" rel="noopener">https://blog.csdn.net/UCLoveLikeTheWind/article/details/114649507</a></p>
+<p>2.结构体类型:</p>
+<ul>
+<li>truct: 定义的结构体对象</li>
+</ul>
+<p>3.容器类型:</p>
+<ul>
+<li>list:有序元素列表</li>
+<li>set: 无序无重复元素集合</li>
+<li>map:有序的key/value集合</li>
+</ul>
+<p>4.异常类型:</p>
+<ul>
+<li>exception:异常类型</li>
+</ul>
+<p>5.服务类型:</p>
+<ul>
+<li>service:具体对应服务的类</li>
+</ul>
+<h1 id="5-Thrift的网络服务模型"><a href="#5-Thrift的网络服务模型" class="headerlink" title="5.Thrift的网络服务模型"></a>5.Thrift的网络服务模型</h1><p>Thrift提供的网络服务模型:单线程、多线程、事件驱动。按是否阻塞划分为:阻塞服务模型、非阻塞服务模型。</p>
+<ul>
+<li><p>阻塞服务模型:TSimpleServer、TThreadPoolServer</p>
+</li>
+<li><p>非阻塞服务模型:TNonblockingServer、THsHaServer和TThreadedSelectorServer</p>
+</li>
+</ul>
+<img src="/images/blog18/IMG_3624.JPG" width="80%"/>
+
+<p>TServer源码分析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TServer</span> </span>&#123;</span><br><span class="line"><span class="number">2</span>	<span class="keyword">protected</span> TProcessorFactory processorFactory_;	</span><br><span class="line"><span class="number">3</span>	<span class="keyword">protected</span> TServerTransport serverTransport_;	</span><br><span class="line"><span class="number">4</span>	<span class="keyword">protected</span> TTransportFactory inputTransportFactory_;	</span><br><span class="line"><span class="keyword">protected</span> TTransportFactory outputTransportFactory_;</span><br><span class="line"><span class="number">6</span>	<span class="keyword">protected</span> TProtocolFactory inputProtocolFactory_;	</span><br><span class="line"><span class="keyword">protected</span> TProtocolFactory outputProtocolFactory_;</span><br><span class="line"><span class="number">8</span>	<span class="keyword">private</span> <span class="keyword">boolean</span> isServing;	</span><br><span class="line"><span class="number">9</span></span><br><span class="line"><span class="number">10</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">TServer</span><span class="params">(TServer.AbstractServerArgs args)</span></span>&#123;</span><br><span class="line"><span class="number">11</span>	<span class="keyword">this</span>.processorFactory_= args.processorFactory;	</span><br><span class="line"><span class="number">12</span>	<span class="keyword">this</span>.serverTransport_= args.serverTransport;	</span><br><span class="line"><span class="number">13</span>	<span class="keyword">this</span>.inputTransportFactory_= args.inputTransportFactory;	</span><br><span class="line"><span class="number">14</span>	<span class="keyword">this</span>.outputTransportFactory_= args.outputTransportFactory;	</span><br><span class="line"><span class="number">15</span>	<span class="keyword">this</span>.inputProtocolFactory_= args.inputProtocolFactory;	</span><br><span class="line"><span class="number">16</span>	<span class="keyword">this</span>.outputProtocolFactory_ = args.outputProtocolFactory;	</span><br><span class="line"><span class="number">1718</span></span><br><span class="line"><span class="number">19</span>	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">serve</span><span class="params">()</span></span>;	</span><br><span class="line"><span class="number">20</span></span><br><span class="line"><span class="number">21</span>	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">( )</span></span>&#123;	</span><br><span class="line"><span class="number">22</span></span><br><span class="line"><span class="number">23</span></span><br><span class="line"><span class="number">24</span>	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isServing</span><span class="params">()</span></span>&#123;	</span><br><span class="line"><span class="number">25</span>	<span class="keyword">return</span> <span class="keyword">this</span>.isServing;	</span><br><span class="line"> <span class="number">26</span>	&#125;	</span><br><span class="line"> <span class="number">27</span></span><br><span class="line"><span class="number">28</span>	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setServing</span><span class="params">(<span class="keyword">boolean</span> serving)</span></span>&#123;	</span><br><span class="line">I</span><br><span class="line"><span class="number">29</span>	<span class="keyword">this</span>.isServing =serving;	</span><br><span class="line"><span class="number">30</span>	&#125;	</span><br><span class="line"><span class="number">31</span></span><br><span class="line">  <span class="number">36</span>	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Args</span> <span class="keyword">extends</span> <span class="title">TServer</span>.<span class="title">AbstractServerArgs</span>&lt;<span class="title">TServer</span>.<span class="title">Args</span>&gt; </span>&#123;	</span><br><span class="line"><span class="number">37</span>	<span class="function"><span class="keyword">public</span> <span class="title">Args</span><span class="params">(TServerTransport transport)</span></span>&#123;	</span><br><span class="line"><span class="number">38</span>	<span class="keyword">super</span>(transport);	</span><br><span class="line">	<span class="number">39</span>	</span><br><span class="line"><span class="number">40</span></span><br><span class="line"><span class="number">41</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="建造者模式"><a href="#建造者模式" class="headerlink" title="建造者模式"></a>建造者模式</h2><p>使用args的工厂进行构建:</p>
+<table>
+<thead>
+<tr>
+<th>工厂类型</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TProcessorFactory</td>
+<td>处理层工厂类</td>
+</tr>
+<tr>
+<td>TTransportFactory</td>
+<td>传输层输入工厂类</td>
+</tr>
+<tr>
+<td>TTransportFactory</td>
+<td>传输层输出工厂类</td>
+</tr>
+<tr>
+<td>TProtocolFactory</td>
+<td>协议层输入工厂类</td>
+</tr>
+<tr>
+<td>TProtocolFactory</td>
+<td>协议层输出工厂类</td>
+</tr>
+</tbody></table>
+<h2 id="三个方法"><a href="#三个方法" class="headerlink" title="三个方法"></a>三个方法</h2><ul>
+<li>serve()用于启动服务，</li>
+<li>stop()用于关闭服务，</li>
+<li>isServing()用于检测服务的起停状态。</li>
+</ul>
+<p>注意</p>
+<p>TServer的不同实现类的启动方式不一样，因此serve()定义为抽象方法。而不是所有的服务都需要优雅的退出,因此stop()方法没有被定义为抽象</p>
+<h2 id="非阻塞服务模型"><a href="#非阻塞服务模型" class="headerlink" title="非阻塞服务模型"></a>非阻塞服务模型</h2><h3 id="TNonblockingServer"><a href="#TNonblockingServer" class="headerlink" title="TNonblockingServer"></a>TNonblockingServer</h3><ul>
+<li>NonblockingServer模式是单线程工作，但是采用NIO的模式，借助Channel/Selector机制,采用IO事件模型来处理</li>
+<li>所有的socket都被注册到selector中，在一个线程中通过seletor循环监控所有的socket,</li>
+<li>每次selector循环结束时，处理所有的处于就绪状态的socket，对于有数据到来的socket进行数据读取操作，对于有数据发送的socket则进行数据发送操作，对于监听socket则产生一个新业务socket并将其注册到selector上。<ul>
+<li>注意:TNonblockingServer要求底层的传输通道必须使用TFramedTransport</li>
+</ul>
+</li>
+</ul>
+<p>优缺点:</p>
+<ul>
+<li>相比于阻塞服务模型的效率提升主要体现在I0多路复用上，TNonblockingServer采用非阻塞IO，对accept/read/write等I0事件进行监控和处理，同时监控多个socket的状态变化。</li>
+<li>TNonblockingServer模式在业务处理上还是采用单线程股序来完成。在业务处理比较复杂、耗时的时候，例如果些销口函数需要涉服数批库执行时间股长，会导数整个服务被用责住，此时该模式效也不高，因为多个圆用请求任务依然是一个提一个执行。 </li>
+</ul>
+<h3 id="THsHaServer"><a href="#THsHaServer" class="headerlink" title="THsHaServer"></a>THsHaServer</h3><ul>
+<li>鉴于TNonblockingServer的缺点，THsHaServer继承于TNonblockingServer，引入了线程池提高了任务处理的并发能力。</li>
+<li>HHaServer半同步半异步(H4l-Sync/Htal-Async)的处理模式，Hall-Aysnc用于10事件处理(AeptRoad/wite),Haf-Syno用于业务handeritrpc的同步处理上。<ul>
+<li>注意:THsHServer和TNonblockingServer一样，要求底层的传输通道必须使用TFramedTransport.</li>
+</ul>
+</li>
+</ul>
+<p>优缺点:</p>
+<ul>
+<li>THsHaServer与TNonblockingServer模式相比，THsHaServer在完成数据读取之后，将业务处理过程交由一个线程池来完成，主线程直接返回进行下一次循环操作，效率大大提升。</li>
+<li>主线程仍然需要完成所有socket的监听接收、数据读取和数据写入操作。当并发请求数较大时，且发送数据量较多时，监听socket上新连接请求不能被及时接受。 </li>
+</ul>
+<h3 id="TThreadedSelectorServer"><a href="#TThreadedSelectorServer" class="headerlink" title="TThreadedSelectorServer"></a>TThreadedSelectorServer</h3><p>TThreadedSeiectorServer是对THsHaServer的一种扩充，它将selector中的读写10事件(read)write)从主线程中分离出来，同时引入worker工作线程池，它也是种Half-SyncHall-Async的服务模型。 </p>
+<p>TThreadedSelectorServer模式是目前Thrit提供的最高级的线程服务模型，它内部有如果几个部分构成:</p>
+<ul>
+<li><p>一个AcceptThread线程对象，专门用于处理监听socket上的新连接。</p>
+</li>
+<li><p>若干个SelectorThread对象专门用于处理业务socket的网络O读写操作，所有网络数据的读写均是有这些线程来完成。</p>
+</li>
+<li><p>一个负载均衡器SelectorThreadLoadBalancer对象，主要用于AcceptThread线程接收到一个新socket连接请求时，决定将这个新连接请求分配给哪个SelectorThread线程.    </p>
+</li>
+<li><p>一个EMecunorServic类型的工作线程池，在SolectorTnead线程中，监听到有业务ocke中有调用请求过来，则将请求数据读取之后，交结Ex0cutorServico线程地中的线程完成此次调用的具体执行、主要用于处理每个rpc请求的handle营调处理(这部分是同步的)。    </p>
+</li>
+</ul>
+<p>工作流程如下所示:</p>
+<img src="/images/blog18/IMG_3625.JPG" width="80%"/>
+
+<p>TThreadedSelectorServer模式中有一个专门的线程AcceptThread用于处理新连接请求，因此能够及时响应大量并发连接请求;另外它将网络/O操作分散到多个SelectorThread线程中来完成，因此能够快速对网络0进行读写操作，能够很好地应对网络/O较多的情况。</p>
 
     </div>
 
@@ -301,12 +476,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog19/" rel="prev" title="ArrayList add null分析">
-      <i class="fa fa-chevron-left"></i> ArrayList add null分析
+    <a href="/blog22/" rel="prev" title="blog22">
+      <i class="fa fa-chevron-left"></i> blog22
     </a></div>
       <div class="post-nav-item">
-    <a href="/blog14/" rel="next" title="ArrayList add null分析">
-      ArrayList add null分析 <i class="fa fa-chevron-right"></i>
+    <a href="/blog19/" rel="next" title="服务治理平台 OCTO2.0-学习笔记">
+      服务治理平台 OCTO2.0-学习笔记 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -367,7 +542,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#现象"><span class="nav-number">1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">2.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文档"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-定义"><span class="nav-number">1.</span> <span class="nav-text">0.定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-RPC"><span class="nav-number">2.</span> <span class="nav-text">1.RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RPC-调用过程"><span class="nav-number">2.1.</span> <span class="nav-text">RPC 调用过程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-架构模型"><span class="nav-number">3.</span> <span class="nav-text">2.架构模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Thrift支持的协议"><span class="nav-number">4.</span> <span class="nav-text">3.Thrift支持的协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通讯协议"><span class="nav-number">4.1.</span> <span class="nav-text">通讯协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传输协议"><span class="nav-number">4.2.</span> <span class="nav-text">传输协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务模型"><span class="nav-number">4.3.</span> <span class="nav-text">服务模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Thrift的数据类型"><span class="nav-number">5.</span> <span class="nav-text">4.Thrift的数据类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Thrift的网络服务模型"><span class="nav-number">6.</span> <span class="nav-text">5.Thrift的网络服务模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建造者模式"><span class="nav-number">6.1.</span> <span class="nav-text">建造者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三个方法"><span class="nav-number">6.2.</span> <span class="nav-text">三个方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非阻塞服务模型"><span class="nav-number">6.3.</span> <span class="nav-text">非阻塞服务模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TNonblockingServer"><span class="nav-number">6.3.1.</span> <span class="nav-text">TNonblockingServer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#THsHaServer"><span class="nav-number">6.3.2.</span> <span class="nav-text">THsHaServer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TThreadedSelectorServer"><span class="nav-number">6.3.3.</span> <span class="nav-text">TThreadedSelectorServer</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -383,7 +558,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

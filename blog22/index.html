@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+
+<meta name="google-site-verification" content="azItrs0f6XYWmZQ1U6I08mos9ZGCiCAGdYFVEWVfCk4" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"windwj000.github.io","root":"/","scheme":"Pisces","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="发展过程ChatGPT是美国OpenAI公司研发的大参数预训练生成语言模型，是一款通用的自然语言生成模型，其中GPT “生成性预先训练转换器”(generative pretrained transformer)的缩写。该模型被互联网巨大的语料库训练之后，其可以根据你输入的文字内容来生成对应的文字回答，即为常见的聊天问答模式。 语言模型的工作方式是对语言文本进行概率建模，用来预测下一段输出内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="blog22">
+<meta property="og:url" content="https://windwj000.github.io/blog22/index.html">
+<meta property="og:site_name" content="风的个人网站">
+<meta property="og:description" content="发展过程ChatGPT是美国OpenAI公司研发的大参数预训练生成语言模型，是一款通用的自然语言生成模型，其中GPT “生成性预先训练转换器”(generative pretrained transformer)的缩写。该模型被互联网巨大的语料库训练之后，其可以根据你输入的文字内容来生成对应的文字回答，即为常见的聊天问答模式。 语言模型的工作方式是对语言文本进行概率建模，用来预测下一段输出内容">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3649.JPG">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3650.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3651.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3652.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3653.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3654.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3655.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3656.jpg">
+<meta property="og:image" content="https://windwj000.github.io/images/blog22/IMG_3657.jpg">
+<meta property="article:published_time" content="2023-11-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-13T01:58:01.093Z">
+<meta property="article:author" content="风">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://windwj000.github.io/images/blog22/IMG_3649.JPG">
+
+<link rel="canonical" href="https://windwj000.github.io/blog22/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>blog22 | 风的个人网站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="风的个人网站" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风的个人网站</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://windwj000.github.io/blog22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风的个人网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          blog22
+        </h1>
+
+        <div class="post-meta"> 
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-11-12 22:00:00" 
+                itemprop="dateCreated datePublished" 
+                datetime="2023-11-12T22:00:00+08:00">2023-11-12
+                
+              </time>
+
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/backend/" itemprop="url" rel="index">
+                    <span itemprop="name">backend</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/images/blog22/IMG_3649.JPG" width="80%"/>
+
+<h1 id="发展过程"><a href="#发展过程" class="headerlink" title="发展过程"></a>发展过程</h1><p>ChatGPT是美国<strong>OpenAI</strong>公司研发的大参数预训练生成语言模型，是一款通用的<strong>自然语言生成模型</strong>，其中GPT “生成性预先训练转换器”(generative pretrained transformer)的缩写。该模型被互联网巨大的语料库训练之后，其可以根据你输入的文字内容来生成对应的文字回答，即为常见的聊天问答模式。</p>
+<p><strong>语言模型</strong>的工作方式是对语言文本进行概率建模，用来预测下一段输出内容的概率。</p>
+<img src="/images/blog22/IMG_3650.jpg" width="80%"/>
+
+<p><strong>GPT和BERT</strong></p>
+<ul>
+<li><p>GPT使用的是<strong>Transformer</strong>(Google Brain 2017年提出)的Decoder组件，Decoder组件在计算某个位置时只关注文章的<strong>上文</strong>信息。GPT更适合根据上文推测下文（比如对话聊天）。</p>
+</li>
+<li><p>BERT使用的是<strong>Transformer</strong>的Encoder组件，Encoder组件在计算某个位置时会关注文章的<strong>上下文</strong>信息。BERT更适合嵌入式表达，即填空式的任务（比如完形填空）。</p>
+</li>
+</ul>
+<p>🦐 <strong>GPT-1发布：</strong></p>
+<p>2018年6月，OpenAl 在题为《Improving Language Understanding by <strong>Generative</strong> <strong>Pre-Training</strong>》的论文中提出了第一个GPT 模型GPT-1。从这篇论文中得出的关键结论是，<strong>Transformer 架构</strong>与<strong>无监督预训练</strong>的结合产生了可喜的结果。GPT-1 以无监督预训练+<strong>有监督微调</strong>的方式，针对特定任务进行训练，实现了 “强大的自然语言理解”。</p>
+<p>🦞 <strong>GPT-2发布：</strong></p>
+<p>2019年2月，OpenAI发表了第二篇论文《Language Models are <strong>Unsupervised</strong> <strong>Multitask</strong> Learners》，其中介绍了由GPT-1演变的GPT-2。尽管GPT-2 大了一个数量级，但它们在其他方面非常相似。两者之间<strong>只有一个区别</strong>：GPT-2 可以完成<strong>多任务处理</strong>。OpenAI成功地证明了半监督语言模型可以在“无需特定任务训练”的情况下，在多项任务上表现出色。该模型在零样本任务转移设置中取得了显著效果。</p>
+<p>🦑 <strong>GPT-3发布：</strong></p>
+<p>2020年5月，OpenAI发表《Language Models are <strong>Few-Shot</strong> Learners》，演进至GPT-3，直接让<strong>预训练模型处理任务</strong>。GPT-3 比GPT-2 大100 倍，但基本原则大体一致。</p>
+<p><strong>GPT、GPT-2、GPT-3</strong></p>
+<img src="/images/blog22/IMG_3651.jpg" width="80%"/>
+
+<p>在方向上，OpenAI并未追求在特定类型任务上的表现，而是不断增强模型的<strong>泛化</strong>能力。因而就对训练数据量和参数量提出来更高的要求。伴随着巨大<strong>参数量</strong>的是巨大的<strong>训练成本</strong>，GPT-3的训练费用也达到了惊人的1200万美元，</p>
+<p>🦀 <strong>InstructGPT发布：</strong></p>
+<p>2022 年初(1or2月)，OpenAI发表《Training language models to follow <strong>instructions</strong> with human feedback》，使用<strong>基于人类反馈的强化学习</strong> <strong>RLHF</strong>(Deepmind 2017年提出，属于Google)和<strong>指令激发 Instruction Tuning</strong>(Google Quoc V.Le 2021年提出)</p>
+<p><strong>🐳ChatGPT发布：</strong></p>
+<p>2022年11月30日，ChatGPT在深度融合代码和文本预训练<strong>模型</strong>Code-davinci-002的基础上，利用Instruction tuning和RLHF技术优化获得，还应该在<strong>对话数据</strong>上进行了<strong>针对性的优化</strong>。对<strong>InstructGPT的微调。</strong></p>
+<p><strong>5天用户数</strong>达到<strong>1百万</strong>。仅用<strong>两个月</strong>时间，<strong>月活</strong>用户达到<strong>1亿</strong>，是<strong>史上</strong>用户<strong>增速最快</strong>的消费应用。在美团科研合作部、美团平台/NLP中心联合策划的《<a href="https://123.sankuai.com/huati/question/110398" target="_blank" rel="noopener">Top Talk第77期：聊聊ChatGPT背后的技术</a>》活动中，<strong>2000多人观看了直播</strong>。</p>
+<p>ChatGPT<strong>不开源</strong>，其参数规模，技术细节都没有对外公布。</p>
+<h2 id="InstructGPT"><a href="#InstructGPT" class="headerlink" title="InstructGPT"></a>InstructGPT</h2><p>ChatGPT与Open AI此前发布的InstructGPT具有非常接近的姊妹关系，两个模型的训练过程也非常接近，因此InstructGPT有较为可靠的参考价值。</p>
+<p>在InstrcutGPT之前，大部分大规模语言模型的目标都是基于上一个输入<strong>片段</strong>token来推测下一个输出片段。重复把问题以及当前生成的所有内容再作为下一次的输入，生成下一个token，直到生成完整的回答。既然一句话是基于前面所有上文的一个个词生成的，同样的原理也可以把之前的对话作为下一次问题的输入，这样下一次的回答就可以包含之前对话的上下文。</p>
+<h3 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h3><ul>
+<li>Instruction Tuning(预训练) </li>
+<li>训练Reward模型</li>
+<li>使用强化学习算法，进一步调整模型</li>
+</ul>
+<img src="/images/blog22/IMG_3652.jpg" width="80%"/>
+
+<p>InstructGPT训练框架</p>
+<h3 id="Instruction-Tuning"><a href="#Instruction-Tuning" class="headerlink" title="Instruction Tuning"></a>Instruction Tuning</h3><p><strong>NLP</strong>任务的描述、输入和输出都可以转化为自然语言描述的形式，<strong>处理任务</strong>的过程都可以转化为<strong>文本补全</strong>的过程。此时可以通过任务的描述、输入和少量的任务示例转化为执行任务的问题或指令（Prompt），通过标记员（labeler）标记希望得到的结果，进行训练，让预训练模型能够直接得到正确的结果。这是在<strong>只给定任务描述</strong>而<strong>不给定任务示例</strong>的情况下生成答案的能力。</p>
+<p>Instruction Tuning的实验会划分训练任务（转化后的黄色的任务及数据集）和测试任务（转化后的绿色的任务及数据集），也就是测试任务的任务描述是训练时没有见过的（不只是数据集没见过，而是这种任务的任务指令都没见过）。这一部分重要的结论是：<strong>当训练的指令达到一定规模时，大模型能够泛化处理各种没见过的指令，在测试任务中获得不错的性能提升。</strong>这是极其重要的性质，我们不可能把世界上所有的指令都人工标注喂到大模型中。</p>
+<img src="/images/blog22/IMG_3653.jpg" width="80%"/>
+
+<p> 不同于HuggingFace的T0、Google的Flan和FlanPaLM，<strong>在InstructGPT中，Instruct Tuning的过程中没有使用开源数据集转化的数据，而是完全人工标注的数据</strong>，相比于开源数据集转化的数据，这种人工标注(覆盖生成、开放式问答、封闭式问答、聊天、重写、综述、分类、抽取等任务)的指令来源为OpenAPI开放平台<strong>收集的数据和高素质标注人员的头脑风暴</strong>，<strong>更符合人们交互的指令模式</strong>。而且，在InstructGPT论文中，<strong>只需要几万的数据</strong>就可以完成Instruction Tuning的过程，模型就能够处理各种指令给出合理的答案。</p>
+<h3 id="RLHF"><a href="#RLHF" class="headerlink" title="RLHF"></a>RLHF</h3><p>通过Instruction Tuning得到目标和<strong>用户的意图</strong>是不一致的，用户的意图是让语言模型能够有用并且安全地遵循用户的<strong>指令</strong>。此处的指令也就是InstrcutGPT名字的来源，也呼应了ChatGPT的最大优势，即<strong>对用户意图的理解</strong>。</p>
+<p>RLHF通过利用人类的反馈和对答案的喜好基于强化学习算法继续优化模型，<strong>模型的输出能够更加符合用户期望</strong>，并且这个过程还能赋予InstrcutGPT多种智能助手应该具有的特性（公正、质疑、无害、听取意见等）。为此，通过<strong>标记员</strong>的人工标记来训练出一个<strong>反馈模型</strong>，再使用强化学习进一步优化模型。</p>
+<h3 id="InstructGPT的特点"><a href="#InstructGPT的特点" class="headerlink" title="InstructGPT的特点"></a>InstructGPT的<strong>特点</strong></h3><p>在OpenAI关于InstrcutGPT的论文中，可以找到一些直观优势的量化分析，InstrcutGPT对比GPT-3模型有如下特点：</p>
+<p>1️⃣71%~88%的情况下，InstrcutGPT生成的回答要比GPT-3模型的回答更加<strong>符合训练人员的喜好</strong>。</p>
+<p>2️⃣在回答真实程度上更加可靠，<strong>编造</strong>的概率从GPT-3的41%下降到InstrcutGPT的21%。</p>
+<p>3️⃣InstrcutGPT产生<strong>有毒回答</strong>(指语言文字中包含仇恨言论、谣言或者歧视性内容)的概率减小了25%。</p>
+<h1 id="ChatGPT的商业动向"><a href="#ChatGPT的商业动向" class="headerlink" title="ChatGPT的商业动向"></a>ChatGPT的商业动向</h1><p>2023年1月末，微软继续向OpenAI投下100亿美元，并于2月2日宣布将其旗下所有产品全线整合ChatGPT；</p>
+<p>2月6日，谷歌宣布将推出一款对标产品Bard；</p>
+<p>2月7日，百度内部类似于ChatGPT的项目名字确定为“文心一言”；</p>
+<p>2月8日，微软正式发布整合ChatGPT的新版必应搜索引擎，微软市值涨超800亿美元。</p>
+<h1 id="接触ChatGPT"><a href="#接触ChatGPT" class="headerlink" title="接触ChatGPT"></a>接触ChatGPT</h1><img src="/images/blog22/IMG_3654.jpg" width="80%"/>
+
+<img src="/images/blog22/IMG_3655.jpg" width="80%"/>
+
+<p>国内访问链接 <a href="https://chat.forchange.cn/" target="_blank" rel="noopener">https://chat.forchange.cn/</a></p>
+<h2 id="ChatGPT的特点"><a href="#ChatGPT的特点" class="headerlink" title="ChatGPT的特点"></a>ChatGPT的特点</h2><ul>
+<li>🎉Decoder 结构：适合问答模式；</li>
+<li>🎈通用模型：避免在早期架构和训练阶段为特定任务做调优；</li>
+<li>🧨巨量数据和参数：模型知识储备丰富；</li>
+<li>🧧连续对话的能力：具备强大上下文对话能力。</li>
+</ul>
+<h1 id="ChatGPT的优缺点"><a href="#ChatGPT的优缺点" class="headerlink" title="ChatGPT的优缺点"></a>ChatGPT的优缺点</h1><p><strong>优点</strong></p>
+<ul>
+<li><strong>直观的交互方式</strong>：当问题可以用几句话概括时，ChatGPT可以将问题答案直观地展示在我们面前，跟搜索引擎相比几乎就是降维打击。</li>
+<li>不断<strong>修正结论</strong>：把各种约束条件都想好，发给ChatGPT，然后就能得到一个初步的答案。如果对初步的答案不满意，还可以继续修正自己的各种条件，直到得出自己比较满意的结果。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li><p>内容缺乏准确性：ChatGPT在很多基本事实上都会出现错误。</p>
+</li>
+<li><p>边界模糊：模型边界模糊，结果容易不可控。</p>
+</li>
+<li><p>有毒回答：有毒内容出现频率高。</p>
+</li>
+<li><p>缺乏及时性： 搜索引擎对内容的及时性要求很高。提升及时性可能的选项包括：1）重新训练（时间金钱开销巨大）；2）Fine tuning（Overfitting 过拟合，造成对原有知识的遗忘）。</p>
+</li>
+<li><p>信息<strong>可追溯性</strong>：一般来说，一个可靠的信息来源会比是否能够回答问题更加重要。ChatGPT经过<strong>基于人类反馈的强化学习</strong>，信息来源十分模糊。如果我们依赖ChatGPT目前的交互形式，验证信息来源就会变得更加困难。</p>
+<ul>
+<li>可追溯性对大规模语言或者图像模型的重要性：1.<strong>进一步优化和排序结果</strong>。2.<strong>数据剔除，版权追溯</strong>。</li>
+</ul>
+</li>
+</ul>
+<h1 id="工程应用-酒旅场景的任务示例"><a href="#工程应用-酒旅场景的任务示例" class="headerlink" title="工程应用-酒旅场景的任务示例"></a>工程应用-酒旅场景的任务示例</h1><img src="/images/blog22/IMG_3656.jpg" width="80%"/>
+
+<h1 id="ChatGPT代替员工"><a href="#ChatGPT代替员工" class="headerlink" title="ChatGPT代替员工"></a>ChatGPT代替员工</h1><img src="/images/blog22/IMG_3657.jpg" width="80%"/>
+
+<p>哪些行业可能会有较大改变/颠覆(我认为)？</p>
+<ul>
+<li>秘书、客服</li>
+<li>教育</li>
+<li>文史</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #555;font-size:14px;">-------------The End-------------</div>
+    
+</div>
+      
+    </div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/blog23/" rel="prev" title="blog23">
+      <i class="fa fa-chevron-left"></i> blog23
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/blog18/" rel="next" title="thrift">
+      thrift <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#发展过程"><span class="nav-number">1.</span> <span class="nav-text">发展过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#InstructGPT"><span class="nav-number">1.1.</span> <span class="nav-text">InstructGPT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#训练模型"><span class="nav-number">1.1.1.</span> <span class="nav-text">训练模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Instruction-Tuning"><span class="nav-number">1.1.2.</span> <span class="nav-text">Instruction Tuning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RLHF"><span class="nav-number">1.1.3.</span> <span class="nav-text">RLHF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InstructGPT的特点"><span class="nav-number">1.1.4.</span> <span class="nav-text">InstructGPT的特点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ChatGPT的商业动向"><span class="nav-number">2.</span> <span class="nav-text">ChatGPT的商业动向</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接触ChatGPT"><span class="nav-number">3.</span> <span class="nav-text">接触ChatGPT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ChatGPT的特点"><span class="nav-number">3.1.</span> <span class="nav-text">ChatGPT的特点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ChatGPT的优缺点"><span class="nav-number">4.</span> <span class="nav-text">ChatGPT的优缺点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工程应用-酒旅场景的任务示例"><span class="nav-number">5.</span> <span class="nav-text">工程应用-酒旅场景的任务示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ChatGPT代替员工"><span class="nav-number">6.</span> <span class="nav-text">ChatGPT代替员工</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="风"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">风</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/windwj000" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;windwj000" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">风</span>
+</div>
+
+<div class=BbeiAn-info">
+  苏ICP备20029962号
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
