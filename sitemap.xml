@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://windwj000.github.io/blog20/</loc>
+    
+    <lastmod>2023-11-13</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://windwj000.github.io/blog22/</loc>
     
     <lastmod>2023-11-13</lastmod>
@@ -12,24 +21,6 @@
   
   <url>
     <loc>https://windwj000.github.io/blog21/</loc>
-    
-    <lastmod>2023-11-13</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://windwj000.github.io/blog20/</loc>
-    
-    <lastmod>2023-11-13</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://windwj000.github.io/blog23/</loc>
     
     <lastmod>2023-11-13</lastmod>
     
@@ -256,14 +247,14 @@
 
   
   <url>
-    <loc>https://windwj000.github.io/categories/backend/</loc>
+    <loc>https://windwj000.github.io/categories/welcome/</loc>
     <lastmod>2023-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://windwj000.github.io/categories/welcome/</loc>
+    <loc>https://windwj000.github.io/categories/java/</loc>
     <lastmod>2023-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -277,14 +268,14 @@
   </url>
   
   <url>
-    <loc>https://windwj000.github.io/categories/other/</loc>
+    <loc>https://windwj000.github.io/categories/backend/</loc>
     <lastmod>2023-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://windwj000.github.io/categories/java/</loc>
+    <loc>https://windwj000.github.io/categories/other/</loc>
     <lastmod>2023-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
